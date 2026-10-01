@@ -535,6 +535,8 @@ export function parseCatalogMenu(html: string): CatalogCard[] {
   for (const item of body.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
     const raw = cleanText(item[1]);
     const href = /^https?:\/\//.test(raw) ? raw : (/^\/[a-z0-9-]+\/?$/.test(raw) ? `${SPFUNDS_SITE}${raw}` : '');
+    // Section pages (for example /spre-2/) still resolve to the fund page once the
+    // menu link for the ticker is known, so cards only fill the gap.
     const ticker = sanitizeTicker(item[2]);
     if (!/^[A-Z]{4,5}$/.test(ticker) || !href) continue;
     if (entries.some((entry) => entry.ticker === ticker)) continue;

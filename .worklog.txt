@@ -139,6 +139,20 @@ CHRONOLOGICAL JOURNAL
 - Recorded the fixed session branch (arena/01a0f9b5-sp-funds) and the consequential deviation from the plan's suggested feat/sp-funds-etfs branch, plus the sandbox egress constraint and its mitigation (fixtures + isolated live acceptance through temporary Actions workflows).
 - No source code, workflows or API data exist yet; nothing to preserve or repair. Next checkpoint: research workflow + raw fixtures.
 
+### 2026-10-01 — Updater, raw capture corpus and offline test suite (completed checkpoint)
+- scripts/update-data.ts (no runtime dependencies, Bun + node:fs only): self-contained SP Funds updater — config loading (checked-in scripts/update-data.config.json defaults, nonblank env wins, `TICKERS`, `MAX_FETCHES`, `REQUEST_SLEEP`, `CONCURRENCY`, range filters, `SKIP_SPFUNDS`/`SKIP_YAHOO`/`SKIP_EDGAR`, `VERBOSE`), a request gate, and per-fund continue-on-error orchestration writing api/spfunds/index.json plus funds/<T>/{meta,holdings,history}.json with 250-row holdings / 1000-row history pages (iShares-style row objects keyed by header).
+- Parsers: official homepage catalog (menu wins over cards; card links may be absolute or section pages), fund page (Fund Details / Fund Details & Pricing / Performance Statistics month-end + quarter-end / Distribution Details / documents), official daily holdings CSV, Yahoo chart API (daily history + dividends when the page publishes no schedule), and the SEC N-PORT-P fallback keyed by the EDGAR series feed with a registrant allow-list.
+- Byte-stability: every writer strips generatedAt/catalogReadAt recursively and only rewrites changed bytes; a second identical run reports 0 written.
+- scripts/fixtures/2026-10-01/: hermetic fixtures — trimmed fund pages, homepage, per-fund CSV head, dividend-stripped Yahoo charts, trimmed EDGAR submissions and a hand-built NPORT-P primary_doc sample.
+- scripts/update-data.test.ts: 63 offline tests over those fixtures (catalog, fund pages, CSV, Yahoo, N-PORT fallback, writers, console contract, filters, cursors, end-to-end orchestration).
+
+### 2026-10-01 — Console and orchestration parity with the pinned sibling (completed checkpoint)
+- Console output now matches the sibling family exactly: `[ idx/total ] TICKER STATUS` with the width-aware bracket and 9-character status column, `[ config ]`, `[ filter ]`, `[ cursor ]`, `[ done ] counts: funds= holdings= history=; processed= skipped=`, per-fund success/failure lines and `[ name.padEnd(9) ]` verbose notes; money renders as `$1.2B`/`$12.3M`/`$1234.56` and the string `null` when unknown.
+- Catalog = official lineup unioned with the published index: bounded or filtered runs never shrink the feed, unprocessed funds keep their published rows, and the scope-aware MAX_FETCHES cursor is written only after a clean batch and cleared by a full pass.
+- Range filters are data-dependent: evaluated per fund against freshly parsed facts, skipping the fund before any file is written (status `skipped`, reason `filter: <key>`).
+- Per-fund outcomes are `updated`/`unchanged`/`skipped` via sha256 content digests, so a SKIP_SPFUNDS+SKIP_YAHOO run is a byte-for-byte no-op.
+- Verified offline end to end: 5 funds updated, counts funds=5 holdings=190 history=1,309; the immediate re-run reports all 5 unchanged and 0 written; two identical full runs leave 16 byte-identical files.
+
 ### 2026-09-28 — Initial research, baseline audit, and planning (completed)
 - Cloned https://github.com/daggerok/SP-Funds at main branch.
 - Verified repository contents: LICENSE (MIT) and minimal README.md.
