@@ -1,4 +1,4 @@
-# SP Funds source capture 2026-10-01T23:11:08Z
+# SP Funds source capture 2026-10-01T23:20:31Z
 # host: GitHub Actions runner; UA: browser-like
 
 ## site
@@ -9,36 +9,39 @@
 ## SPUS
 200 574931 https://www.sp-funds.com/spus/
 200 23573 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPUS.csv
-200 43433 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=max&interval=1d&events=div%2Csplit
-200 3529 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=1mo&interval=1d&events=div%2Csplit
+200 43431 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=max&interval=1d&events=div%2Csplit
+200 3528 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPRE
 200 425455 https://www.sp-funds.com/spre/
 200 3468 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPRE.csv
-200 37036 https://query1.finance.yahoo.com/v8/finance/chart/SPRE?range=max&interval=1d&events=div%2Csplit
+200 37067 https://query1.finance.yahoo.com/v8/finance/chart/SPRE?range=max&interval=1d&events=div%2Csplit
 200 3514 https://query1.finance.yahoo.com/v8/finance/chart/SPRE?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPSK
-200 540489 https://www.sp-funds.com/spsk/
+200 540491 https://www.sp-funds.com/spsk/
 200 23392 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPSK.csv
-200 43576 https://query1.finance.yahoo.com/v8/finance/chart/SPSK?range=max&interval=1d&events=div%2Csplit
+200 43563 https://query1.finance.yahoo.com/v8/finance/chart/SPSK?range=max&interval=1d&events=div%2Csplit
 200 3507 https://query1.finance.yahoo.com/v8/finance/chart/SPSK?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPTE
 200 466079 https://www.sp-funds.com/spte/
 200 11219 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPTE.csv
-200 18724 https://query1.finance.yahoo.com/v8/finance/chart/SPTE?range=max&interval=1d&events=div%2Csplit
+200 18726 https://query1.finance.yahoo.com/v8/finance/chart/SPTE?range=max&interval=1d&events=div%2Csplit
 200 3372 https://query1.finance.yahoo.com/v8/finance/chart/SPTE?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPWO
 200 690704 https://www.sp-funds.com/spwo/
 200 42445 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPWO.csv
-200 18601 https://query1.finance.yahoo.com/v8/finance/chart/SPWO?range=max&interval=1d&events=div%2Csplit
+200 18599 https://query1.finance.yahoo.com/v8/finance/chart/SPWO?range=max&interval=1d&events=div%2Csplit
 200 3410 https://query1.finance.yahoo.com/v8/finance/chart/SPWO?range=1mo&interval=1d&events=div%2Csplit
 
 ## sec edgar
 200 189515 https://data.sec.gov/submissions/CIK0001742912.json
 200 21519 https://data.sec.gov/submissions/CIK0001989916.json
+403 1925 https://www.sec.gov/files/company_tickers_mf.json
+# first NPORT-P CIK 1742912 accession none
+# first NPORT-P CIK 1989916 accession none
 200 2065 https://www.sp-funds.com/go/spus-premium-discount
 200 2065 https://www.sp-funds.com/go/spre-premium-discount
 200 2065 https://www.sp-funds.com/go/spsk-premium-discount
