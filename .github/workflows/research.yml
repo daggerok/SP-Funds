@@ -40,6 +40,7 @@ jobs:
           TICKERS: ${{ inputs.tickers }}
         run: |
           set -euo pipefail
+          TICKERS="${TICKERS:-SPUS SPRE SPSK SPTE SPWO}"
           UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36"
           DIR="research/2026-10-01/raw"
           mkdir -p "$DIR"
@@ -75,6 +76,26 @@ jobs:
           log "## sec edgar"
           grab "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json"
           grab "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json"
+          if command -v jq >/dev/null; then
+            for cik in 1742912 1989916; do
+              acc=$(jq -r '[.filings.recent | {form: .form, acc: .accessionNumber, doc: .primaryDocument, date: .filingDate}] | map(select(.form == "NPORT-P")) | first | .acc' "$DIR/edgar-submissions-$(printf '%010d' "$cik").json" 2>/dev/null || echo "")
+              if [ -n "$acc" ] && [ "$acc" != "null" ]; then
+                nodash=$(echo "$acc" | tr -d '-')
+                log "# NPORT-P $cik $acc"
+                grab "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/" "$DIR/edgar-index-$cik.html"
+                idx=$(curl -sS --max-time 60 -A "$UA" "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/index.json" || echo "")
+                echo "$idx" > "$DIR/edgar-index-$cik.json"
+                xml=$(echo "$idx" | jq -r '[.directory.item[] | select(.name | test("primary_doc.xml$"))] | first | .name' 2>/dev/null || echo "")
+                if [ -n "$xml" ] && [ "$xml" != "null" ]; then
+                  grab "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/$xml" "$DIR/edgar-$cik-primary_doc.xml"
+                fi
+              fi
+            done
+          fi
+          for t in $TICKERS; do
+            lt=$(echo "$t" | tr 'A-Z' 'a-z')
+            grab "https://www.sp-funds.com/go/$lt-premium-discount" "$DIR/$t-premium-discount.bin"
+          done
 
           log ""
           log "## trimmed fixtures"
