@@ -77,9 +77,23 @@ jobs:
           log ""
           log "## sec edgar"
           SECUA="Daggerok SP-Funds daggerok@users.noreply.github.com"
-          grab "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json" -A "$SECUA"
-          grab "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json" -A "$SECUA"
-          grab "https://www.sec.gov/files/company_tickers_mf.json" "$DIR/sec-company_tickers_mf.json" -A "$SECUA"
+          grab_sec() { # url outfile [extra curl args...] -- SEC blocks runner egress, so a
+            # readable mirror (r.jina.ai, which fetches server-side) is the documented
+            # fallback for this capture-only workflow. The updater itself never proxies.
+            local url="$1" out="$2"; shift 2
+            local before="" after=""
+            [ -s "$out" ] && before=$(wc -c < "$out" | tr -d ' ')
+            grab "$url" "$out" "$@"
+            after=$(wc -c < "$out" 2>/dev/null | tr -d ' ')
+            if [ "${after:-0}" = "${before:-0}" ] || [ "${after:-0}" -lt 1000 ]; then
+              local proxied="https://r.jina.ai/$url"
+              log "# retrying through $proxied"
+              grab "$proxied" "$out" -H 'x-respond-with: text'
+            fi
+          }
+          grab_sec "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json" -A "$SECUA"
+          grab_sec "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json" -A "$SECUA"
+          grab_sec "https://www.sec.gov/files/company_tickers_mf.json" "$DIR/sec-company_tickers_mf.json" -A "$SECUA"
             for cik in 1742912 1989916; do
               padded=$(printf '%010d' "$cik")
               acc=$(python3 -c 'import json,sys;r=json.load(open(sys.argv[1]))["filings"]["recent"];print(next((a for f,a in zip(r["form"],r["accessionNumber"]) if f=="NPORT-P"),""))' "$DIR/edgar-submissions-$padded.json" || echo "")
