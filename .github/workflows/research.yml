@@ -76,7 +76,7 @@ jobs:
 
           log ""
           log "## sec edgar"
-          SECUA="SP Funds static feed (https://github.com/daggerok/SP-Funds, daggerok@users.noreply.github.com)"
+          SECUA="Daggerok SP-Funds daggerok@users.noreply.github.com"
           grab "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json" -A "$SECUA"
           grab "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json" -A "$SECUA"
           grab "https://www.sec.gov/files/company_tickers_mf.json" "$DIR/sec-company_tickers_mf.json" -A "$SECUA"

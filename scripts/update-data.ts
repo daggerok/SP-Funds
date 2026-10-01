@@ -382,8 +382,8 @@ export function readConfig(
     edgarFallback: parseBoolean(envValue(merged, 'EDGAR_FALLBACK'), true),
     skipSpFunds: parseBoolean(envValue(merged, 'SKIP_SPFUNDS', ['SKIP_SP_FUNDS']), false),
     skipYahoo: parseBoolean(envValue(merged, 'SKIP_YAHOO'), false),
-    // EDGAR requires a declared identity with a reachable contact; a URL alone is rejected.
-    secUa: envValue(merged, 'SEC_UA') || 'SP Funds static feed (https://github.com/daggerok/SP-Funds, daggerok@users.noreply.github.com)',
+    // EDGAR requires a declared identity with a reachable contact ("Company Name email").
+    secUa: envValue(merged, 'SEC_UA') || 'Daggerok SP-Funds daggerok@users.noreply.github.com',
     aumRange: parseAumRange(envValue(merged, 'AUM')),
     terRange: parseRange(envValue(merged, 'TER')),
     dividendYieldRange: parseRange(envValue(merged, 'DIVIDEND_YIELD')),
