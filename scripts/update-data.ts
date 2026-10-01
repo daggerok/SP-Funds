@@ -382,7 +382,8 @@ export function readConfig(
     edgarFallback: parseBoolean(envValue(merged, 'EDGAR_FALLBACK'), true),
     skipSpFunds: parseBoolean(envValue(merged, 'SKIP_SPFUNDS', ['SKIP_SP_FUNDS']), false),
     skipYahoo: parseBoolean(envValue(merged, 'SKIP_YAHOO'), false),
-    secUa: envValue(merged, 'SEC_UA') || 'SP Funds static feed https://github.com/daggerok/SP-Funds (contact via repository issues)',
+    // EDGAR requires a declared identity with a reachable contact; a URL alone is rejected.
+    secUa: envValue(merged, 'SEC_UA') || 'SP Funds static feed (https://github.com/daggerok/SP-Funds, daggerok@users.noreply.github.com)',
     aumRange: parseAumRange(envValue(merged, 'AUM')),
     terRange: parseRange(envValue(merged, 'TER')),
     dividendYieldRange: parseRange(envValue(merged, 'DIVIDEND_YIELD')),
@@ -413,6 +414,8 @@ VERBOSE, which stay config-file/CLI-only because GitHub permits 25 inputs):
   HISTORY_PAGE_SIZE  Rows per generated history JSON page (default 1000)
   MAX_RETRIES        Retries after the initial request for 408/425/429/5xx (default 2)
   TICKERS            Space/comma separated subset of the catalog, e.g. "SPUS SPSK SPWO"
+  AUM/TER/...        Range filters are evaluated against the previously published
+                     facts; a fund with no published entry yet always runs once.
   AUM                AUM min:max (K/M/B/T suffixes or nano/micro/small/mid/large)
   TER                Expense-ratio percentage range: min:max
   DIVIDEND_YIELD     Derived distribution-rate percentage range: min:max
@@ -1537,6 +1540,50 @@ export function fundFilterReasons(entry: SelectionEntry, config: UpdaterConfig):
   return reasons;
 }
 
+/** The previously published catalog, used to evaluate the selection filters. */
+export async function readPreviousIndex(apiRoot: URL): Promise<Map<string, JsonRecord>> {
+  try {
+    const payload = JSON.parse(await readFile(new URL('index.json', apiRoot), 'utf8')) as JsonRecord;
+    const map = new Map<string, JsonRecord>();
+    for (const entry of (payload['funds'] as JsonRecord[] | undefined) ?? []) {
+      const ticker = sanitizeTicker(entry['ticker']);
+      if (ticker) map.set(ticker, entry);
+    }
+    return map;
+  } catch {
+    return new Map<string, JsonRecord>();
+  }
+}
+
+/**
+ * Selection filters run against the previously published facts, because a fund
+ * page has to be fetched before its fresh AUM/TER/yields exist. A fund with no
+ * published entry yet is never filtered out: the first run must be able to
+ * publish the facts a later run filters on.
+ */
+export function selectionEntryFromIndex(entry: JsonRecord | undefined): SelectionEntry | null {
+  if (!entry) return null;
+  const monthEnd = ((entry['returns'] as JsonRecord | undefined)?.['monthEnd'] ?? {}) as JsonRecord;
+  const returns = emptyReturns();
+  returns.asOfDate = (monthEnd['asOfDate'] as string | null) ?? null;
+  returns.ytd = numberOrNull(monthEnd['ytd']);
+  returns.yr1 = numberOrNull(monthEnd['yr1']);
+  returns.yr3 = numberOrNull(monthEnd['yr3']);
+  returns.yr5 = numberOrNull(monthEnd['yr5']);
+  returns.yr10 = numberOrNull(monthEnd['yr10']);
+  returns.sinceInception = numberOrNull(monthEnd['sinceInception']);
+  const metrics = (entry['metrics'] ?? null) as DerivedMetrics | null;
+  return {
+    ticker: sanitizeTicker(entry['ticker']),
+    aumValue: numberOrNull(entry['aumValue']),
+    terValue: numberOrNull(entry['terValue']),
+    secYield: metrics ? numberOrNull(metrics.secYield) : null,
+    dividendYield: metrics ? numberOrNull(metrics.dividendYield) : null,
+    returns,
+    metrics,
+  };
+}
+
 export function periodKey(period: ReturnPeriod): NumericReturnKey {
   if (period === 'YTD') return 'ytd';
   if (period === '1Y') return 'yr1';
@@ -2114,9 +2161,19 @@ export async function runUpdater(
   }
   const catalog = buildCatalog(catalogHtml ?? '', config.tickers);
   if (!catalog.length) throw new Error('catalog: no SP Funds ETFs selected');
-  outputPrintFilter(catalog.length, catalog.length);
+  const previousIndex = await readPreviousIndex(apiRoot);
+  const skipped: Array<{ ticker: string; reasons: string[] }> = [];
+  const selected = catalog.filter((fund) => {
+    const entry = selectionEntryFromIndex(previousIndex.get(fund.ticker));
+    if (!entry) return true;
+    const reasons = fundFilterReasons(entry, config);
+    if (!reasons.length) return true;
+    skipped.push({ ticker: fund.ticker, reasons });
+    return false;
+  });
+  outputPrintFilter(selected.length, catalog.length);
 
-  const batch = batchSelection(catalog, config.maxFetches, await readCursor(apiRoot));
+  const batch = batchSelection(selected, config.maxFetches, await readCursor(apiRoot));
   const reporter = outputCreateReporter(batch.length);
   const outcomes: Array<{ fund: CatalogFund; outcome: FundOutcome }> = [];
   const summary: RunSummary = { brand: 'SP Funds', generatedAt, funds: batch.length, holdings: 0, history: 0, written: 0, failures: [] };
@@ -2167,6 +2224,7 @@ export async function runUpdater(
   summary.written = (indexWritten ? 1 : 0) + ordered.filter(({ outcome }) => outcome.written).length;
 
   console.log(`[ done     ] ${summary.funds} funds, ${formatCount(summary.holdings)} holdings rows, ${formatCount(summary.history)} history rows, ${formatCount(summary.written)} files written`);
+  if (skipped.length) console.log(`[ skipped  ] ${skipped.map(({ ticker, reasons }) => `${ticker} (${reasons.join('+')})`).join(', ')}`);
   if (summary.failures.length) console.log(`[ failed   ] ${summary.failures.join(', ')}`);
   await outputWriteSummary([
     `### SP Funds data update`,
@@ -2175,6 +2233,7 @@ export async function runUpdater(
     `- Holdings rows: ${formatCount(summary.holdings)}`,
     `- History rows: ${formatCount(summary.history)}`,
     `- Files written: ${formatCount(summary.written)}`,
+    `- Funds kept by filters: ${selected.length} of ${catalog.length}${skipped.length ? ` (kept out: ${skipped.map(({ ticker, reasons }) => `${ticker} ${reasons.join('+')}`).join(', ')})` : ''}`,
     `- Ticker cursor: ${nextCursor ?? '(all)'}`,
     summary.failures.length ? `- Failures: ${summary.failures.join(', ')}` : `- Failures: none`,
   ]);

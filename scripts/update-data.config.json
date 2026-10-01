@@ -10,7 +10,7 @@
   "EDGAR_FALLBACK": "true",
   "SKIP_SPFUNDS": "false",
   "SKIP_YAHOO": "false",
-  "SEC_UA": "SP Funds static feed https://github.com/daggerok/SP-Funds (contact via repository issues)",
+  "SEC_UA": "SP Funds static feed (https://github.com/daggerok/SP-Funds, daggerok@users.noreply.github.com)",
   "AUM": ":",
   "TER": ":",
   "DIVIDEND_YIELD": ":",
