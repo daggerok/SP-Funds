@@ -74,44 +74,26 @@ jobs:
 
           log ""
           log "## sec edgar"
-          grab "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json"
-          grab "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json"
-          grab "https://www.sec.gov/files/company_tickers_mf.json" "$DIR/sec-company_tickers_mf.json"
-          for cik in 1742912 1989916; do
-            padded=$(printf '%010d' "$cik")
-            acc=$(python3 -c '
-              import json, sys
-              recent = json.load(open(sys.argv[1]))["filings"]["recent"]
-              print(next((a for f, a in zip(recent["form"], recent["accessionNumber"]) if f == "NPORT-P"), ""))
-            ' "$DIR/edgar-submissions-$padded.json" || echo "")
-            log "# first NPORT-P CIK $cik accession ${acc:-none}"
-            if [ -n "$acc" ]; then
-              nodash=$(echo "$acc" | tr -d '-')
-              grab "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/" "$DIR/edgar-index-$padded.html"
-              curl -sS --max-time 60 -A "$UA" "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/index.json" -o "$DIR/edgar-index-$padded.json" || true
-              xml=$(python3 -c '
-              import json, sys
-              try:
-                  items = json.load(open(sys.argv[1]))["directory"]["item"]
-              except Exception:
-                  items = []
-              print(next((item["name"] for item in items if item.get("name", "").endswith("primary_doc.xml")), ""))
-            ' "$DIR/edgar-index-$padded.json" || echo "")
-              log "# primary_doc.xml ${xml:-none}"
-              if [ -n "$xml" ]; then
-                grab "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/$xml" "$DIR/edgar-$cik-primary_doc.xml"
-                python3 -c '
-              import re, sys
-              xml = open(sys.argv[1], encoding="utf-8", errors="replace").read()
-              blocks = re.findall(r"<invstOrSec\b[^>]*>[\s\S]*?</invstOrSec>", xml)
-              head = re.search(r"<genInfo>[\s\S]*?</fundInfo>", xml)
-              body = head.group(0).replace("</fundInfo>", "</fundInfo>\n<invstOrSecs>") if head else xml[:4000]
-              open(sys.argv[2], "w", encoding="utf-8").write(body + "\n" + "\n".join(blocks[:25]) + "\n</invstOrSecs>\n")
-              print("trimmed", len(blocks), "positions to", min(25, len(blocks)))
-            ' "$DIR/edgar-$cik-primary_doc.xml" "research/2026-10-01/fixtures/edgar-$cik-primary_doc.trimmed.xml"
+          SECUA="SP Funds static feed (https://github.com/daggerok/SP-Funds; contact via repository issues)"
+          grab "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json" -A "$SECUA"
+          grab "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json" -A "$SECUA"
+          grab "https://www.sec.gov/files/company_tickers_mf.json" "$DIR/sec-company_tickers_mf.json" -A "$SECUA"
+            for cik in 1742912 1989916; do
+              padded=$(printf '%010d' "$cik")
+              acc=$(python3 -c 'import json,sys;r=json.load(open(sys.argv[1]))["filings"]["recent"];print(next((a for f,a in zip(r["form"],r["accessionNumber"]) if f=="NPORT-P"),""))' "$DIR/edgar-submissions-$padded.json" || echo "")
+              log "# first NPORT-P CIK $cik accession ${acc:-none}"
+              if [ -n "$acc" ]; then
+                nodash=$(echo "$acc" | tr -d '-')
+                grab "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/" "$DIR/edgar-index-$padded.html" -A "$SECUA"
+                curl -sS --max-time 60 -A "$SECUA" "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/index.json" -o "$DIR/edgar-index-$padded.json" || true
+                xml=$(python3 -c 'import json,sys;items=(json.load(open(sys.argv[1])).get("directory") or {}).get("item") or [];print(next((i["name"] for i in items if i.get("name","").endswith("primary_doc.xml")),""))' "$DIR/edgar-index-$padded.json" || echo "")
+                log "# primary_doc.xml ${xml:-none}"
+                if [ -n "$xml" ]; then
+                  grab "https://www.sec.gov/Archives/edgar/data/$cik/$nodash/$xml" "$DIR/edgar-$cik-primary_doc.xml" -A "$SECUA"
+                  python3 -c 'import re,sys;xml=open(sys.argv[1],encoding="utf-8",errors="replace").read();blocks=re.findall(r"<invstOrSec\b[^>]*>[\s\S]*?</invstOrSec>",xml);head=re.search(r"<genInfo>[\s\S]*?</fundInfo>",xml);body=head.group(0).replace("</fundInfo>","</fundInfo>\n<invstOrSecs>") if head else xml[:4000];open(sys.argv[2],"w",encoding="utf-8").write(body+"\n"+"\n".join(blocks[:25])+"\n</invstOrSecs>\n");print("trimmed",len(blocks),"positions to",min(25,len(blocks)))' "$DIR/edgar-$cik-primary_doc.xml" "research/2026-10-01/fixtures/edgar-$cik-primary_doc.trimmed.xml"
+                fi
               fi
-            fi
-          done
+            done
 
           for t in $TICKERS; do
             lt=$(echo "$t" | tr 'A-Z' 'a-z')
@@ -132,18 +114,8 @@ jobs:
             fi
           done
           if [ -s "$DIR/sec-company_tickers_mf.json" ]; then
-            python3 -c '
-              import json, sys
-              payload = json.load(open(sys.argv[1]))
-              fields = payload["fields"]
-              index = {name: fields.index(name) for name in fields}
-              wanted = {"SPUS", "SPRE", "SPSK", "SPTE", "SPWO"}
-              rows = [row for row in payload["data"] if str(row[index["symbol"]]).upper() in wanted]
-              open(sys.argv[2], "w").write(json.dumps({"fields": fields, "data": rows}, indent=1) + "
-              ")
-              print("kept", len(rows), "ticker rows")
-            ' "$DIR/sec-company_tickers_mf.json" research/2026-10-01/fixtures/sec-company_tickers_mf.json || true
-          fi
+            python3 -c 'import json,sys;payload=json.load(open(sys.argv[1]));fields=payload["fields"];index={n:fields.index(n) for n in fields};rows=[row for row in payload["data"] if str(row[index["symbol"]]).upper() in {"SPUS","SPRE","SPSK","SPTE","SPWO"}];open(sys.argv[2],"w").write(json.dumps({"fields":fields,"data":rows},indent=1)+"\n");print("kept",len(rows),"ticker rows")' "$DIR/sec-company_tickers_mf.json" research/2026-10-01/fixtures/sec-company_tickers_mf.json || true
+            fi
           for cik in 0001742912 0001989916; do
             if command -v jq >/dev/null && [ -s "$DIR/edgar-submissions-$cik.json" ]; then
               jq -c '{cik, name, formerNames, filings: {recent: (.filings.recent | with_entries(select(.key as $k | ["accessionNumber","filingDate","form","primaryDocument","reportDate","filmNumber"] | index($k))))}}' "$DIR/edgar-submissions-$cik.json" > "research/2026-10-01/fixtures/edgar-submissions-$cik.trimmed.json" || true
