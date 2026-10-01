@@ -12,6 +12,12 @@ on:
         required: false
         default: "SPUS SPRE SPSK SPTE SPWO"
         type: string
+  push:
+    # Temporary: workflow_dispatch is only dispatchable once a workflow exists
+    # on the default branch, so the research capture is also triggered by an
+    # ordinary push to the session branch.
+    branches: [arena/01a0f9b5-sp-funds]
+    paths-ignore: [research/**, api/**]
 
 permissions:
   contents: write
@@ -22,6 +28,8 @@ concurrency:
 
 jobs:
   research:
+    # Never loop on the bot's own research commit.
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
