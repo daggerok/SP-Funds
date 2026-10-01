@@ -1,0 +1,114 @@
+name: Research SP Funds sources (temporary)
+
+# TEMPORARY research workflow: captures raw source fixtures (fund pages, daily
+# holdings CSVs, Yahoo chart payloads, SEC EDGAR metadata) into research/ so the
+# offline parser tests can be written against real, dated bytes. Deleted before
+# the final pull request.
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Tickers to capture"
+        required: false
+        default: "SPUS SPRE SPSK SPTE SPWO"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-sp-funds
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Capture raw sources
+        env:
+          TICKERS: ${{ inputs.tickers }}
+        run: |
+          set -euo pipefail
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36"
+          DIR="research/2026-10-01/raw"
+          mkdir -p "$DIR"
+          : > research/2026-10-01/capture-log.txt
+          log() { echo "$@" | tee -a research/2026-10-01/capture-log.txt; }
+          grab() { # url outfile [extra curl args...]
+            local url="$1" out="$2"; shift 2
+            local code size
+            code=$(curl -sS -L --max-time 90 -A "$UA" -H 'Accept: text/html,application/json,text/csv,*/*' -w '%{http_code}' -o "$out" "$@" "$url" || echo "000")
+            size=$(wc -c < "$out" 2>/dev/null || echo 0)
+            log "$code $size $url"
+          }
+          log "# SP Funds source capture $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          log "# host: GitHub Actions runner; UA: browser-like"
+          log ""
+
+          log "## site"
+          grab "https://www.sp-funds.com/" "$DIR/home.html"
+          grab "https://www.sp-funds.com/wp-sitemap.xml" "$DIR/wp-sitemap.xml"
+          grab "https://www.sp-funds.com/sitemap_index.xml" "$DIR/sitemap_index.xml"
+
+          for t in $TICKERS; do
+            lt=$(echo "$t" | tr 'A-Z' 'a-z')
+            log ""
+            log "## $t"
+            grab "https://www.sp-funds.com/$lt/" "$DIR/$t.page.html"
+            grab "https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_$t.csv" "$DIR/TidalFG_Holdings_$t.csv"
+            grab "https://query1.finance.yahoo.com/v8/finance/chart/$t?range=max&interval=1d&events=div%2Csplit" "$DIR/yahoo-$t.json"
+            grab "https://query1.finance.yahoo.com/v8/finance/chart/$t?range=1mo&interval=1d&events=div%2Csplit" "$DIR/yahoo-$t-1mo.json"
+          done
+
+          log ""
+          log "## sec edgar"
+          grab "https://data.sec.gov/submissions/CIK0001742912.json" "$DIR/edgar-submissions-0001742912.json"
+          grab "https://data.sec.gov/submissions/CIK0001989916.json" "$DIR/edgar-submissions-0001989916.json"
+
+          log ""
+          log "## trimmed fixtures"
+          mkdir -p research/2026-10-01/fixtures
+          for t in $TICKERS; do
+            if command -v jq >/dev/null && [ -s "$DIR/yahoo-$t.json" ]; then
+              jq -c '{chart:{result:[.chart.result[0] | {meta, timestamp: (.timestamp[-400:]), indicators: {quote: [.indicators.quote[0] | {close: (.close[-400:]), volume: (.volume[-400:])}], adjclose: [.indicators.adjclose[0] | {adjclose: (.adjclose[-400:])}]}}], error: null}}' "$DIR/yahoo-$t.json" > "research/2026-10-01/fixtures/yahoo-$t.json" || cp "$DIR/yahoo-$t.json" "research/2026-10-01/fixtures/yahoo-$t.json"
+            fi
+            if [ -s "$DIR/TidalFG_Holdings_$t.csv" ]; then
+              head -41 "$DIR/TidalFG_Holdings_$t.csv" > "research/2026-10-01/fixtures/TidalFG_Holdings_$t.head40.csv"
+              tail -5 "$DIR/TidalFG_Holdings_$t.csv" >> "research/2026-10-01/fixtures/TidalFG_Holdings_$t.head40.csv"
+              wc -l "$DIR/TidalFG_Holdings_$t.csv" | tee -a research/2026-10-01/capture-log.txt
+            fi
+          done
+          for cik in 0001742912 0001989916; do
+            if command -v jq >/dev/null && [ -s "$DIR/edgar-submissions-$cik.json" ]; then
+              jq -c '{cik, name, formerNames, filings: {recent: (.filings.recent | with_entries(select(.key as $k | ["accessionNumber","filingDate","form","primaryDocument","reportDate","filmNumber"] | index($k))))}}' "$DIR/edgar-submissions-$cik.json" > "research/2026-10-01/fixtures/edgar-submissions-$cik.trimmed.json" || true
+              jq -r '[.filings.recent | to_entries[]] | length' "$DIR/edgar-submissions-$cik.json" 2>/dev/null | tee -a research/2026-10-01/capture-log.txt || true
+            fi
+          done
+
+          log ""
+          log "## sizes"
+          du -sh "$DIR" research/2026-10-01/fixtures | tee -a research/2026-10-01/capture-log.txt
+          find "$DIR" research/2026-10-01/fixtures -type f -exec sha256sum {} + | sort -k2 | tee research/2026-10-01/capture-hashes.txt
+
+      - name: Commit captured research
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research
+          if git diff --cached --quiet; then
+            echo "no research changes"
+            exit 0
+          fi
+          git commit -m "chore(research): capture SP Funds raw source fixtures"
+          git push
+
+      - name: Summary
+        run: |
+          echo "### SP Funds research capture" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat research/2026-10-01/capture-log.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
