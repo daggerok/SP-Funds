@@ -1,4 +1,4 @@
-# SP Funds source capture 2026-10-01T23:22:05Z
+# SP Funds source capture 2026-10-01T23:22:45Z
 # host: GitHub Actions runner; UA: browser-like
 
 ## site
@@ -9,39 +9,48 @@
 ## SPUS
 200 574931 https://www.sp-funds.com/spus/
 200 23573 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPUS.csv
-200 43440 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=max&interval=1d&events=div%2Csplit
+200 43430 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=max&interval=1d&events=div%2Csplit
 200 3528 https://query1.finance.yahoo.com/v8/finance/chart/SPUS?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPRE
 200 425455 https://www.sp-funds.com/spre/
 200 3468 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPRE.csv
-200 37051 https://query1.finance.yahoo.com/v8/finance/chart/SPRE?range=max&interval=1d&events=div%2Csplit
+200 37044 https://query1.finance.yahoo.com/v8/finance/chart/SPRE?range=max&interval=1d&events=div%2Csplit
 200 3514 https://query1.finance.yahoo.com/v8/finance/chart/SPRE?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPSK
 200 540491 https://www.sp-funds.com/spsk/
 200 23392 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPSK.csv
-200 43601 https://query1.finance.yahoo.com/v8/finance/chart/SPSK?range=max&interval=1d&events=div%2Csplit
+200 43556 https://query1.finance.yahoo.com/v8/finance/chart/SPSK?range=max&interval=1d&events=div%2Csplit
 200 3507 https://query1.finance.yahoo.com/v8/finance/chart/SPSK?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPTE
 200 466079 https://www.sp-funds.com/spte/
 200 11219 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPTE.csv
-200 18714 https://query1.finance.yahoo.com/v8/finance/chart/SPTE?range=max&interval=1d&events=div%2Csplit
+200 18736 https://query1.finance.yahoo.com/v8/finance/chart/SPTE?range=max&interval=1d&events=div%2Csplit
 200 3372 https://query1.finance.yahoo.com/v8/finance/chart/SPTE?range=1mo&interval=1d&events=div%2Csplit
 
 ## SPWO
 200 690704 https://www.sp-funds.com/spwo/
 200 42445 https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPWO.csv
-200 18590 https://query1.finance.yahoo.com/v8/finance/chart/SPWO?range=max&interval=1d&events=div%2Csplit
+200 18594 https://query1.finance.yahoo.com/v8/finance/chart/SPWO?range=max&interval=1d&events=div%2Csplit
 200 3410 https://query1.finance.yahoo.com/v8/finance/chart/SPWO?range=1mo&interval=1d&events=div%2Csplit
 
 ## sec edgar
+# kept the previous research/2026-10-01/raw/edgar-submissions-0001742912.json (HTTP 403, 4819 bytes)
 403 4819 https://data.sec.gov/submissions/CIK0001742912.json
+# kept the previous research/2026-10-01/raw/edgar-submissions-0001989916.json (HTTP 403, 4819 bytes)
 403 4819 https://data.sec.gov/submissions/CIK0001989916.json
+# kept the previous research/2026-10-01/raw/sec-company_tickers_mf.json (HTTP 403, 1925 bytes)
 403 1925 https://www.sec.gov/files/company_tickers_mf.json
-# first NPORT-P CIK 1742912 accession none
-# first NPORT-P CIK 1989916 accession none
+# first NPORT-P CIK 1742912 accession 0002000324-26-004454
+# kept the previous research/2026-10-01/raw/edgar-index-0001742912.html (HTTP 403, 4819 bytes)
+403 4819 https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/
+# primary_doc.xml none
+# first NPORT-P CIK 1989916 accession 0000894189-26-025311
+# kept the previous research/2026-10-01/raw/edgar-index-0001989916.html (HTTP 403, 4819 bytes)
+403 4819 https://www.sec.gov/Archives/edgar/data/1989916/000089418926025311/
+# primary_doc.xml none
 200 2065 https://www.sp-funds.com/go/spus-premium-discount
 200 2065 https://www.sp-funds.com/go/spre-premium-discount
 200 2065 https://www.sp-funds.com/go/spsk-premium-discount
@@ -54,7 +63,9 @@
 173 research/2026-10-01/raw/TidalFG_Holdings_SPSK.csv
 109 research/2026-10-01/raw/TidalFG_Holdings_SPTE.csv
 400 research/2026-10-01/raw/TidalFG_Holdings_SPWO.csv
+16
+16
 
 ## sizes
-3.1M	research/2026-10-01/raw
-132K	research/2026-10-01/fixtures
+3.3M	research/2026-10-01/raw
+236K	research/2026-10-01/fixtures
