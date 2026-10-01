@@ -8,10 +8,11 @@ Read .worklog.txt in the repository root. It is the canonical, self-contained ha
 Instructions:
 1. Reconcile CURRENT STATE against Git and remote origin/main.
 2. Follow the MANDATORY WORKLOG AND RECOVERY PROTOCOL in .worklog.txt.
-3. Create feature branch `feat/sp-funds-etfs`.
+3. Work on the session branch `arena/01a0f9b5-sp-funds` (do not create `feat/sp-funds-etfs`; this session is pinned to that branch) and open the Pull Request against main from it.
 4. Implement the ETF holdings-to-watchlist app according to the plan in .worklog.txt (Bun-only, zero runtime dependencies, sibling parity UI, offline fixture tests, isolated live acceptance).
-5. After each small completed step, update .worklog.txt, make a scoped Conventional Commit, and push to GitHub.
-6. When complete, open a Pull Request against main.
+5. Session amendment (2026-10-01): mirror the closest sibling's `scripts/update-data.config.json` mechanism exactly (checked-in JSON string defaults read relative to import.meta.url; nonblank ENV always wins; blank/undefined inherits the JSON; ENOENT falls back to built-ins, malformed JSON throws), implement ALL workflows (update-data + CI verification + main-only Pages deploy), and keep the data workflow at or under GitHub's 25 `workflow_dispatch` input ceiling the same way the siblings already do (see AAM: "GitHub permits 25 inputs. SEC_UA and VERBOSE remain config-file/CLI-only.").
+6. After each small completed step, update .worklog.txt and .prompt.txt when the instructions change, make a scoped Conventional Commit, and push to GitHub.
+7. When complete, open a Pull Request against main.
 
 ================================================================================================
 === 1st PROMPT (Alternative Russian wording matching protocol) ===
@@ -23,10 +24,11 @@ GitHub Personal Access Token: <PASTE_YOUR_TOKEN_HERE>
 
 Инструкции:
 1. Перед изменениями полностью прочитай существующий .worklog.txt. Сверь CURRENT STATE с Git и remote origin/main.
-2. Создай feature-ветку `feat/sp-funds-etfs`.
+2. Работай в ветке сессии `arena/01a0f9b5-sp-funds` (не создавай `feat/sp-funds-etfs`; сессия жёстко привязана к этой ветке) и открой Pull Request в main из неё.
 3. Реализуй приложение согласно плану в .worklog.txt (Bun-only, zero runtime dependencies, sibling parity UI, offline tests, scoped live acceptance).
-4. После каждого небольшого законченного этапа обновляй .worklog.txt, делай scoped Conventional Commit и push.
-5. По завершении открой Pull Request в main.
+4. Поправка сессии (2026-10-01): повтори механизм `scripts/update-data.config.json` как в ближайшем sibling (JSON-умолчания читаются относительно import.meta.url; непустая переменная окружения всегда важнее; пустое/undefined наследует JSON; ENOENT — встроенные умолчания, битый JSON — ошибка), реализуй ВСЕ workflow (обновление данных + CI-проверка + main-only Pages), и уложи входные параметры data-workflow в лимит GitHub в 25 `workflow_dispatch` input'ов так же, как это уже сделано у sibling (AAM: "GitHub permits 25 inputs. SEC_UA and VERBOSE remain config-file/CLI-only.").
+5. После каждого небольшого законченного этапа обновляй .worklog.txt (и .prompt.txt, если меняются инструкции), делай scoped Conventional Commit и push.
+6. По завершении открой Pull Request в main.
 
 ================================================================================================
 === 2nd and all next PROMPT(s) after rate limit stop/restart ===
@@ -36,5 +38,3 @@ GitHub Personal Access Token: <PASTE_YOUR_TOKEN_HERE>
 что осталось и есть ли расхождения. Продолжи с первого незавершённого
 шага в рамках записанных разрешений. После каждого небольшого этапа
 обновляй .worklog.txt, делай commit и push.
-
-================================================================================================
