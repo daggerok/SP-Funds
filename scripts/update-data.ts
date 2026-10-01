@@ -6,6 +6,7 @@
 // the pinned family conventions (daggerok/JPMorgan, daggerok/Neos, daggerok/Xtrackers);
 // the shared holdings-CSV contract is adapted from daggerok/Neos (same TidalFG columns).
 // Every acquisition detail specific to this brand is documented in .worklog.txt.
+import { createHash } from 'node:crypto';
 import { readFileSync as readUpdaterConfig } from 'node:fs';
 import { appendFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
@@ -102,6 +103,7 @@ const SEC_DATA_HOST = 'https://data.sec.gov';
 const EDGAR_ARCHIVES = 'https://www.sec.gov/Archives/edgar/data';
 const EDGAR_BROWSE_URL = 'https://www.sec.gov/cgi-bin/browse-edgar';
 export const SEC_FUND_TICKERS_URL = 'https://www.sec.gov/files/company_tickers_mf.json';
+export const SEC_COMPANY_TICKERS_URL = 'https://www.sec.gov/files/company_tickers.json';
 
 // ---------------------------------------------------------------------------
 // Small helpers
@@ -130,6 +132,20 @@ export function numberOrNull(raw: unknown): number | null {
   if (!text || /^(?:-|—|–|N\/?A|--|null|nan)$/i.test(text)) return null;
   if (/^\(.+\)$/.test(text)) text = '-' + text.slice(1, -1);
   const value = Number(text);
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Prices on the fund pages are published with a magnitude suffix ("$3274.89m",
+ * "$3.28B"); numberOrNull would drop them, so money parsing understands K/M/B/T.
+ */
+export function parseMoneyNumber(raw: unknown): number | null {
+  const text = cleanText(raw).replace(/[$,\s]/g, '');
+  if (!text) return null;
+  const match = /^([+-]?[\d.]+)\s*([KMBT])?$/i.exec(text);
+  if (!match) return numberOrNull(raw);
+  const suffix = match[2] ? AMOUNT_SUFFIXES[match[2].toUpperCase()] ?? 1 : 1;
+  const value = Number(match[1]) * suffix;
   return Number.isFinite(value) ? value : null;
 }
 
@@ -491,12 +507,15 @@ export function parseCatalogCards(html: string): CatalogCard[] {
     const descriptionMatch = /<div\b[^>]*class="[^"]*bdt-ep-advanced-icon-box-description[^"]*"[^>]*>([\s\S]*?)<\/div>/i.exec(body);
     const linkMatch = /<a\b[^>]*class="[^"]*bdt-ep-advanced-icon-box-readmore[^"]*"[^>]*href="([^"]+)"/i.exec(body);
     const href = linkMatch ? cleanText(linkMatch[1]) : '';
-    if (!/^\/[a-z0-9-]+\/?$/.test(href)) continue;
+    const fundPage = /^https?:\/\//.test(href)
+      ? (href.startsWith(SPFUNDS_SITE) ? href : null)
+      : (/^\/[a-z0-9-]+\/?$/.test(href) ? `${SPFUNDS_SITE}${href}` : null);
+    if (!fundPage) continue;
     cards.push({
       ticker,
       name: null,
       description: descriptionMatch ? cleanText(descriptionMatch[1]) : null,
-      fundPage: `${SPFUNDS_SITE}${href}`,
+      fundPage,
     });
   }
   return cards;
@@ -514,9 +533,10 @@ export function parseCatalogMenu(html: string): CatalogCard[] {
   if (!body) return [];
   const entries: CatalogCard[] = [];
   for (const item of body.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
-    const href = cleanText(item[1]);
+    const raw = cleanText(item[1]);
+    const href = /^https?:\/\//.test(raw) ? raw : (/^\/[a-z0-9-]+\/?$/.test(raw) ? `${SPFUNDS_SITE}${raw}` : '');
     const ticker = sanitizeTicker(item[2]);
-    if (!/^[A-Z]{4,5}$/.test(ticker) || !/^https?:\/\//.test(href)) continue;
+    if (!/^[A-Z]{4,5}$/.test(ticker) || !href) continue;
     if (entries.some((entry) => entry.ticker === ticker)) continue;
     entries.push({ ticker, name: null, description: null, fundPage: href });
   }
@@ -1349,18 +1369,20 @@ export function createTransport(config: UpdaterConfig, gate: () => Promise<void>
     let lastError: unknown = null;
     for (let attempt = 0; attempt <= config.maxRetries; attempt += 1) {
       await gate();
+      let response: Response | null = null;
       try {
-        const response = await fetcher(url, { ...init, signal: AbortSignal.timeout(45_000) });
-        if (response.ok) return response;
-        if (!RETRY_STATUS.has(response.status) || attempt === config.maxRetries) {
-          throw new Error(`${label}: HTTP ${response.status}`);
-        }
-        outputNote(`[ retry    ] ${label} HTTP ${response.status}; retry ${attempt + 1}/${config.maxRetries}`);
+        response = await fetcher(url, { ...init, signal: AbortSignal.timeout(45_000) });
       } catch (error) {
         lastError = error;
-        if (attempt === config.maxRetries) break;
-        outputNote(`[ retry    ] ${label} ${errorMessage(error)}; retry ${attempt + 1}/${config.maxRetries}`);
       }
+      if (response) {
+        if (response.ok) return response;
+        // A permanent status (403/404/...) is never retried: only transient ones are.
+        if (!RETRY_STATUS.has(response.status)) throw new Error(`${label}: HTTP ${response.status}`);
+        lastError = new Error(`${label}: HTTP ${response.status}`);
+      }
+      if (attempt === config.maxRetries) break;
+      outputNote(`[ ${'retry'.padEnd(9)}] ${label}: ${errorMessage(lastError)}, retry ${attempt + 1}/${config.maxRetries}`);
       await wait(500 * 2 ** attempt);
     }
     throw lastError instanceof Error ? lastError : new Error(`${label}: request failed`);
@@ -1474,13 +1496,10 @@ export async function writePages(
   return { pages: pages.map((page) => page.name), pageSize, totalRows: rows.length, asOfDate };
 }
 
-export async function readPreviousPages(dir: URL): Promise<{ headers: string[]; rows: SheetRow[]; manifest: PageManifest | null }> {
-  let manifest: PageManifest | null = null;
-  try {
-    manifest = JSON.parse(await readFile(new URL('meta.json', dir), 'utf8')) as PageManifest;
-  } catch {
-    manifest = null;
-  }
+export async function readPreviousPages(
+  dir: URL,
+  manifest: PageManifest | null = null,
+): Promise<{ headers: string[]; rows: SheetRow[]; manifest: PageManifest | null }> {
   const headers: string[] = [];
   const rows: SheetRow[] = [];
   try {
@@ -1488,9 +1507,14 @@ export async function readPreviousPages(dir: URL): Promise<{ headers: string[]; 
       const payload = JSON.parse(await readFile(new URL(name, dir), 'utf8')) as JsonRecord;
       const pageHeaders = (payload['headers'] as string[] | undefined) ?? [];
       if (!headers.length) headers.push(...pageHeaders);
-      for (const row of (payload['rows'] as string[][] | undefined) ?? []) {
+      for (const row of (payload['rows'] as Array<unknown> | undefined) ?? []) {
         const record: SheetRow = {};
-        pageHeaders.forEach((header, index) => { record[header] = row[index] ?? ''; });
+        if (Array.isArray(row)) {
+          pageHeaders.forEach((header, index) => { record[header] = row[index] ?? ''; });
+        } else {
+          const object = (row ?? {}) as SheetRow;
+          pageHeaders.forEach((header) => { record[header] = object[header] ?? ''; });
+        }
         rows.push(record);
       }
     }
@@ -1669,7 +1693,7 @@ export function outputCount(value: unknown): unknown {
   if (typeof value === 'number') return value;
   if (Array.isArray(value)) return value.length;
   const record = (value ?? {}) as JsonRecord;
-  return record['totalRows'] ?? record['rows'] ?? null;
+  return record['totalRows'] ?? (Array.isArray(record['rows']) ? (record['rows'] as unknown[]).length : null) ?? null;
 }
 
 export function outputScalar(value: unknown): unknown {
@@ -1680,42 +1704,44 @@ export function outputScalar(value: unknown): unknown {
   return value;
 }
 
-export function outputMoney(value: unknown): string | null {
-  const numeric = typeof value === 'number' ? value : numberOrNull(outputScalar(value));
-  if (numeric === null) return null;
-  return formatAumDisplay(numeric);
+/** Monetary display for the console line; the string `'null'` means unavailable. */
+export function outputMoney(value: unknown): string {
+  const raw = outputScalar(value);
+  if (raw === null || raw === undefined || raw === '—' || raw === '--') return 'null';
+  const text = String(raw).replace(/[$,\s]/g, '');
+  const match = /^([+-]?[\d.]+)([KMBT])?$/i.exec(text);
+  if (!match) return outputClean(raw);
+  const number = Number(match[1]) * (AMOUNT_SUFFIXES[match[2]?.toUpperCase() ?? ''] ?? 1);
+  if (!Number.isFinite(number)) return 'null';
+  for (const [unit, scale] of [['T', 1e12], ['B', 1e9], ['M', 1e6], ['K', 1e3]] as const) {
+    if (Math.abs(number) >= scale) return `$${(number / scale).toFixed(1)}${unit}`;
+  }
+  return `$${number.toFixed(2)}`;
 }
 
-export function outputFundLine(
-  index: number,
-  total: number,
-  ticker: string,
-  status: string,
-  data: JsonRecord = {},
-  reason?: unknown,
-): string {
-  const fields: string[] = [];
-  const push = (name: string, value: unknown): void => {
-    if (value === null || value === undefined || value === 'null' || value === '') return;
-    fields.push(`${name}=${outputClean(value)}`);
-  };
-  push('history', outputCount(data['history']));
-  push('holdings', outputCount(data['holdings']));
-  push('divs', outputCount(data['distributions']));
-  push('netAssets', outputMoney(data['netAssets']));
-  push('div', data['dividendYield']);
-  push('sec', data['secYield']);
-  push('reason', reason);
-  const head = `[ ${String(`${index}/${total}`).padStart(8)} ] ${ticker.padEnd(5)} ${status}`.padEnd(29);
-  return fields.length ? `${head} ${fields.join(' ')}` : head.trimEnd();
+export function outputFundLine(index: number, total: number, ticker: string, status: string, data: JsonRecord = {}, reason?: unknown): string {
+  const width = Math.max(2, String(total).length);
+  const metrics = (data['metrics'] ?? {}) as JsonRecord;
+  const yields = (data['yields'] ?? {}) as JsonRecord;
+  // Presentation only. Keep valid zero/false values; omit unavailable fields.
+  const field = (key: string, value: unknown): string =>
+    value === null || value === undefined || value === 'null' ? '' : `${key}=${outputClean(value)}`;
+  const detail = [
+    field('history', outputCount(data['history'] ?? data['historyCount'])),
+    field('holdings', outputCount(data['holdings'] ?? data['holdingsCount'])),
+    field('divs', outputCount(data['distributions'])),
+    field('netAssets', outputMoney(data['netAssets'] ?? data['aum'])),
+    field('div', outputScalar(data['dividendYield'] ?? yields['dividendYield'] ?? metrics['dividendYield'])),
+    field('sec', outputScalar(data['secYield'] ?? yields['secYield'] ?? metrics['secYield'])),
+  ].filter((part) => part !== '').join(' ');
+  return `[ ${String(index).padStart(width)}/${String(total).padEnd(width)}  ] ${outputClean(ticker).padEnd(5)} ${status.padEnd(9)}${detail ? ` ${detail}` : ''}${reason ? ` reason=${outputClean(reason)}` : ''}`;
 }
 
 export function outputCreateReporter(total: number) {
-  let index = 0;
+  let completed = 0;
   return {
     result(ticker: string, status: string, data: JsonRecord = {}, reason?: unknown): void {
-      index += 1;
-      console.log(outputFundLine(index, total, ticker, status, data, reason));
+      console.log(outputFundLine(++completed, total, ticker, status, data, reason));
     },
   };
 }
@@ -1748,12 +1774,115 @@ export const FALLBACK_CATALOG: CatalogFund[] = SPFUNDS_TICKERS.map((ticker) => (
 
 export type ProviderState = { spFunds: boolean; yahoo: boolean; edgar: boolean; retained: string[] };
 
+export type UpdateStatus = 'updated' | 'unchanged' | 'skipped';
 export type FundOutcome = {
   entry: JsonRecord;
   providers: ProviderState;
   reason?: string;
   written: boolean;
+  status: UpdateStatus;
 };
+
+/** Rebuild a catalog row from a published meta.json (skipped/retained funds). */
+export function entryFromMeta(ticker: string, meta: JsonRecord): JsonRecord {
+  const distributions = (meta['distributions'] ?? {}) as JsonRecord;
+  const exchange = (meta['exchange'] as string | null) ?? null;
+  return {
+    ticker,
+    name: (meta['name'] as string | null) ?? null,
+    category: (meta['category'] as string | null) ?? null,
+    fundPage: (meta['fundPage'] as string | null) ?? fundPageUrl(ticker),
+    dataFile: (meta['dataFile'] as string | null) ?? `funds/${ticker}/meta.json`,
+    ter: meta['ter'] ?? null,
+    terValue: meta['terValue'] ?? null,
+    nav: meta['nav'] ?? null,
+    navValue: meta['navValue'] ?? null,
+    aum: meta['aum'] ?? null,
+    aumValue: meta['aumValue'] ?? null,
+    asOfDate: meta['asOfDate'] ?? null,
+    inceptionDate: meta['inceptionDate'] ?? null,
+    exchange,
+    closePrice: meta['closePrice'] ?? null,
+    closePriceAsOfDate: (meta['closePriceAsOfDate'] as string | null) ?? null,
+    premiumDiscount: meta['premiumDiscount'] ?? null,
+    cusip: (meta['cusip'] as string | null) ?? null,
+    isin: (meta['isin'] as string | null) ?? null,
+    distributions: { frequency: distributions['frequency'] ?? null, exDate: distributions['exDate'] ?? null, dividend: distributions['dividend'] ?? null },
+    returns: (meta['returns'] as JsonRecord | undefined) ?? { monthEnd: emptyReturns(), quarterEnd: emptyReturns() },
+    metrics: (meta['metrics'] as JsonRecord | undefined) ?? null,
+    holdings: Number((meta['holdings'] as JsonRecord | undefined)?.['totalRows'] ?? 0),
+    history: Number((meta['history'] as JsonRecord | undefined)?.['totalRows'] ?? 0),
+  };
+}
+
+/**
+ * The published distribution calendar: the freshly parsed one, or the previously
+ * published rows when a transient failure left nothing to parse.
+ */
+export function publishDistributions(
+  mergedDividends: Dividend[],
+  frequency: string | null,
+  latest: Dividend | null,
+  previousMeta: JsonRecord,
+): JsonRecord {
+  const previous = (previousMeta['distributions'] ?? {}) as JsonRecord;
+  const headers = ['Ex-Date', 'Record Date', 'Payable Date', 'Amount'];
+  const rows = mergedDividends.length
+    ? mergedDividends.slice(0, 60).map((row) => [row.exDate, row.recordDate ?? '', row.payDate ?? '', row.amount === null ? '' : String(row.amount)])
+    : ((previous['rows'] as string[][] | undefined) ?? []);
+  return {
+    frequency: frequency ?? (previous['frequency'] as string | null) ?? null,
+    exDate: latest?.exDate ?? (previous['exDate'] as string | null) ?? null,
+    dividend: latest ? String(latest.amount) : ((previous['dividend'] as string | null) ?? null),
+    paymentsPerYear: paymentsPerYear(frequency) ?? paymentsPerYear((previous['frequency'] as string | null) ?? null),
+    headers: (previous['headers'] as string[] | undefined) ?? headers,
+    rows,
+  };
+}
+
+/** Content digest of a published fund directory, timestamps ignored (updated vs unchanged). */
+export async function fundDigest(apiRoot: URL, ticker: string): Promise<string> {
+  const dir = new URL(`funds/${ticker}/`, apiRoot);
+  const hash = createHash('sha256');
+  const collect = async (base: URL, prefix: string): Promise<void> => {
+    let entries: Array<{ name: string; isDirectory(): boolean }>;
+    try {
+      entries = await readdir(base, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries.map((item) => ({ name: item.name, isDirectory: () => item.isDirectory() })).sort((a, b) => a.name.localeCompare(b.name))) {
+      const path = `${prefix}${entry.name}`;
+      if (entry.isDirectory()) {
+        await collect(new URL(`${entry.name}/`, base), `${path}/`);
+        continue;
+      }
+      if (!entry.name.endsWith('.json')) continue;
+      hash.update(path);
+      try {
+        hash.update(stableContentKey(JSON.parse(await readFile(new URL(entry.name, base), 'utf8'))));
+      } catch {
+        hash.update('unparseable');
+      }
+    }
+  };
+  await collect(dir, '');
+  return hash.digest('hex');
+}
+
+/** JSON key sorted, timestamps stripped: the byte-churn-free identity of a document. */
+export function stableContentKey(value: unknown): string {
+  const stable = (input: unknown): unknown => {
+    if (Array.isArray(input)) return input.map(stable);
+    if (input && typeof input === 'object') {
+      return Object.fromEntries(Object.keys(input as JsonRecord).sort()
+        .filter((key) => key !== 'generatedAt' && key !== 'catalogReadAt')
+        .map((key) => [key, stable((input as JsonRecord)[key])]));
+    }
+    return input;
+  };
+  return JSON.stringify(stable(value)) ?? 'null';
+}
 
 type PreviousFund = { meta: JsonRecord | null; holdings: { headers: string[]; rows: SheetRow[]; asOfDate: string | null }; history: { rows: SheetRow[]; asOfDate: string | null } };
 
@@ -1765,8 +1894,8 @@ async function readPreviousFund(apiRoot: URL, ticker: string): Promise<PreviousF
   } catch {
     meta = null;
   }
-  const holdings = await readPreviousPages(new URL('holdings/', dir));
-  const history = await readPreviousPages(new URL('history/', dir));
+  const holdings = await readPreviousPages(new URL('holdings/', dir), (meta?.['holdings'] as PageManifest | undefined) ?? null);
+  const history = await readPreviousPages(new URL('history/', dir), (meta?.['history'] as PageManifest | undefined) ?? null);
   return {
     meta,
     holdings: { headers: holdings.headers, rows: holdings.rows, asOfDate: holdings.manifest?.asOfDate ?? null },
@@ -1782,11 +1911,11 @@ export function detailsFromPage(page: FundPage, ticker: string): FundDetails {
   const exchange = cleanText(lookupPattern(page.details, /primary exchange/i)) || null;
   const secYield = numberOrNull(lookupPattern(page.details, /sec yield/i));
   const indexTicker = cleanText(lookupPattern(page.details, /index/i)) ?? ''; // not published by SP Funds
-  const nav = numberOrNull(lookupPattern(page.pricing, /^nav$/i));
-  const netAssets = numberOrNull(lookupPattern(page.pricing, /net assets/i));
-  const shares = numberOrNull(lookupPattern(page.pricing, /shares outstanding/i));
+  const nav = parseMoneyNumber(lookupPattern(page.pricing, /^nav$/i));
+  const netAssets = parseMoneyNumber(lookupPattern(page.pricing, /net assets/i));
+  const shares = parseMoneyNumber(lookupPattern(page.pricing, /shares outstanding/i));
   const premiumDiscount = numberOrNull(lookupPattern(page.pricing, /premium\/?discount/i));
-  const close = numberOrNull(lookupPattern(page.pricing, /closing price/i));
+  const close = parseMoneyNumber(lookupPattern(page.pricing, /closing price/i));
   return {
     ticker,
     name: page.name,
@@ -1824,6 +1953,17 @@ export async function updateFund(
   const previous = await readPreviousFund(apiRoot, ticker);
   const providers: ProviderState = { spFunds: false, yahoo: false, edgar: false, retained: [] };
 
+  // Both issuer switches off with something already published: keep every byte.
+  if (config.skipSpFunds && config.skipYahoo && previous.meta) {
+    return {
+      entry: entryFromMeta(ticker, previous.meta),
+      providers: { ...providers, retained: ['issuer page (SKIP_SPFUNDS)', 'holdings', 'history'] },
+      reason: 'retained: SKIP_SPFUNDS+SKIP_YAHOO',
+      written: false,
+      status: 'unchanged',
+    };
+  }
+
   // 1) Official fund page: details, pricing, returns, distributions, documents.
   let page: FundPage | null = null;
   if (!config.skipSpFunds) {
@@ -1833,7 +1973,7 @@ export async function updateFund(
       providers.spFunds = true;
     } catch (error) {
       providers.retained.push('issuer page');
-      outputNote(`[ issuer   ] ${ticker} fund page unavailable (${errorMessage(error)}); keeping the previously published fund data`);
+      outputNote(`[ ${'issuer'.padEnd(9)}] ${ticker}: fund page unavailable (${errorMessage(error)}), keeping the published data`);
     }
   } else {
     providers.retained.push('issuer page (SKIP_SPFUNDS)');
@@ -1855,7 +1995,7 @@ export async function updateFund(
       csvTotals = { netAssets: parsed.netAssets, sharesOutstanding: parsed.sharesOutstanding };
       providers.spFunds = true;
     } catch (error) {
-      outputNote(`[ holdings ] ${ticker} official CSV unavailable (${errorMessage(error)}); trying the SEC N-PORT-P fallback`);
+      outputNote(`[ ${'holdings'.padEnd(9)}] ${ticker}: official holdings CSV unavailable (${errorMessage(error)}), trying EDGAR`);
       if (config.edgarFallback && edgar) {
         try {
           const fallback = await edgar(ticker, catalogFund.name);
@@ -1866,7 +2006,7 @@ export async function updateFund(
             providers.edgar = true;
           }
         } catch (nportError) {
-          outputNote(`[ edgar    ] ${ticker} N-PORT-P fallback failed (${errorMessage(nportError)})`);
+          outputNote(`[ ${'edgar'.padEnd(9)}] ${ticker}: N-PORT-P fallback failed (${errorMessage(nportError)})`);
         }
       }
     }
@@ -1895,7 +2035,7 @@ export async function updateFund(
       yahooName = chart.longName;
       providers.yahoo = true;
     } catch (error) {
-      outputNote(`[ yahoo    ] ${ticker} chart unavailable (${errorMessage(error)}); keeping the previously published history`);
+      outputNote(`[ ${'chart'.padEnd(9)}] ${ticker}: Yahoo chart unavailable (${errorMessage(error)}), keeping the published history`);
     }
   }
   if (!days.length) {
@@ -1941,12 +2081,12 @@ export async function updateFund(
     premiumDiscount: numberOrNull(previousDetails['premiumDiscount']),
   };
 
-  const closePriceValue = page ? numberOrNull(lookupPattern(page.pricing, /closing price/i)) : null;
+  const closePriceValue = page ? parseMoneyNumber(lookupPattern(page.pricing, /closing price/i)) : null;
 
   // The official holdings CSV carries the same NetAssets / SharesOutstanding
   // totals as the Pricing table; use them only when the page did not load.
-  const officialNetAssets = numberOrNull(lookupPattern(page?.pricing ?? new Map(), /net assets/i)) ?? csvTotals.netAssets;
-  const officialShares = numberOrNull(lookupPattern(page?.pricing ?? new Map(), /shares outstanding/i)) ?? csvTotals.sharesOutstanding;
+  const officialNetAssets = parseMoneyNumber(lookupPattern(page?.pricing ?? new Map(), /net assets/i)) ?? csvTotals.netAssets;
+  const officialShares = parseMoneyNumber(lookupPattern(page?.pricing ?? new Map(), /shares outstanding/i)) ?? csvTotals.sharesOutstanding;
   const aumValue = merged.aumValue ?? officialNetAssets;
   const sharesValue = officialShares;
   const midpointValue = merged.midpoint
@@ -1963,6 +2103,27 @@ export async function updateFund(
     merged.navValue,
     merged.secYield,
   );
+
+  // Data-dependent selection filters run on the freshly published facts; a fund
+  // that has nothing published yet always writes once so later runs can filter it.
+  const filterReasons = fundFilterReasons({
+    ticker,
+    aumValue,
+    terValue: merged.terValue,
+    secYield: merged.secYield,
+    dividendYield: metrics.dividendYield,
+    returns: merged.officialReturns ?? emptyReturns(),
+    metrics,
+  }, config);
+  if (filterReasons.length && previous.meta) {
+    return {
+      entry: entryFromMeta(ticker, previous.meta),
+      providers: { ...providers, retained: [...providers.retained, 'all published files'] },
+      reason: `filter: ${filterReasons.join('+')}`,
+      written: false,
+      status: 'skipped',
+    };
+  }
 
   const holdingsManifest = await writePages(
     new URL('holdings/', dir), ticker, 'holdings', [...HOLDINGS_HEADERS], holdingsRows, config.holdingsPageSize, holdingsAsOf,
@@ -1994,14 +2155,7 @@ export async function updateFund(
     midpoint: midpointValue,
     cusip: merged.cusip,
     isin: merged.isin,
-    distributions: {
-      frequency,
-      exDate: officialDistribution?.exDate ?? null,
-      dividend: officialDistribution ? String(officialDistribution.amount) : null,
-      paymentsPerYear: paymentsPerYear(frequency),
-      headers: ['Ex-Date', 'Record Date', 'Payable Date', 'Amount'],
-      rows: mergedDividends.slice(0, 60).map((row) => [row.exDate, row.recordDate ?? '', row.payDate ?? '', row.amount === null ? '' : String(row.amount)]),
-    },
+    distributions: publishDistributions(mergedDividends, frequency, officialDistribution, previousMeta),
     returns: {
       monthEnd: (page?.monthEnd?.returns ?? merged.officialReturns ?? emptyReturns()),
       quarterEnd: (page?.quarterEnd?.returns ?? page?.monthEnd?.returns ?? merged.officialReturns ?? emptyReturns()),
@@ -2047,38 +2201,8 @@ export async function updateFund(
     performance: page ? { benchmark: page.benchmark, benchmarkName: page.benchmarkName, rows: page.performanceRows } : (previousMeta['performance'] ?? null),
   };
   const written = await writeIfChanged(new URL('meta.json', dir), meta);
-  const entry: JsonRecord = {
-    ticker,
-    name,
-    category: null,
-    fundPage: fundPageUrl(ticker),
-    dataFile: `funds/${ticker}/meta.json`,
-    ter: meta['ter'],
-    terValue: meta['terValue'],
-    nav: meta['nav'],
-    navValue: meta['navValue'],
-    aum: meta['aum'],
-    aumValue: meta['aumValue'],
-    asOfDate: meta['asOfDate'],
-    inceptionDate: meta['inceptionDate'],
-    exchange: meta['exchange'],
-    closePrice: meta['closePrice'],
-    closePriceAsOfDate: meta['closePriceAsOfDate'],
-    premiumDiscount: meta['premiumDiscount'],
-    cusip: meta['cusip'],
-    isin: meta['isin'],
-    distributions: {
-      frequency: meta['distributions'] && (meta['distributions'] as JsonRecord)['frequency'],
-      exDate: (meta['distributions'] as JsonRecord)['exDate'],
-      dividend: (meta['distributions'] as JsonRecord)['dividend'],
-    },
-    returns: meta['returns'],
-    metrics: meta['metrics'],
-    holdings: holdingsManifest.totalRows,
-    history: historyManifest.totalRows,
-  };
   const reason = providers.retained.length ? `retained: ${[...new Set(providers.retained)].join(', ')}` : undefined;
-  return { entry, providers, reason, written };
+  return { entry: entryFromMeta(ticker, meta), providers, reason, written, status: written ? 'updated' : 'unchanged' };
 }
 
 // ---------------------------------------------------------------------------
@@ -2124,6 +2248,7 @@ export type RunSummary = {
   history: number;
   written: number;
   failures: string[];
+  skipped: string[];
 };
 
 export async function runUpdater(
@@ -2148,113 +2273,162 @@ export async function runUpdater(
 
   outputPrintConfig('SP Funds', config as unknown as JsonRecord);
 
-  // 1) Catalog tickers: the official homepage cards, then the requested subset.
+  // 1) Catalog tickers: the official "Our ETFs" lineup, unioned with everything
+  //    already published so a bounded or filtered run never shrinks the feed.
   let catalogHtml: string | undefined = options.catalogHtml;
   if (catalogHtml === undefined && !config.skipSpFunds) {
     try {
       const response = await transport(SPFUNDS_LINEUP_URL, 'lineup homepage', { headers: browserHeaders() });
       catalogHtml = await response.text();
     } catch (error) {
-      outputNote(`[ lineup   ] homepage unavailable (${errorMessage(error)}); falling back to the known tickers`);
+      outputNote(`[ ${'catalog'.padEnd(9)}] homepage unavailable (${errorMessage(error)}), using the known SP Funds tickers`);
       catalogHtml = '';
     }
   }
-  const catalog = buildCatalog(catalogHtml ?? '', config.tickers);
-  if (!catalog.length) throw new Error('catalog: no SP Funds ETFs selected');
   const previousIndex = await readPreviousIndex(apiRoot);
-  const skipped: Array<{ ticker: string; reasons: string[] }> = [];
-  const selected = catalog.filter((fund) => {
-    const entry = selectionEntryFromIndex(previousIndex.get(fund.ticker));
-    if (!entry) return true;
-    const reasons = fundFilterReasons(entry, config);
-    if (!reasons.length) return true;
-    skipped.push({ ticker: fund.ticker, reasons });
-    return false;
+  const catalog = new Map<string, CatalogFund>();
+  for (const fund of buildCatalog(catalogHtml ?? '', config.tickers)) catalog.set(fund.ticker, fund);
+  for (const [ticker, entry] of previousIndex) {
+    if (!catalog.has(ticker)) catalog.set(ticker, catalogFromPrevious(ticker, entry));
+  }
+  if (!catalog.size) throw new Error('catalog: no SP Funds ETFs selected');
+  const unknown = config.tickers.filter((ticker) => !catalog.has(ticker));
+  if (unknown.length) throw new Error(`catalog: requested tickers absent from the lineup: ${unknown.join(', ')}`);
+  const universe = [...catalog.values()].sort((a, b) => a.ticker.localeCompare(b.ticker));
+  const filtered = universe.filter((fund) => !config.tickers.length || config.tickers.includes(fund.ticker));
+  const deferred = Boolean(
+    config.aumRange || config.terRange || config.dividendYieldRange || config.secYieldRange
+    || Object.keys(config.performanceRanges).length || Object.keys(config.totalReturnRanges).length,
+  );
+  outputPrintFilter(filtered.length, universe.length);
+  if (deferred) console.log(`[ ${'filter'.padEnd(9)}] range filters are evaluated per fund against freshly parsed facts`);
+
+  // 2) Bounded batches resume from a cursor that is only valid for the same scope.
+  const scope = stableContentKey({
+    tickers: [...config.tickers].sort(), aum: config.aumRange ?? null, ter: config.terRange ?? null,
+    dividend: config.dividendYieldRange ?? null, sec: config.secYieldRange ?? null,
+    performance: config.performanceRanges, totalReturn: config.totalReturnRanges,
   });
-  outputPrintFilter(selected.length, catalog.length);
+  const cursor = config.maxFetches > 0 ? await readCursor(apiRoot, scope) : null;
+  const batch = batchSelection(filtered, config.maxFetches, cursor);
+  if (config.maxFetches > 0) console.log(`[ ${'cursor'.padEnd(9)}] ${batch.length} selected for this batch; after ${cursor ?? 'start'}`);
+  const queue = [...batch];
 
-  const batch = batchSelection(selected, config.maxFetches, await readCursor(apiRoot));
+  const rows = new Map<string, JsonRecord>(previousIndex);
+  for (const fund of universe) {
+    if (!rows.has(fund.ticker)) rows.set(fund.ticker, entryFromMeta(fund.ticker, { fundPage: fund.fundPage }));
+  }
+
   const reporter = outputCreateReporter(batch.length);
-  const outcomes: Array<{ fund: CatalogFund; outcome: FundOutcome }> = [];
-  const summary: RunSummary = { brand: 'SP Funds', generatedAt, funds: batch.length, holdings: 0, history: 0, written: 0, failures: [] };
-  const nextCursor = batch.length ? batch[batch.length - 1].ticker : null;
-  await writeCursor(apiRoot, nextCursor);
-
-  const workers = new Array(Math.max(1, config.concurrency)).fill(null).map(async () => {
+  const summary: RunSummary = { brand: 'SP Funds', generatedAt, funds: batch.length, holdings: 0, history: 0, written: 0, failures: [], skipped: [] };
+  const outcomes: Array<{ ticker: string; status: string; reason?: string }> = [];
+  const workers = new Array(Math.max(1, Math.min(config.concurrency, queue.length))).fill(null).map(async () => {
     for (;;) {
-      const fund = batch.shift();
+      const fund = queue.shift();
       if (!fund) return;
+      const before = await fundDigest(apiRoot, fund.ticker);
       try {
         const outcome = await updateFund(fund, config, apiRoot, transport, edgar, now);
-        outcomes.push({ fund, outcome });
-        reporter.result(fund.ticker, 'ok', {
+        const changed = (await fundDigest(apiRoot, fund.ticker)) !== before;
+        rows.set(fund.ticker, outcome.entry);
+        outcomes.push({ ticker: fund.ticker, status: outcome.status === 'updated' && !changed ? 'unchanged' : outcome.status, reason: outcome.reason });
+        summary.written += changed ? 1 : 0;
+        reporter.result(fund.ticker, outcome.status === 'updated' && !changed ? 'unchanged' : outcome.status, {
           history: outcome.entry['history'],
           holdings: outcome.entry['holdings'],
           distributions: (outcome.entry['distributions'] as JsonRecord | undefined)?.['frequency'],
           netAssets: outcome.entry['aumValue'],
-          dividendYield: outcome.entry['metrics'] && (outcome.entry['metrics'] as JsonRecord)['dividendYieldText'],
-          secYield: outcome.entry['metrics'] && (outcome.entry['metrics'] as JsonRecord)['secYieldText'],
+          yields: outcome.entry['metrics'],
         }, outcome.reason);
       } catch (error) {
-        outputNote(`[ error    ] ${fund.ticker}: ${errorMessage(error)}`);
-        reporter.result(fund.ticker, 'FAILED', {}, errorMessage(error));
+        outputNote(`[ ${'error'.padEnd(9)}] ${fund.ticker}: ${errorMessage(error)}`);
+        outcomes.push({ ticker: fund.ticker, status: 'failed', reason: errorMessage(error) });
         summary.failures.push(fund.ticker);
+        reporter.result(fund.ticker, 'failed', {}, errorMessage(error));
       }
     }
   });
   await Promise.all(workers);
 
-  const ordered = [...catalog
-    .map((fund) => outcomes.find((entry) => entry.fund.ticker === fund.ticker))
-    .filter((entry): entry is { fund: CatalogFund; outcome: FundOutcome } => Boolean(entry))]
-;
-  const entries = ordered.map(({ outcome }) => catalogIndexEntry(outcome));
-  const holdingsTotal = ordered.reduce((sum, { outcome }) => {
-    const manifest = ((outcome.entry['holdings'] as number | undefined) ?? 0);
-    return sum + Number(manifest || 0);
-  }, 0);
-  const historyTotal = ordered.reduce((sum, { outcome }) => sum + Number((outcome.entry['history'] as number | undefined) ?? 0), 0);
-  const index = buildCatalogIndex('SP Funds', ordered.map(({ fund }) => fund), holdingsTotal, historyTotal, generatedAt);
-  index['funds'] = entries;
-  index['counts'] = { funds: entries.length, holdings: holdingsTotal, history: historyTotal };
+  // 3) Publish the catalog: every fund keeps its row, processed funds get fresh facts.
+  const funds = [...rows.values()].sort((a, b) => String(a['ticker']).localeCompare(String(b['ticker'])));
+  const holdingsTotal = funds.reduce((sum, row) => sum + (numberOrNull(row['holdings']) ?? 0), 0);
+  const historyTotal = funds.reduce((sum, row) => sum + (numberOrNull(row['history']) ?? 0), 0);
+  const index = buildCatalogIndex('SP Funds', [], holdingsTotal, historyTotal, generatedAt);
+  index['funds'] = funds;
+  index['counts'] = { funds: funds.length, holdings: holdingsTotal, history: historyTotal };
   const indexWritten = await writeIfChanged(new URL('index.json', apiRoot), index);
-
   summary.holdings = holdingsTotal;
   summary.history = historyTotal;
-  summary.written = (indexWritten ? 1 : 0) + ordered.filter(({ outcome }) => outcome.written).length;
+  summary.written += indexWritten ? 1 : 0;
 
-  console.log(`[ done     ] ${summary.funds} funds, ${formatCount(summary.holdings)} holdings rows, ${formatCount(summary.history)} history rows, ${formatCount(summary.written)} files written`);
-  if (skipped.length) console.log(`[ skipped  ] ${skipped.map(({ ticker, reasons }) => `${ticker} (${reasons.join('+')})`).join(', ')}`);
-  if (summary.failures.length) console.log(`[ failed   ] ${summary.failures.join(', ')}`);
+  // 4) Progress: only a clean bounded batch advances the cursor, a full pass clears it.
+  let progressWritten = false;
+  if (!summary.failures.length) {
+    if (config.maxFetches > 0 && batch.length) progressWritten = await writeIfChanged(new URL(STATE_FILE, apiRoot), { scope, cursor: batch[batch.length - 1].ticker });
+    else if (config.maxFetches === 0) progressWritten = await clearCursor(apiRoot);
+  }
+
+  const failures = summary.failures.length;
+  const updated = outcomes.filter((outcome) => outcome.status === 'updated').length;
+  const skipped = outcomes.filter((outcome) => outcome.status === 'skipped').length;
+  summary.skipped = outcomes.filter((outcome) => outcome.status === 'skipped').map((outcome) => outcome.ticker);
+  console.log(`[ ${'done'.padEnd(9)}] ${updated} funds updated, ${failures} failures`);
+  console.log(`[ ${'done'.padEnd(9)}] counts: funds=${funds.length} holdings=${formatCount(holdingsTotal)} history=${formatCount(historyTotal)}; processed=${outcomes.length} skipped=${skipped}${progressWritten ? '' : ''}`);
+  if (failures) console.log(`[ ${'failed'.padEnd(9)}] ${summary.failures.join(', ')}`);
   await outputWriteSummary([
     `### SP Funds data update`,
     ``,
-    `- Tickers processed: ${summary.funds}`,
-    `- Holdings rows: ${formatCount(summary.holdings)}`,
-    `- History rows: ${formatCount(summary.history)}`,
+    `- Funds processed: ${outcomes.length} (updated ${updated}, skipped ${skipped}, failed ${failures})`,
+    `- Catalog: ${funds.length} funds, ${formatCount(holdingsTotal)} holdings rows, ${formatCount(historyTotal)} history rows`,
     `- Files written: ${formatCount(summary.written)}`,
-    `- Funds kept by filters: ${selected.length} of ${catalog.length}${skipped.length ? ` (kept out: ${skipped.map(({ ticker, reasons }) => `${ticker} ${reasons.join('+')}`).join(', ')})` : ''}`,
-    `- Ticker cursor: ${nextCursor ?? '(all)'}`,
-    summary.failures.length ? `- Failures: ${summary.failures.join(', ')}` : `- Failures: none`,
+    `- Ticker cursor: ${config.maxFetches > 0 ? (batch[batch.length - 1]?.ticker ?? '(none)') : '(full pass)'}`,
+    failures ? `- Failures: ${summary.failures.join(', ')}` : `- Failures: none`,
   ]);
   if (options.summary) await options.summary(summary);
   return summary;
 }
 
-/** Round-robin progress marker used by MAX_FETCHES, mirroring the sibling name. */
-export async function readCursor(apiRoot: URL): Promise<string | null> {
+/** A previously published fund that the live catalog no longer advertises. */
+export function catalogFromPrevious(ticker: string, entry: JsonRecord): CatalogFund {
+  return {
+    ticker,
+    name: (entry['name'] as string | null) ?? null,
+    category: (entry['category'] as string | null) ?? null,
+    fundPage: (entry['fundPage'] as string | null) ?? fundPageUrl(ticker),
+    inceptionDate: (entry['inceptionDate'] as string | null) ?? null,
+    terValue: numberOrNull(entry['terValue']),
+    netTerValue: numberOrNull(entry['terValue']),
+    aumValue: numberOrNull(entry['aumValue']),
+    officialReturns: emptyReturns(),
+  };
+}
+
+/** Bounded-run progress marker; only valid for the same selection scope. */
+export async function readCursor(apiRoot: URL, scope: string | null = null): Promise<string | null> {
   try {
     const payload = JSON.parse(await readFile(new URL(STATE_FILE, apiRoot), 'utf8')) as JsonRecord;
-    const cursor = sanitizeTicker(payload['ticker'] ?? '');
-    return cursor || null;
+    if (scope !== null && payload['scope'] !== scope) return null;
+    return sanitizeTicker(payload['cursor'] ?? '') || null;
   } catch {
     return null;
   }
 }
 
-/** Only the ticker is published: a timestamp here would dirty `git diff` on every run. */
-export async function writeCursor(apiRoot: URL, ticker: string | null): Promise<void> {
-  await writeIfChanged(new URL(STATE_FILE, apiRoot), { ticker: ticker ?? null, pageSize: null });
+export async function writeCursor(apiRoot: URL, cursor: string | null, scope: string | null = null): Promise<void> {
+  await writeIfChanged(new URL(STATE_FILE, apiRoot), { scope, cursor: cursor ?? null });
+}
+
+/** A full pass republishes every fund, so the cursor file is removed. */
+export async function clearCursor(apiRoot: URL): Promise<boolean> {
+  const file = new URL(STATE_FILE, apiRoot);
+  try {
+    await readFile(file);
+  } catch {
+    return false;
+  }
+  await rm(file, { force: true });
+  return true;
 }
 
 export async function main(argv: string[] = process.argv.slice(2)): Promise<number> {
@@ -2272,7 +2446,7 @@ if (import.meta.main) {
   main()
     .then((code) => { process.exitCode = code; })
     .catch((error) => {
-      console.error(`[ error    ] ${errorMessage(error)}`);
+      console.error(`[ ${'error'.padEnd(9)}] ${errorMessage(error)}`);
       process.exitCode = 1;
     });
 }
