@@ -1,0 +1,19 @@
+# SP Funds source capture 2026-10-01T23:10:37Z
+# host: GitHub Actions runner; UA: browser-like
+
+## site
+200 120841 https://www.sp-funds.com/
+200 1054 https://www.sp-funds.com/wp-sitemap.xml
+200 1054 https://www.sp-funds.com/sitemap_index.xml
+
+## sec edgar
+200 189515 https://data.sec.gov/submissions/CIK0001742912.json
+200 21519 https://data.sec.gov/submissions/CIK0001989916.json
+
+## trimmed fixtures
+16
+16
+
+## sizes
+344K	research/2026-10-01/raw
+112K	research/2026-10-01/fixtures
