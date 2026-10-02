@@ -428,7 +428,8 @@
     "dividendYieldText": "3.59%",
     "secYield": 4.58,
     "secYieldText": "4.58%",
-    "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+    "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
+    "performanceAsOf": "2026-09-30"
   },
   "holdings": {
     "pages": [

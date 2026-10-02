@@ -76,7 +76,8 @@
         "dividendYieldText": "4.24%",
         "secYield": 2.24,
         "secYieldText": "2.24%",
-        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
+        "performanceAsOf": "2026-09-30"
       },
       "holdings": 30,
       "history": 1445
@@ -140,7 +141,8 @@
         "dividendYieldText": "3.59%",
         "secYield": 4.58,
         "secYieldText": "4.58%",
-        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
+        "performanceAsOf": "2026-09-30"
       },
       "holdings": 172,
       "history": 1697
@@ -204,7 +206,8 @@
         "dividendYieldText": "0.16%",
         "secYield": 0.09,
         "secYieldText": "0.09%",
-        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
+        "performanceAsOf": "2026-08-31"
       },
       "holdings": 108,
       "history": 710
@@ -268,7 +271,8 @@
         "dividendYieldText": "0.52%",
         "secYield": 0.39,
         "secYieldText": "0.39%",
-        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
+        "performanceAsOf": "2026-09-30"
       },
       "holdings": 219,
       "history": 1705
@@ -332,7 +336,8 @@
         "dividendYieldText": "0.92%",
         "secYield": 0.77,
         "secYieldText": "0.77%",
-        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+        "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
+        "performanceAsOf": "2026-08-31"
       },
       "holdings": 399,
       "history": 697
