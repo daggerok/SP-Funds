@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T01:47:23.668Z",
+  "generatedAt": "2026-10-02T03:20:02.991Z",
   "provider": "SP Funds",
   "source": {
     "catalog": "https://www.sp-funds.com/",
@@ -266,8 +266,8 @@
         "siAnn": 18.57,
         "dividendYield": 0.52,
         "dividendYieldText": "0.52%",
-        "secYield": 0.4,
-        "secYieldText": "0.40%",
+        "secYield": 0.39,
+        "secYieldText": "0.39%",
         "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
       },
       "holdings": 219,
