@@ -1,0 +1,22 @@
+# scope: index funds and per-fund directories
+index funds: SPRE,SPSK,SPTE,SPUS,SPWO
+counts: {"funds": 5, "holdings": 928, "history": 6254}
+entries with holdings rows: 5
+entries with history rows: 5
+generatedAt: 2026-10-02T01:43:18.141Z
+per-fund dirs: SPRE,SPSK,SPTE,SPUS,SPWO
+files: 20
+# byte stability (run1 vs run2 sha256 list)
+byte-identical: no
+--- research/2026-10-01/acceptance/hashes1.txt	2026-10-02 01:43:25.408427692 +0000
++++ research/2026-10-01/acceptance/hashes2.txt	2026-10-02 01:43:32.697499968 +0000
+@@ -1,4 +1,4 @@
+-38e42d91de1ec2b0e38e54c34afad264b24a853f83cff698fac6670b469ba35e  api/spfunds/funds/SPRE/history/001.json
++2aee97ed2f88c04c146c21e582846b7bcf43607d7caae9114cf5bc8705183ca2  api/spfunds/funds/SPRE/history/001.json
+ 66b6165c974bc4fdf0aced9f7fe1c47a47886920bc2ab0231b91a505865f7c49  api/spfunds/funds/SPRE/history/002.json
+ a60c4312f083427b5ec918f7bc211c92567d753be71d5cf3f894413fe385e69e  api/spfunds/funds/SPRE/holdings/001.json
+ eb4a45c81c784e2cb055497a73a6cbd5414eda77566c27a0ab243acadc6c343c  api/spfunds/funds/SPRE/meta.json
+# run outcome lines
+[ done     ] 5 funds updated, 0 failures
+[ done     ] counts: funds=5 holdings=928 history=6,254; processed=5 skipped=0
+SEC 403 mentions in run1: 0
