@@ -25,5 +25,6 @@
   "SKIP_SPFUNDS": "false",
   "SKIP_YAHOO": "false",
   "EDGAR_FALLBACK": "true",
-  "VERBOSE": "false"
+  "VERBOSE": "false",
+  "USE_SYSTEM_CA": "auto"
 }

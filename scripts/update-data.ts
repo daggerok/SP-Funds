@@ -9,6 +9,42 @@ import { appendFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/pro
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// --- TLS trust store (identical in every ETF repo) ---
+const SYSTEM_CA_MARKER = 'ETF_UPDATER_SYSTEM_CA';
+const CERT_ERROR = /UNABLE_TO_GET_ISSUER_CERT|UNABLE_TO_VERIFY_LEAF_SIGNATURE|SELF_SIGNED_CERT|CERT_HAS_EXPIRED|unable to get (?:local )?issuer certificate|self[- ]signed certificate|certificate has expired/i;
+
+export function isCertError(error: unknown): boolean {
+  const e = error as { code?: unknown; message?: unknown; cause?: unknown } | null;
+  return CERT_ERROR.test(`${String(e?.code ?? '')} ${String(e?.message ?? '')}`) || (e?.cause ? isCertError(e.cause) : false);
+}
+
+export function systemCaActive(env: Record<string, string | undefined> = process.env, execArgv: string[] = process.execArgv): boolean {
+  return execArgv.includes('--use-system-ca') || env.NODE_USE_SYSTEM_CA === '1' || env[SYSTEM_CA_MARKER] === '1';
+}
+
+export function reexecWithSystemCa(): never {
+  const child = Bun.spawnSync([process.execPath, '--use-system-ca', ...process.argv.slice(1)], {
+    env: { ...process.env, [SYSTEM_CA_MARKER]: '1' },
+    stdio: ['inherit', 'inherit', 'inherit'],
+  });
+  process.exit(child.exitCode ?? 1);
+}
+
+/** mode: auto (restart once on an untrusted-certificate error), true (restart now), false (never). */
+export function installSystemCa(mode: string, reexec: () => never = reexecWithSystemCa, active: boolean = systemCaActive()): void {
+  if (mode === 'false' || active) return;
+  if (mode === 'true') reexec();
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (...args: Parameters<typeof fetch>) => {
+    try { return await realFetch(...args); }
+    catch (error) {
+      if (!isCertError(error)) throw error;
+      console.error('[ notice   ] TLS certificate not trusted; restarting once with --use-system-ca');
+      return reexec();
+    }
+  }) as typeof fetch;
+}
+
 export type JsonRecord = Record<string, unknown>;
 export type SheetRow = Record<string, string>;
 export type Sheet = { headers: string[]; rows: SheetRow[]; asOfDate: string | null };
@@ -262,7 +298,7 @@ export const CONTROL_NAMES = [
   'MAX_FETCHES', 'REQUEST_SLEEP', 'CONCURRENCY', 'TICKERS', 'AUM', 'TER', 'DIVIDEND_YIELD', 'SEC_YIELD',
   'HOLDINGS_PAGE_SIZE', 'HISTORY_PAGE_SIZE', 'MAX_RETRIES', 'HISTORY_RANGE',
   ...['PERFORMANCE', 'TOTAL_RETURN'].flatMap((prefix) => ['YTD', '1Y', '3Y', '5Y', '10Y'].map((period) => `${prefix}_${period}`)),
-  'SEC_UA', 'SKIP_SPFUNDS', 'SKIP_YAHOO', 'EDGAR_FALLBACK', 'VERBOSE',
+  'SEC_UA', 'SKIP_SPFUNDS', 'SKIP_YAHOO', 'EDGAR_FALLBACK', 'VERBOSE', 'USE_SYSTEM_CA',
 ] as const;
 export type ControlName = (typeof CONTROL_NAMES)[number];
 export const CONFIG_FILE_URL = new URL('./update-data.config.json', import.meta.url);
@@ -324,6 +360,14 @@ function parseFlag(controls: Record<string, string | undefined>, name: string, f
   throw new Error(`${name}: expected boolean`);
 }
 
+/** USE_SYSTEM_CA: auto (default, also when blank) | true | false, case-insensitive. */
+export function parseSystemCaMode(controls: Record<string, string | undefined>): 'auto' | 'true' | 'false' {
+  const raw = (controls['USE_SYSTEM_CA'] ?? '').trim().toLowerCase();
+  if (!raw) return 'auto';
+  if (raw === 'auto' || raw === 'true' || raw === 'false') return raw;
+  throw new Error('USE_SYSTEM_CA: expected auto, true or false');
+}
+
 function parseBound(name: string, text: string, aum: boolean): number | undefined {
   const bound = text.trim().toLowerCase();
   if (!bound) return undefined;
@@ -372,6 +416,7 @@ export function readConfig(controls: Record<string, string | undefined> = {}): U
   if (!/^(max|\d+y)$/.test(historyRange)) throw new Error('HISTORY_RANGE: expected max or <N>y');
   if (/^0+y$/.test(historyRange)) throw new Error('HISTORY_RANGE: expected max or <N>y with N >= 1');
   parseFlag(controls, 'VERBOSE', false); // validated here; applied through process.env in main()
+  parseSystemCaMode(controls);
   const tickersRaw = controls['TICKERS'] ?? '';
   return {
     concurrency: parseInteger(controls, 'CONCURRENCY', 1, 2),
@@ -430,6 +475,7 @@ Controls:
   SKIP_YAHOO         true = keep the previously published Yahoo history/distributions
   EDGAR_FALLBACK     true = use SEC N-PORT-P holdings when the issuer CSV is unavailable
   VERBOSE            true = print per-request retry/fallback notices
+  USE_SYSTEM_CA      auto (default) = restart once with Bun --use-system-ca on an untrusted-certificate error; true = always; false = never
 `;
 
 // ---------------------------------------------------------------------------
@@ -2425,6 +2471,7 @@ export async function main(argv: string[] = process.argv.slice(2), env: Record<s
   }
   if (argv.length) throw new Error(`unsupported argument(s): ${argv.join(' ')}. Use --help for usage.`);
   const controls = await runtimeControls(env);
+  installSystemCa(parseSystemCaMode(controls));
   if (controls['VERBOSE'] !== undefined && env === process.env) process.env['VERBOSE'] = controls['VERBOSE'];
   const summary = await runUpdater(readConfig(controls));
   return summary.failures.length ? 1 : 0;
