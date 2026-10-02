@@ -115,6 +115,53 @@ describe('client app parity (app.tsx)', () => {
   });
 });
 
+describe('README structure', () => {
+  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  const headings = readme
+    .split('\n')
+    .filter((line) => !line.startsWith('```'))
+    .filter((line) => /^#{1,3} /.test(line))
+    .map((line) => line.trim());
+
+  test('the pinned sibling section order is preserved', () => {
+    const expected = [
+      '# SP Funds',
+      '## Using Bun',
+      '## Updating the static SP Funds data',
+      '### Data sources',
+      '### Update controls',
+      '### Examples',
+      '## TypeScript',
+      '## Brands table',
+      '## Sibling applications',
+      '## License',
+    ];
+    for (const heading of expected) expect(headings).toContain(heading);
+    expect(headings.filter((line) => line.startsWith('## '))).toEqual(
+      ['## Using Bun', '## Updating the static SP Funds data', '## TypeScript', '## Brands table', '## Sibling applications', '## License'],
+    );
+  });
+
+  test('documented controls and examples exist in the implementation', () => {
+    const defaults = JSON.parse(readFileSync(new URL('./update-data.config.json', import.meta.url), 'utf8'));
+    for (const key of Object.keys(defaults)) {
+      if (key === 'TICKERS' || key === 'SEC_UA') continue; // documented as "all" / "declared UA"
+      expect(readme).toContain(`| \`${key}\` |`);
+    }
+    const examples = [...readme.matchAll(/^([A-Z_]+)="([^"]*)" \.\/scripts\/update-data\.ts$/gm)].map((match) => match[1]);
+    expect(examples.length).toBeGreaterThan(0);
+    for (const name of examples) expect(defaults).toHaveProperty(name);
+  });
+
+  test('brand and sibling tables carry the SP Funds rows and the sibling family', () => {
+    expect(readme).toMatch(/\| \*\*SP Funds\*\* \| \[sp-funds\.com\]\(https:\/\/www\.sp-funds\.com\/\)/);
+    expect(readme).toMatch(/\| SP Funds \| .* \| \[SP-Funds\]\(https:\/\/github\.com\/daggerok\/SP-Funds\) \|/);
+    for (const sibling of ['Xtrackers', 'NEOS', 'WisdomTree', 'SPDR', 'SP Funds']) {
+      expect(readme).toContain(`| **${sibling}** |`);
+    }
+  });
+});
+
 describe('generated feed contract', () => {
   test('index entries and fund meta carry every field the copied UI reads', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'spfunds-contract-'));
