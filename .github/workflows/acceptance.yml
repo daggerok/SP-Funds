@@ -1,0 +1,98 @@
+name: SP Funds live acceptance (temporary)
+
+# TEMPORARY acceptance workflow: runs the real updater CLI (no mocks, no skip
+# flags, normal conservative pacing) twice against the live sources, records the
+# command/config/logs and proves byte stability, then commits the published
+# api/spfunds snapshot plus the evidence. Deleted before the final pull request.
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/01a0f9b5-sp-funds]
+    paths: [scripts/**, .github/workflows/acceptance.yml, package.json]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: acceptance-spfunds
+  cancel-in-progress: false
+
+jobs:
+  accept:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TICKERS: SPUS SPRE SPSK SPTE SPWO
+      VERBOSE: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Updater tests
+        run: bun test scripts/update-data.test.ts
+      - name: Run 1 (live, real CLI)
+        run: |
+          set -euo pipefail
+          dir="research/2026-10-01/acceptance"
+          mkdir -p "$dir"
+          {
+            echo "# SP Funds live acceptance — run 1"
+            echo "# revision: $(git rev-parse HEAD)"
+            echo "# command: TICKERS=\"$TICKERS\" VERBOSE=1 bun scripts/update-data.ts"
+            echo "# date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > "$dir/run1.log"
+          bun scripts/update-data.ts 2>&1 | tee -a "$dir/run1.log"
+          find api/spfunds -type f | sort | xargs sha256sum > "$dir/hashes1.txt"
+      - name: Run 2 (identical command)
+        run: |
+          set -euo pipefail
+          dir="research/2026-10-01/acceptance"
+          {
+            echo "# SP Funds live acceptance — run 2"
+            echo "# revision: $(git rev-parse HEAD)"
+            echo "# command: TICKERS=\"$TICKERS\" VERBOSE=1 bun scripts/update-data.ts"
+            echo "# date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > "$dir/run2.log"
+          bun scripts/update-data.ts 2>&1 | tee -a "$dir/run2.log"
+          find api/spfunds -type f | sort | xargs sha256sum > "$dir/hashes2.txt"
+      - name: Verify scope and byte stability
+        run: |
+          set -euo pipefail
+          dir="research/2026-10-01/acceptance"
+          {
+            echo "# scope: index funds and per-fund directories"
+            python3 - <<'PY'
+          import json
+          index = json.load(open('api/spfunds/index.json'))
+          print('index funds:', ','.join(f['ticker'] for f in index['funds']))
+          print('counts:', json.dumps(index['counts']))
+          print('index entries with holdings:', sum(1 for f in index['funds'] if f['holdings']))
+          print('index entries with history:', sum(1 for f in index['funds'] if f['history']))
+          print('generatedAt:', index['generatedAt'])
+          PY
+            echo "# byte stability (run1 vs run2 sha256 list)"
+            if diff -q "$dir/hashes1.txt" "$dir/hashes2.txt" >/dev/null; then
+              echo "byte-identical: yes ($(wc -l < "$dir/hashes1.txt") files)"
+              diff -u "$dir/hashes1.txt" "$dir/hashes2.txt" || true
+            else
+              echo "byte-identical: no"
+              diff -u "$dir/hashes1.txt" "$dir/hashes2.txt" | tee -a "$dir/summary.txt" || true
+            fi
+            echo "# retained/failed lines"
+            grep -E "^\[ (done|failed|error) " "$dir/run1.log" || true
+            grep -cE "403" "$dir/run1.log" | sed 's/^/# SEC 403 mentions: /'
+          } > "$dir/summary.txt"
+          cat "$dir/summary.txt" >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit the snapshot and evidence
+        run: |
+          set -euo pipefail
+          git add api/spfunds research/2026-10-01/acceptance
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git config user.name "Daggerok SP Funds"
+          git config user.email "daggerok@users.noreply.github.com"
+          git commit -m "chore(data): live acceptance snapshot for the SP Funds feed"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
