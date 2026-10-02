@@ -41,6 +41,22 @@ import { readFileSync } from 'node:fs';
 
 const TICKERS = ['SPUS', 'SPRE', 'SPSK', 'SPTE', 'SPWO'];
 
+/** Runs `work` with every updater environment key removed, then restores it. */
+function withCleanEnvironment<T>(work: () => T): T {
+  const names = Object.keys(loadUpdaterDefaults());
+  const saved = names.map((name) => [name, process.env[name]] as const);
+  for (const name of names) delete process.env[name];
+  try {
+    return work();
+  } finally {
+    for (const [name, value] of saved) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+}
+
+
 /** Routes every outbound URL of an offline run to the captured 2026-10-01 bytes. */
 function fixtureRoutes(overrides: Record<string, string> = {}): Array<[RegExp, () => string]> {
   return [
@@ -400,7 +416,9 @@ describe('configuration', () => {
     expect(defaults['REQUEST_SLEEP']).toBe('1');
     expect(Object.keys(defaults).length).toBeGreaterThanOrEqual(25);
     expect(defaults['SEC_UA']).toContain('SP-Funds');
-    const config = readConfig(applyUpdaterDefaults(defaults));
+    // The assertion is about the checked-in JSON, so an exported environment
+    // (TICKERS=... VERBOSE=1 bun test) must not shadow it.
+    const config = withCleanEnvironment(() => readConfig(applyUpdaterDefaults(defaults)));
     expect(config.tickers).toEqual([]);
     expect(config.historyRange).toBe('max');
     expect(config.edgarFallback).toBe(true);
