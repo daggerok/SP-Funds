@@ -1,3 +1,13 @@
+=== SESSION STATUS (2026-10-02) ===
+Implementation is COMPLETE on branch arena/01a0f9b5-sp-funds; a Pull Request against main is open.
+Delivered: sibling-parity app.tsx/index.html (8 substitution categories), scripts/update-data.ts + 63 offline
+tests + scripts/app-contract.test.ts, scripts/update-data.config.json, scripts/fixtures/2026-10-01/**,
+update-data/ci/pages workflows (25-input workaround) + dependabot, README pinned to daggerok/Xtrackers,
+and the published api/spfunds/** live-acceptance snapshot (5 funds, 928 positions, 6,254 history rows).
+Remaining for the repository owner (the session token has no admin/push scope for them): merge the PR, enable
+GitHub Pages (Actions) after merge, and apply the About description/homepage/topics listed in the PR body.
+Details, evidence and the exact next actions are in .worklog.txt (CURRENT STATE block).
+
 === 1st PROMPT: COPY & PASTE THIS TO THE IMPLEMENTING AGENT (WITH YOUR GITHUB ACCESS TOKEN) ===
 
 Target repository: https://github.com/daggerok/SP-Funds
