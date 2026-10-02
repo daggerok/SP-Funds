@@ -54,6 +54,8 @@ Each fund carries a derived `metrics` object that powers the catalog columns sha
 - `siAnn` - since-inception annualized NAV return when the site publishes it
 - `dividendYield` - indicated distribution rate (latest distribution × frequency ÷ NAV) when the page publishes no explicit rate; `—` otherwise
 - `secYield` - 30-day SEC yield when published; `—` otherwise
+- `returnsBasis` - mandatory non-empty label of how the returns are computed: here always the official SP Funds month-end NAV total returns from the fund page performance table, with the cumulative 3/5/10-year figures derived from the published annualized ones
+- `performanceAsOf` - mandatory ISO `YYYY-MM-DD` date of that performance table (the month-end `Date` column), not the NAV date; `null` only when the table date is unknown. Both fields are the last two keys of `metrics`
 
 ### Update controls
 
