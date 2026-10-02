@@ -1,7 +1,7 @@
 # SP Funds live acceptance — run 1
-# revision: 663fa5f8a62e638ff7ab5219f04b03bc66a9598d
+# revision: 05c68e7f457a252d04813df522bd33b56ad1f9a5
 # command: TICKERS="SPUS SPRE SPSK SPTE SPWO" VERBOSE=1 bun scripts/update-data.ts
-# date: 2026-10-02T01:43:18Z
+# date: 2026-10-02T01:45:12Z
 [ config   ] SP Funds updater:
               MAX_FETCHES=0
               REQUEST_SLEEP=1
@@ -31,10 +31,10 @@
               TOTAL_RETURN_YTD=:
               VERBOSE=true
 [ filter   ] 5 of 5 funds pass filters
-[  1/5   ] SPRE  updated   history=1445 holdings=30 netAssets=$198.6M div=4.24 sec=2.24
-[  2/5   ] SPSK  updated   history=1697 holdings=172 netAssets=$453.0M div=3.59 sec=4.58
-[  3/5   ] SPTE  updated   history=710 holdings=108 netAssets=$261.5M div=0.16 sec=0.09
-[  4/5   ] SPUS  updated   history=1705 holdings=219 netAssets=$3.3B div=0.52 sec=0.4
-[  5/5   ] SPWO  updated   history=697 holdings=399 netAssets=$241.4M div=0.92 sec=0.77
-[ done     ] 5 funds updated, 0 failures
+[  1/5   ] SPRE  unchanged history=1445 holdings=30 netAssets=$198.6M div=4.24 sec=2.24
+[  2/5   ] SPSK  unchanged history=1697 holdings=172 netAssets=$453.0M div=3.59 sec=4.58
+[  3/5   ] SPTE  unchanged history=710 holdings=108 netAssets=$261.5M div=0.16 sec=0.09
+[  4/5   ] SPUS  unchanged history=1705 holdings=219 netAssets=$3.3B div=0.52 sec=0.4
+[  5/5   ] SPWO  unchanged history=697 holdings=399 netAssets=$241.4M div=0.92 sec=0.77
+[ done     ] 0 funds updated, 0 failures
 [ done     ] counts: funds=5 holdings=928 history=6,254; processed=5 skipped=0
