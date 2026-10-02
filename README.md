@@ -57,7 +57,7 @@ Each fund carries a derived `metrics` object that powers the catalog columns sha
 
 ### Update controls
 
-Defaults below are from `scripts/update-data.config.json`; blank Actions inputs do not override them. The individual workflow inputs cover every control except `SEC_UA`, `EDGAR_FALLBACK` and `VERBOSE`, which are set through `advanced`.
+Defaults below are from `scripts/update-data.config.json`; blank Actions inputs do not override them. The individual workflow inputs cover every control except `SEC_UA`, `EDGAR_FALLBACK`, `VERBOSE` and `USE_SYSTEM_CA`, which are set through `advanced`.
 
 | Environment variable | Default | Meaning |
 | --- | --: | --- |
@@ -88,6 +88,7 @@ Defaults below are from `scripts/update-data.config.json`; blank Actions inputs 
 | `SKIP_YAHOO` | `false` | Skip Yahoo Finance (keeps published history/dividends) |
 | `EDGAR_FALLBACK` | `true` | Use SEC EDGAR N-PORT-P when the issuer's daily holdings file is unavailable |
 | `VERBOSE` | `false` | Provider, fallback and retry detail; the compact fund reporter always retains real zero/false values and omits missing fields |
+| `USE_SYSTEM_CA` | `auto` | TLS trust store: `auto` restarts the updater once with Bun's `--use-system-ca` when a request fails with an untrusted-certificate error; `true` always uses the system CA store; `false` never restarts. Not an individual workflow input: use `advanced`, the config file or the CLI environment. |
 
 `TICKERS` combines with AUM, TER, yield and return filters using AND logic; it does not override them. Funds not selected for a successful update keep their prior published metadata and data files.
 

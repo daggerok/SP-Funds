@@ -23,7 +23,7 @@ import {
   parseYahooChart, paymentsPerYear, periodKey, readConfig, readCursor, readPreviousIndex, readPreviousPages,
   resolveControls, round, runUpdater, runtimeControls, samePublishedContent, sanitizeTicker, secHeaders,
   selectionEntryFromIndex, splitPages, spFundsAssetCategory, stableStringify, toIsoDate, trustForTicker,
-  updateFund, writeIfChanged, writePages, writeCursor, yahooChartUrl,
+  installSystemCa, isCertError, updateFund, writeIfChanged, writePages, writeCursor, yahooChartUrl,
   type CatalogFund, type FundOutcome, type JsonRecord, type SheetRow, type Transport, type UpdaterConfig,
 } from './update-data';
 
@@ -658,7 +658,7 @@ describe('configuration', () => {
   test('the resolver rejects unknown keys, non-scalars, newlines and invalid values', () => {
     const invalid: unknown[] = [
       { UNKNOWN: 1 }, { SEC_UA: 'x\nEVIL=yes' }, { SEC_UA: 'x\0y' }, { CONCURRENCY: 0 }, { MAX_RETRIES: 0 }, { MAX_RETRIES: -1 },
-      { MAX_FETCHES: 1.5 }, { MAX_FETCHES: '-1' }, { REQUEST_SLEEP: '-1' }, { REQUEST_SLEEP: 'fast' }, { VERBOSE: 'maybe' },
+      { MAX_FETCHES: 1.5 }, { MAX_FETCHES: '-1' }, { REQUEST_SLEEP: '-1' }, { REQUEST_SLEEP: 'fast' }, { VERBOSE: 'maybe' }, { USE_SYSTEM_CA: 'maybe' },
       { SKIP_YAHOO: 'maybe' }, { EDGAR_FALLBACK: '2' }, { AUM: '1:2:3' }, { AUM: 'huge' }, { AUM: '5B:1B' }, { TER: 'a:b' }, { TER: '2' },
       { PERFORMANCE_1Y: '10:0' }, { TOTAL_RETURN_YTD: ':x' }, { HISTORY_RANGE: '1mo' }, { HISTORY_RANGE: '0y' }, { HOLDINGS_PAGE_SIZE: 0 },
       { HISTORY_PAGE_SIZE: 'big' }, { TICKERS: ['SPUS'] }, { TICKERS: { a: 1 } }, null, [], 'text',
@@ -725,6 +725,61 @@ describe('configuration', () => {
     expect(rows.sort()).toEqual([...CONTROL_NAMES].sort());
     expect(doc).toContain('scripts/update-data.config.json');
     expect(doc).toContain(SEC_UA_DEFAULT);
+  });
+});
+
+describe('system CA support', () => {
+  test('USE_SYSTEM_CA resolves case-insensitively, defaults to auto and rejects other values', () => {
+    const file = JSON.parse(readFileSync(new URL('./update-data.config.json', import.meta.url), 'utf8'));
+    expect(file.USE_SYSTEM_CA).toBe('auto');
+    for (const value of ['auto', 'true', 'false', 'AUTO', 'True', 'FALSE']) {
+      expect(() => readConfig(resolveControls(file, {}, {}, { USE_SYSTEM_CA: value }))).not.toThrow();
+    }
+    expect(() => resolveControls(file, {}, {}, { USE_SYSTEM_CA: 'maybe' })).toThrow('USE_SYSTEM_CA');
+    expect(() => readConfig({ USE_SYSTEM_CA: 'maybe' })).toThrow('USE_SYSTEM_CA');
+  });
+
+  test('isCertError detects untrusted-certificate errors, also through cause', () => {
+    expect(isCertError({ code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY' })).toBe(true);
+    expect(isCertError(new Error('unable to get local issuer certificate'))).toBe(true);
+    expect(isCertError(new Error('fetch failed', { cause: new Error('unable to get local issuer certificate') }))).toBe(true);
+    expect(isCertError({ code: 'ECONNRESET' })).toBe(false);
+    expect(isCertError(new Error('HTTP 403'))).toBe(false);
+    expect(isCertError(null)).toBe(false);
+  });
+
+  test('installSystemCa leaves fetch alone for false or an active store, restarts for true, wraps fetch for auto', async () => {
+    const original = globalThis.fetch;
+    const never = (): never => { throw new Error('unexpected reexec'); };
+    try {
+      installSystemCa('false', never, false);
+      expect(globalThis.fetch).toBe(original);
+      installSystemCa('auto', never, true);
+      expect(globalThis.fetch).toBe(original);
+
+      let calls = 0;
+      expect(() => installSystemCa('true', (() => { calls++; throw new Error('reexec'); }) as () => never, false)).toThrow('reexec');
+      expect(calls).toBe(1);
+      expect(globalThis.fetch).toBe(original);
+
+      let reexecs = 0;
+      const reexec = (): never => { reexecs++; throw new Error('reexec'); };
+      let next: () => Promise<Response> = async () => new Response('ok');
+      globalThis.fetch = (async () => next()) as unknown as typeof fetch;
+      const stub = globalThis.fetch;
+      installSystemCa('auto', reexec, false);
+      expect(globalThis.fetch).not.toBe(stub);
+      expect(await (await fetch('https://example.test/')).text()).toBe('ok');
+      expect(reexecs).toBe(0);
+      next = async () => { throw new Error('HTTP 403'); };
+      await expect(fetch('https://example.test/')).rejects.toThrow('HTTP 403');
+      expect(reexecs).toBe(0);
+      next = async () => { throw Object.assign(new Error('fetch failed'), { code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY' }); };
+      await expect(fetch('https://example.test/')).rejects.toThrow('reexec');
+      expect(reexecs).toBe(1);
+    } finally {
+      globalThis.fetch = original;
+    }
   });
 });
 
