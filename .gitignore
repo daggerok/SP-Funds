@@ -6,3 +6,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Temporary run-1 snapshot kept inside the acceptance workflow workspace only.
+research/**/acceptance/snapshot1/
