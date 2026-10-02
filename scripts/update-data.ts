@@ -1352,7 +1352,7 @@ export function deriveMetrics(
     dividendYieldText: formatPercentText(dividendYield),
     secYield,
     secYieldText: secYield === null ? '—' : `${secYield.toFixed(2)}%`,
-    returnsBasis: 'official SP Funds month-end NAV total returns (fund page Performance Statistics table, "<TICKER> NAV" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns',
+    returnsBasis: 'official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns',
     performanceAsOf: performanceAsOf(returns),
   };
 }
