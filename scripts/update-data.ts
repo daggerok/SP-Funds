@@ -3,11 +3,8 @@
 
 // SP Funds (Sharia-Compliant ETFs) static feed. Bun-only, zero runtime dependencies.
 // Console/reporting shape, config-file precedence and the N-PORT/Python-free helpers follow
-// the pinned family conventions (daggerok/JPMorgan, daggerok/Neos, daggerok/Xtrackers);
-// the shared holdings-CSV contract is adapted from daggerok/Neos (same TidalFG columns).
-// Every acquisition detail specific to this brand is documented in .worklog.txt.
+// the shared family conventions; the holdings-CSV contract matches the other TidalFG-hosted brands.
 import { createHash } from 'node:crypto';
-import { readFileSync as readUpdaterConfig } from 'node:fs';
 import { appendFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -83,11 +80,16 @@ export const holdingsCsvUrl = (ticker: string): string =>
 export const holdingsCsvProvenanceUrl = (ticker: string): string =>
   `${SPFUNDS_SITE}/wp-content/uploads/data/TidalFG_Holdings_${sanitizeTicker(ticker)}.csv`;
 export const fundPageUrl = (ticker: string): string => `${SPFUNDS_SITE}/${sanitizeTicker(ticker).toLowerCase()}/`;
+/**
+ * Explicit period1/period2 (a `range=` parameter is ignored next to them): `max` starts at
+ * the epoch, `<N>y` starts N years before now, so HISTORY_RANGE really limits the window.
+ */
 export const yahooChartUrl = (ticker: string, range: string = 'max', nowMs: number = Date.now()): string => {
   const period2 = Math.floor(nowMs / 1000);
-  const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sanitizeTicker(ticker))}` +
-    `?period1=0&period2=${period2}&interval=1d&events=div%7Csplit&includeAdjustedClose=true`;
-  return range && range !== 'max' ? `${base}&range=${encodeURIComponent(range)}` : base;
+  const years = /^(\d+)y$/i.exec(range.trim());
+  const period1 = years ? Math.max(0, Math.floor(period2 - Number(years[1]) * 365.25 * 86_400)) : 0;
+  return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sanitizeTicker(ticker))}` +
+    `?period1=${period1}&period2=${period2}&interval=1d&events=div%7Csplit&includeAdjustedClose=true`;
 };
 export const yahooChartProvenanceUrl = (ticker: string): string =>
   `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sanitizeTicker(ticker))}`;
@@ -250,162 +252,147 @@ export const AUM_PRESET_BOUNDS = {
 type AumPreset = keyof typeof AUM_PRESET_BOUNDS;
 export const AMOUNT_SUFFIXES: Record<string, number> = { K: 1e3, M: 1e6, B: 1e9, T: 1e12 };
 
-/**
- * The checked-in JSON is the runtime default; a nonblank environment value always
- * wins. Only undefined/blank/whitespace environment values are filled, so an
- * explicit `0`, `false`, `:` or empty TICKERS keeps its meaning.
- */
-export function loadUpdaterDefaults(
-  readFileSyncImpl: (path: URL, encoding: 'utf8') => string = readUpdaterConfig as unknown as (path: URL, encoding: 'utf8') => string,
+export const SEC_UA_DEFAULT = 'daggerok ETF feed daggerok@gmail.com';
+
+// File defaults and explicit overrides, resolved identically by the CLI and the workflow.
+// Precedence: config file < advanced JSON < nonblank named inputs < environment (an explicitly
+// set environment variable wins even when empty) < protected Actions variables (workflow only,
+// passed as the environment layer). Allowlisted scalar controls only, strictly validated.
+export const CONTROL_NAMES = [
+  'MAX_FETCHES', 'REQUEST_SLEEP', 'CONCURRENCY', 'TICKERS', 'AUM', 'TER', 'DIVIDEND_YIELD', 'SEC_YIELD',
+  'HOLDINGS_PAGE_SIZE', 'HISTORY_PAGE_SIZE', 'MAX_RETRIES', 'HISTORY_RANGE',
+  ...['PERFORMANCE', 'TOTAL_RETURN'].flatMap((prefix) => ['YTD', '1Y', '3Y', '5Y', '10Y'].map((period) => `${prefix}_${period}`)),
+  'SEC_UA', 'SKIP_SPFUNDS', 'SKIP_YAHOO', 'EDGAR_FALLBACK', 'VERBOSE',
+] as const;
+export type ControlName = (typeof CONTROL_NAMES)[number];
+export const CONFIG_FILE_URL = new URL('./update-data.config.json', import.meta.url);
+/** Environment aliases accepted next to the canonical control name. */
+const CONTROL_ALIASES: Partial<Record<ControlName, string[]>> = { SKIP_SPFUNDS: ['SKIP_SP_FUNDS'] };
+
+export function resolveControls(
+  file: unknown = {},
+  advanced: unknown = {},
+  inputs: unknown = {},
+  env: Record<string, string | undefined> = {},
 ): Record<string, string> {
-  let payload: unknown;
+  const result: Record<string, string> = {};
+  const known = new Set<string>(CONTROL_NAMES);
+  const apply = (value: unknown, skipEmpty = false): void => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Configuration must be a JSON object');
+    for (const [key, raw] of Object.entries(value)) {
+      if (!known.has(key)) throw new Error(`Unknown updater control: ${key}`);
+      if (skipEmpty && (raw === '' || raw === undefined || raw === null)) continue;
+      if (!['string', 'number', 'boolean'].includes(typeof raw)) throw new Error(`${key}: expected string, number or boolean`);
+      const text = String(raw);
+      if (/[\r\n\0]/.test(text)) throw new Error(`${key}: multiline/control characters are not allowed`);
+      result[key] = text;
+    }
+  };
+  apply(file);
+  apply(advanced);
+  apply(inputs, true);
+  for (const key of CONTROL_NAMES) {
+    const value = [key, ...(CONTROL_ALIASES[key] ?? [])].map((name) => env[name]).find((candidate) => candidate !== undefined);
+    if (value !== undefined) apply({ [key]: value });
+  }
+  readConfig(result); // validate every control before any request or write
+  return result;
+}
+
+export async function runtimeControls(env: Record<string, string | undefined> = process.env): Promise<Record<string, string>> {
+  let file: unknown = {};
   try {
-    payload = JSON.parse(readFileSyncImpl(new URL('./update-data.config.json', import.meta.url), 'utf8'));
+    file = JSON.parse(await readFile(CONFIG_FILE_URL, 'utf8'));
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return {};
-    throw error;
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
   }
-  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
-    throw new Error('scripts/update-data.config.json: expected a flat JSON object of string defaults');
-  }
-  const defaults: Record<string, string> = {};
-  for (const [key, value] of Object.entries(payload as Record<string, unknown>)) {
-    if (value === null || value === undefined) continue;
-    if (!['string', 'number', 'boolean'].includes(typeof value)) {
-      throw new Error(`scripts/update-data.config.json: "${key}" must be a scalar string/number/boolean`);
-    }
-    defaults[key] = String(value);
-  }
-  return defaults;
+  return resolveControls(file, {}, {}, env);
 }
 
-export function applyUpdaterDefaults(
-  defaults: Record<string, string>,
-  env: Record<string, string | undefined> = process.env,
-): Record<string, string | undefined> {
-  const merged: Record<string, string | undefined> = { ...env };
-  for (const [key, value] of Object.entries(defaults)) {
-    const current = merged[key];
-    if (current === undefined || String(current).trim() === '') merged[key] = value;
-  }
-  return merged;
+function parseInteger(controls: Record<string, string | undefined>, name: string, min: number, fallback: number): number {
+  const raw = (controls[name] ?? '').trim();
+  if (!raw) return fallback;
+  if (!/^\d+$/.test(raw) || !Number.isSafeInteger(Number(raw)) || Number(raw) < min) throw new Error(`${name}: expected integer >= ${min}`);
+  return Number(raw);
 }
 
-export function resolveControls(file: unknown = {}, env: Record<string, string | undefined> = {}): Record<string, string> {
-  const controls: Record<string, string> = {};
-  if (file && typeof file === 'object' && !Array.isArray(file)) {
-    for (const [key, value] of Object.entries(file as JsonRecord)) {
-      if (value === null || value === undefined) continue;
-      if (!['string', 'number', 'boolean'].includes(typeof value)) continue;
-      controls[key] = String(value);
-    }
-  }
-  for (const [key, value] of Object.entries(env)) {
-    if (value === undefined || String(value).trim() === '') continue;
-    controls[key] = String(value);
-  }
-  return controls;
+function parseFlag(controls: Record<string, string | undefined>, name: string, fallback: boolean): boolean {
+  const raw = (controls[name] ?? '').trim().toLowerCase();
+  if (!raw) return fallback;
+  if (/^(1|true|yes|y|on)$/.test(raw)) return true;
+  if (/^(0|false|no|n|off)$/.test(raw)) return false;
+  throw new Error(`${name}: expected boolean`);
 }
 
-function envValue(env: Record<string, string | undefined>, name: string, aliases: string[] = []): string {
-  for (const key of [name, ...aliases]) {
-    const value = env[key];
-    if (value !== undefined && String(value).trim() !== '') return String(value).trim();
-  }
-  return '';
+function parseBound(name: string, text: string, aum: boolean): number | undefined {
+  const bound = text.trim().toLowerCase();
+  if (!bound) return undefined;
+  if (aum && bound in AUM_PRESET_BOUNDS) return AUM_PRESET_BOUNDS[bound as AumPreset].min;
+  const match = (aum ? /^(\d+(?:\.\d+)?|\.\d+)\s*([kmbt])?$/ : /^(-?(?:\d+(?:\.\d+)?|\.\d+))$/).exec(bound);
+  if (!match) throw new Error(`${name}: invalid bound "${text.trim()}"`);
+  const value = Number(match[1]) * (match[2] ? AMOUNT_SUFFIXES[match[2].toUpperCase()] ?? 1 : 1);
+  if (!Number.isFinite(value)) throw new Error(`${name}: invalid bound "${text.trim()}"`);
+  return value;
 }
 
-function parsePositiveInt(raw: string, fallback: number): number {
-  const parsed = Number.parseInt(raw, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
-function parseNonNegativeInt(raw: string, fallback: number): number {
-  const parsed = Number.parseInt(raw, 10);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
-}
-
-function parseBoolean(raw: string, fallback = false): boolean {
-  const text = cleanText(raw).toLowerCase();
-  if (!text) return fallback;
-  return /^(1|true|yes|on)$/.test(text);
-}
-
-function parseAumBound(bound: string): number | undefined {
-  const text = cleanText(bound).toLowerCase();
-  if (!text) return undefined;
-  if (text in AUM_PRESET_BOUNDS) return AUM_PRESET_BOUNDS[text as AumPreset].min;
-  const match = /^(-?[\d.]+)\s*([kmbt])?$/.exec(text);
-  if (!match) return undefined;
-  const suffix = match[2] ? AMOUNT_SUFFIXES[match[2].toUpperCase()] ?? 1 : 1;
-  const value = Number(match[1]) * suffix;
-  return Number.isFinite(value) ? value : undefined;
-}
-
-export function parseAumRange(raw: string): (Range & { source?: string }) | undefined {
+function parseRangeStrict(name: string, raw: string, aum: boolean): (Range & { source?: string }) | undefined {
   const text = cleanText(raw);
   if (!text || text === ':') return undefined;
-  if (text in AUM_PRESET_BOUNDS) {
-    const preset = AUM_PRESET_BOUNDS[text as AumPreset];
-    return { min: preset.min, max: preset.max ?? Number.POSITIVE_INFINITY, source: text };
+  if (aum && text.toLowerCase() in AUM_PRESET_BOUNDS) {
+    const preset = AUM_PRESET_BOUNDS[text.toLowerCase() as AumPreset];
+    return { min: preset.min, max: preset.max ?? Number.POSITIVE_INFINITY, source: text.toLowerCase() };
   }
-  if (!text.includes(':')) return undefined;
-  const [left, right] = text.split(':', 2);
-  const min = parseAumBound(left);
-  const max = parseAumBound(right);
-  return { min: min ?? 0, max: max ?? Number.POSITIVE_INFINITY, source: text };
+  const parts = text.split(':');
+  if (parts.length !== 2) throw new Error(`${name}: expected min:max`);
+  const min = parseBound(name, parts[0], aum) ?? (aum ? 0 : Number.NEGATIVE_INFINITY);
+  const max = parseBound(name, parts[1], aum) ?? Number.POSITIVE_INFINITY;
+  if (min > max) throw new Error(`${name}: min must not exceed max`);
+  return aum ? { min, max, source: text } : { min, max };
 }
 
-export function parseRange(raw: string): Range | undefined {
-  const text = cleanText(raw);
-  if (!text || text === ':') return undefined;
-  if (!text.includes(':')) return undefined;
-  const [left, right] = text.split(':', 2);
-  const min = left.trim() === '' ? 0 : Number(left);
-  const max = right.trim() === '' ? Number.POSITIVE_INFINITY : Number(right);
-  if (!Number.isFinite(min) && min !== 0) return undefined;
-  if (!Number.isFinite(max) && max !== Number.POSITIVE_INFINITY) return undefined;
-  if (Number.isNaN(min) || Number.isNaN(max)) return undefined;
-  return { min, max };
-}
+export const parseAumRange = (raw: string): (Range & { source?: string }) | undefined => parseRangeStrict('AUM', raw, true);
+export const parseRange = (raw: string, name = 'range'): Range | undefined => parseRangeStrict(name, raw, false);
 
-function parseRanges(env: Record<string, string | undefined>, prefix: 'PERFORMANCE' | 'TOTAL_RETURN'): RangeMap {
+function parseRanges(controls: Record<string, string | undefined>, prefix: 'PERFORMANCE' | 'TOTAL_RETURN'): RangeMap {
   const ranges: RangeMap = {};
   for (const period of RETURN_PERIODS) {
-    const range = parseRange(envValue(env, `${prefix}_${period}`));
+    const range = parseRange(controls[`${prefix}_${period}`] ?? '', `${prefix}_${period}`);
     if (range) ranges[period] = range;
   }
   return ranges;
 }
 
-export function readConfig(
-  env: Record<string, string | undefined> = {},
-  file: unknown = {},
-): UpdaterConfig {
-  const merged = resolveControls(file, env);
-  const tickersRaw = envValue(merged, 'TICKERS');
+/** Turns resolved (string) controls into the typed config; every invalid value is an error, never a fallback. */
+export function readConfig(controls: Record<string, string | undefined> = {}): UpdaterConfig {
+  const requestSleepRaw = (controls['REQUEST_SLEEP'] ?? '').trim();
+  if (requestSleepRaw && (!/^\d+(?:\.\d+)?$/.test(requestSleepRaw) || !Number.isFinite(Number(requestSleepRaw)))) {
+    throw new Error('REQUEST_SLEEP: expected nonnegative seconds');
+  }
+  const historyRange = (controls['HISTORY_RANGE'] ?? '').trim().toLowerCase() || 'max';
+  if (!/^(max|\d+y)$/.test(historyRange)) throw new Error('HISTORY_RANGE: expected max or <N>y');
+  if (/^0+y$/.test(historyRange)) throw new Error('HISTORY_RANGE: expected max or <N>y with N >= 1');
+  parseFlag(controls, 'VERBOSE', false); // validated here; applied through process.env in main()
+  const tickersRaw = controls['TICKERS'] ?? '';
   return {
-    concurrency: parsePositiveInt(envValue(merged, 'CONCURRENCY'), 2),
-    requestSleep: Number.isFinite(Number(envValue(merged, 'REQUEST_SLEEP')))
-      ? Math.max(0, Number(envValue(merged, 'REQUEST_SLEEP')))
-      : 1,
-    maxFetches: parseNonNegativeInt(envValue(merged, 'MAX_FETCHES'), 0),
-    holdingsPageSize: parsePositiveInt(envValue(merged, 'HOLDINGS_PAGE_SIZE'), 250),
-    historyPageSize: parsePositiveInt(envValue(merged, 'HISTORY_PAGE_SIZE'), 1000),
-    maxRetries: parseNonNegativeInt(envValue(merged, 'MAX_RETRIES'), 2),
-    tickers: tickersRaw ? tickersRaw.split(/[\s,]+/).map(sanitizeTicker).filter(Boolean) : [],
-    historyRange: envValue(merged, 'HISTORY_RANGE') || 'max',
-    edgarFallback: parseBoolean(envValue(merged, 'EDGAR_FALLBACK'), true),
-    skipSpFunds: parseBoolean(envValue(merged, 'SKIP_SPFUNDS', ['SKIP_SP_FUNDS']), false),
-    skipYahoo: parseBoolean(envValue(merged, 'SKIP_YAHOO'), false),
+    concurrency: parseInteger(controls, 'CONCURRENCY', 1, 2),
+    requestSleep: requestSleepRaw ? Number(requestSleepRaw) : 1,
+    maxFetches: parseInteger(controls, 'MAX_FETCHES', 0, 0),
+    holdingsPageSize: parseInteger(controls, 'HOLDINGS_PAGE_SIZE', 1, 250),
+    historyPageSize: parseInteger(controls, 'HISTORY_PAGE_SIZE', 1, 1000),
+    maxRetries: parseInteger(controls, 'MAX_RETRIES', 1, 2),
+    tickers: tickersRaw.split(/[\s,;]+/).map(sanitizeTicker).filter(Boolean),
+    historyRange,
+    edgarFallback: parseFlag(controls, 'EDGAR_FALLBACK', true),
+    skipSpFunds: parseFlag(controls, 'SKIP_SPFUNDS', false),
+    skipYahoo: parseFlag(controls, 'SKIP_YAHOO', false),
     // EDGAR requires a declared identity with a reachable contact ("Company Name email").
-    secUa: envValue(merged, 'SEC_UA') || 'Daggerok SP-Funds daggerok@users.noreply.github.com',
-    aumRange: parseAumRange(envValue(merged, 'AUM')),
-    terRange: parseRange(envValue(merged, 'TER')),
-    dividendYieldRange: parseRange(envValue(merged, 'DIVIDEND_YIELD')),
-    secYieldRange: parseRange(envValue(merged, 'SEC_YIELD')),
-    performanceRanges: parseRanges(merged, 'PERFORMANCE'),
-    totalReturnRanges: parseRanges(merged, 'TOTAL_RETURN'),
+    secUa: (controls['SEC_UA'] ?? '').trim() || SEC_UA_DEFAULT,
+    aumRange: parseAumRange(controls['AUM'] ?? ''),
+    terRange: parseRange(controls['TER'] ?? '', 'TER'),
+    dividendYieldRange: parseRange(controls['DIVIDEND_YIELD'] ?? '', 'DIVIDEND_YIELD'),
+    secYieldRange: parseRange(controls['SEC_YIELD'] ?? '', 'SEC_YIELD'),
+    performanceRanges: parseRanges(controls, 'PERFORMANCE'),
+    totalReturnRanges: parseRanges(controls, 'TOTAL_RETURN'),
   };
 }
 
@@ -413,36 +400,35 @@ export const USAGE = `
 SP Funds static feed updater (Bun, zero runtime dependencies).
 
 Usage:
-  bun ./scripts/update-data.ts [--help]
+  ./scripts/update-data.ts [--help]        (or: bun ./scripts/update-data.ts)
 
-Runtime defaults come from scripts/update-data.config.json (flat JSON of strings).
-A nonblank environment value always wins over the checked-in JSON default; an
-explicit 0/false/':' value is honoured.
+Controls come from scripts/update-data.config.json (flat JSON of strings). An explicitly
+set environment variable wins over the file, even when empty. The workflow resolves the
+same way: file < advanced JSON < nonblank inputs < protected Actions variable.
+Invalid values are errors, never silent fallbacks.
 
-Controls (every control has a matching workflow_dispatch input except SEC_UA and
-VERBOSE, which stay config-file/CLI-only because GitHub permits 25 inputs):
+Controls:
 
   MAX_FETCHES        0 = process every selected fund; N > 0 = at most N funds per run,
                      resuming after the ticker cursor in api/spfunds/update-state.json
   REQUEST_SLEEP      Seconds between request starts inside one worker lane (default 1)
-  CONCURRENCY        Independent worker lanes / parallel funds (default 2)
-  HOLDINGS_PAGE_SIZE Rows per generated holdings JSON page (default 250)
-  HISTORY_PAGE_SIZE  Rows per generated history JSON page (default 1000)
-  MAX_RETRIES        Retries after the initial request for 408/425/429/5xx (default 2)
-  TICKERS            Space/comma separated subset of the catalog, e.g. "SPUS SPSK SPWO"
-  AUM/TER/...        Range filters are evaluated against the previously published
-                     facts; a fund with no published entry yet always runs once.
+  CONCURRENCY        Independent worker lanes / parallel funds, integer >= 1 (default 2)
+  TICKERS            Space/comma/semicolon separated subset of the catalog, e.g. "SPUS SPSK SPWO"
   AUM                AUM min:max (K/M/B/T suffixes or nano/micro/small/mid/large)
   TER                Expense-ratio percentage range: min:max
   DIVIDEND_YIELD     Derived distribution-rate percentage range: min:max
   SEC_YIELD          Official 30-day SEC yield percentage range: min:max
+                     (range filters are evaluated per fund against freshly parsed facts)
+  HOLDINGS_PAGE_SIZE Rows per generated holdings JSON page (default 250)
+  HISTORY_PAGE_SIZE  Rows per generated history JSON page (default 1000)
+  MAX_RETRIES        Retries after the initial request for 408/425/429/5xx, integer >= 1 (default 2)
+  HISTORY_RANGE      Yahoo history window: max or <N>y, e.g. 5y (default max)
   PERFORMANCE_<P>    Official month-end NAV return range for P in YTD,1Y,3Y,5Y,10Y
   TOTAL_RETURN_<P>   Derived cumulative total-return range for the same periods
-  HISTORY_RANGE      Yahoo chart range used for the history sheet (max, 10y, 5y, ...)
-  EDGAR_FALLBACK     true = use SEC N-PORT-P holdings when the issuer CSV is unavailable
+  SEC_UA             Declared SEC contact string (EDGAR requires an identity; redacted in logs)
   SKIP_SPFUNDS       true = keep the previously published issuer data (catalog/meta/holdings)
   SKIP_YAHOO         true = keep the previously published Yahoo history/distributions
-  SEC_UA             Declared SEC contact string (EDGAR requires an identity)
+  EDGAR_FALLBACK     true = use SEC N-PORT-P holdings when the issuer CSV is unavailable
   VERBOSE            true = print per-request retry/fallback notices
 `;
 
@@ -791,8 +777,7 @@ const OCC_OPTION = /^[A-Z0-9]{1,6}\s+\d{6}[CP]\d{8}$/;
 
 /**
  * The CSV publishes no asset-class column, so the Watchlist's category is derived
- * from the row's own identifying fields (documented as derived in the README and
- * in `.worklog.txt`). Cash balances and currency lines are Cash, exchange-traded
+ * from the row's own identifying fields (documented as derived in the README). Cash balances and currency lines are Cash, exchange-traded
  * fund/trust units are Fund, option contracts are Option, everything else Equity.
  */
 export function spFundsAssetCategory(stockTicker: string, securityName: string): string {
@@ -1683,7 +1668,7 @@ export function outputConfigEntries(config: JsonRecord): Array<[string, string]>
 export function outputPrintConfig(brand: string, config: JsonRecord, env: Record<string, string | undefined> = process.env): void {
   const entries: Array<[string, string]> = [...outputConfigEntries(config), ['VERBOSE', String(outputVerbose(env))]];
   console.log(`[ config   ] ${brand} updater:\n${entries
-    .map(([key, value]) => `              ${key}=${/TOKEN|PASSWORD|SECRET|COOKIE/i.test(key) ? '<redacted>' : outputClean(value)}`)
+    .map(([key, value]) => `              ${key}=${/TOKEN|PASSWORD|SECRET|COOKIE|SEC_UA/i.test(key) ? '<redacted>' : outputClean(value)}`)
     .join('\n')}`);
 }
 
@@ -2433,14 +2418,15 @@ export async function clearCursor(apiRoot: URL): Promise<boolean> {
   return true;
 }
 
-export async function main(argv: string[] = process.argv.slice(2)): Promise<number> {
+export async function main(argv: string[] = process.argv.slice(2), env: Record<string, string | undefined> = process.env): Promise<number> {
   if (argv.includes('--help') || argv.includes('-h')) {
     console.log(USAGE.trim());
     return 0;
   }
-  const environment = applyUpdaterDefaults(loadUpdaterDefaults());
-  const config = readConfig(environment);
-  const summary = await runUpdater(config);
+  if (argv.length) throw new Error(`unsupported argument(s): ${argv.join(' ')}. Use --help for usage.`);
+  const controls = await runtimeControls(env);
+  if (controls['VERBOSE'] !== undefined && env === process.env) process.env['VERBOSE'] = controls['VERBOSE'];
+  const summary = await runUpdater(readConfig(controls));
   return summary.failures.length ? 1 : 0;
 }
 
