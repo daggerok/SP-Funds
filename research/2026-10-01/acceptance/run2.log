@@ -1,7 +1,7 @@
 # SP Funds live acceptance — run 2
-# revision: 05c68e7f457a252d04813df522bd33b56ad1f9a5
+# revision: a3b8ae2dee83a9c6e5e1b811bd37b30d73c0c990
 # command: TICKERS="SPUS SPRE SPSK SPTE SPWO" VERBOSE=1 bun scripts/update-data.ts
-# date: 2026-10-02T01:45:19Z
+# date: 2026-10-02T01:47:31Z
 [ config   ] SP Funds updater:
               MAX_FETCHES=0
               REQUEST_SLEEP=1
