@@ -1297,6 +1297,12 @@ export function inferDistributionFrequency(exDates: string[], now: Date = new Da
   return null;
 }
 
+/** The date of the provider performance table the returns come from (never the NAV date), or null. */
+export function performanceAsOf(returns: OfficialReturnRow): string | null {
+  const value = returns.asOfDate;
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null;
+}
+
 export type DerivedMetrics = {
   ytd: number | null;
   tr1y: number | null;
@@ -1312,6 +1318,7 @@ export type DerivedMetrics = {
   secYield: number | null;
   secYieldText: string;
   returnsBasis: string;
+  performanceAsOf: string | null;
 };
 
 /**
@@ -1345,7 +1352,8 @@ export function deriveMetrics(
     dividendYieldText: formatPercentText(dividendYield),
     secYield,
     secYieldText: secYield === null ? '—' : `${secYield.toFixed(2)}%`,
-    returnsBasis: 'official SP Funds month-end NAV total returns (fund page Performance Statistics table, "<TICKER> NAV" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns',
+    returnsBasis: 'official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns',
+    performanceAsOf: performanceAsOf(returns),
   };
 }
 

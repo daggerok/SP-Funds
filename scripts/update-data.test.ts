@@ -12,7 +12,7 @@ import {
   CONTROL_NAMES, HISTORY_HEADERS, HOLDINGS_HEADERS, SEC_UA_DEFAULT, SPFUNDS_TRUST, TIDAL_TRUST, USAGE,
   annualizedFromCumulative, batchSelection, buildCatalog, buildCatalogIndex, yahooHeaders,
   buildPages, catalogIndexEntry, createEdgarFallback, createRequestGate, createTransport,
-  cumulativeFromAnnualized, deriveMetrics, edgarSeriesFilingsUrl, errorMessage, fillNportTickers,
+  cumulativeFromAnnualized, deriveMetrics, performanceAsOf, edgarSeriesFilingsUrl, errorMessage, fillNportTickers,
   formatAumDisplay, formatMoneyText, formatPercentText, formatUsDate, fundFilterReasons, fundPageUrl,
   holdingsCsvUrl, inferDistributionFrequency, lookupPattern, matchesNportFund,
   matchesRange, mergeDividends, nameValueMap, normalizeHoldingName, normalizeWeightText, nportUrlFor, parseMoneyNumber,
@@ -582,6 +582,16 @@ describe('derived metrics', () => {
     expect(metrics.dividendYieldText).toBe('0.52%');
     expect(metrics.secYieldText).toBe('0.40%');
     expect(metrics.returnsBasis).toContain('official SP Funds month-end NAV total returns');
+    expect(metrics.performanceAsOf).toBe('2026-09-30');
+    expect(Object.keys(metrics).slice(-2)).toEqual(['returnsBasis', 'performanceAsOf']);
+  });
+
+  test('performanceAsOf is the performance table date, null when unknown, never empty', () => {
+    expect(performanceAsOf({ ...official, asOfDate: '2026-08-31' })).toBe('2026-08-31');
+    expect(performanceAsOf({ ...official, asOfDate: null })).toBeNull();
+    expect(performanceAsOf({ ...official, asOfDate: '' })).toBeNull();
+    expect(deriveMetrics({ ...official, asOfDate: null }, 'Monthly', 0.026, 59.54, 0.4).performanceAsOf).toBeNull();
+    expect(deriveMetrics(official, 'Monthly', 0.026, 59.54, 0.4).returnsBasis.trim()).not.toBe('');
   });
 
   test('a missing yield or frequency never fabricates a number', () => {
