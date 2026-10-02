@@ -44,7 +44,9 @@ jobs:
             echo "# revision: $(git rev-parse HEAD)"
             echo "# command: TICKERS=\"$TICKERS\" VERBOSE=1 bun scripts/update-data.ts"
             echo "# date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "# start: clean api/spfunds (the previous snapshot stays in git history)"
           } > "$dir/run1.log"
+          rm -rf api/spfunds
           bun scripts/update-data.ts 2>&1 | tee -a "$dir/run1.log"
           find api/spfunds -type f | sort | xargs sha256sum > "$dir/hashes1.txt"
           rm -rf "$dir/snapshot1"
