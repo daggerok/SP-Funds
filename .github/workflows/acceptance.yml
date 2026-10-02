@@ -47,6 +47,8 @@ jobs:
           } > "$dir/run1.log"
           bun scripts/update-data.ts 2>&1 | tee -a "$dir/run1.log"
           find api/spfunds -type f | sort | xargs sha256sum > "$dir/hashes1.txt"
+          rm -rf "$dir/snapshot1"
+          cp -R api/spfunds "$dir/snapshot1"
       - name: Run 2 (identical command)
         env:
           TICKERS: SPUS SPRE SPSK SPTE SPWO
@@ -85,6 +87,11 @@ jobs:
             echo "byte-identical: no" >> "$dir/summary.txt"
             diff -u "$dir/hashes1.txt" "$dir/hashes2.txt" >> "$dir/summary.txt" || true
           fi
+          echo "# run1 -> run2 content diff (upstream change identification)" >> "$dir/summary.txt"
+          diff -ru "$dir/snapshot1" api/spfunds > "$dir/run1-run2.diff" || true
+          echo "changed files: $(grep -c '^diff ' "$dir/run1-run2.diff" || true)" >> "$dir/summary.txt"
+          echo "changed value lines: $(grep -cE '^[-+][^-+]' "$dir/run1-run2.diff" || true)" >> "$dir/summary.txt"
+          grep -E '^[-+][^-+]' "$dir/run1-run2.diff" | head -12 >> "$dir/summary.txt" || true
           echo "# run outcome lines" >> "$dir/summary.txt"
           grep -E "^\[ (done|failed|error) " "$dir/run1.log" >> "$dir/summary.txt" || true
           echo "SEC 403 mentions in run1: $(grep -c '403' "$dir/run1.log" || true)" >> "$dir/summary.txt"
