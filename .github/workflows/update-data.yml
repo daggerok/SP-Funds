@@ -1,0 +1,201 @@
+name: Update SP Funds ETF data
+
+on:
+  # Weekly refresh (every Sunday at 00:00 UTC) plus manual runs.
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    # Vanguard/JPMorgan pattern: blank inputs inherit checked-in JSON defaults.
+    # GitHub permits 25 inputs, so exactly 25 controls are exposed and the
+    # remaining two settings (SEC_UA and VERBOSE) stay config-file/CLI-only.
+    inputs:
+      max_fetches:
+        description: "Batch evaluation size; 0 is a full selected pass; positive resumes the saved scoped cursor"
+        required: false
+        default: ""
+        type: string
+      request_sleep:
+        description: "Minimum seconds between starts in each independent request lane, including retries"
+        required: false
+        default: ""
+        type: string
+      concurrency:
+        description: "Parallel fund workers and independent paced request lanes; keep low"
+        required: false
+        default: ""
+        type: string
+      holdings_page_size:
+        description: "Current holdings rows per JSON page"
+        required: false
+        default: ""
+        type: string
+      history_page_size:
+        description: "Daily history rows per JSON page"
+        required: false
+        default: ""
+        type: string
+      max_retries:
+        description: "Retries after the initial request (transient HTTP/network failures only)"
+        required: false
+        default: ""
+        type: string
+      tickers:
+        description: "Space/comma/semicolon ticker allowlist; combined with every filter using AND"
+        required: false
+        default: ""
+        type: string
+      history_range:
+        description: "Yahoo Finance chart range for the daily history fallback"
+        required: false
+        default: ""
+        type: string
+      edgar_fallback:
+        description: "Use SEC EDGAR N-PORT-P as the holdings fallback when the issuer CSV is unavailable"
+        required: false
+        default: ""
+        type: string
+      skip_spfunds:
+        description: "Skip the official sp-funds.com fund pages (keeps published facts)"
+        required: false
+        default: ""
+        type: string
+      skip_yahoo:
+        description: "Skip Yahoo Finance (keeps published history/dividends)"
+        required: false
+        default: ""
+        type: string
+      aum:
+        description: "USD min:max, K/M/B/T amounts or nano/micro/small/mid/large preset"
+        required: false
+        default: ""
+        type: string
+      ter:
+        description: "Gross expense ratio percent min:max"
+        required: false
+        default: ""
+        type: string
+      dividend_yield:
+        description: "Distribution-yield percent min:max"
+        required: false
+        default: ""
+        type: string
+      sec_yield:
+        description: "Published 30-day SEC yield percent min:max"
+        required: false
+        default: ""
+        type: string
+      performance_ytd:
+        description: "YTD performance percent min:max (3Y/5Y/10Y annualized)"
+        required: false
+        default: ""
+        type: string
+      performance_1y:
+        description: "1Y performance percent min:max (3Y/5Y/10Y annualized)"
+        required: false
+        default: ""
+        type: string
+      performance_3y:
+        description: "3Y performance percent min:max (3Y/5Y/10Y annualized)"
+        required: false
+        default: ""
+        type: string
+      performance_5y:
+        description: "5Y performance percent min:max (3Y/5Y/10Y annualized)"
+        required: false
+        default: ""
+        type: string
+      performance_10y:
+        description: "10Y performance percent min:max (3Y/5Y/10Y annualized)"
+        required: false
+        default: ""
+        type: string
+      total_return_ytd:
+        description: "YTD cumulative total return percent min:max"
+        required: false
+        default: ""
+        type: string
+      total_return_1y:
+        description: "1Y cumulative total return percent min:max"
+        required: false
+        default: ""
+        type: string
+      total_return_3y:
+        description: "3Y cumulative total return percent min:max"
+        required: false
+        default: ""
+        type: string
+      total_return_5y:
+        description: "5Y cumulative total return percent min:max"
+        required: false
+        default: ""
+        type: string
+      total_return_10y:
+        description: "10Y cumulative total return percent min:max"
+        required: false
+        default: ""
+        type: string
+
+permissions: { contents: write }
+concurrency: { group: update-data, cancel-in-progress: false }
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MAX_FETCHES: ${{ inputs.max_fetches || '' }}
+      REQUEST_SLEEP: ${{ inputs.request_sleep || '' }}
+      CONCURRENCY: ${{ inputs.concurrency || '' }}
+      HOLDINGS_PAGE_SIZE: ${{ inputs.holdings_page_size || '' }}
+      HISTORY_PAGE_SIZE: ${{ inputs.history_page_size || '' }}
+      MAX_RETRIES: ${{ inputs.max_retries || '' }}
+      TICKERS: ${{ inputs.tickers || '' }}
+      HISTORY_RANGE: ${{ inputs.history_range || '' }}
+      EDGAR_FALLBACK: ${{ inputs.edgar_fallback || '' }}
+      SKIP_SPFUNDS: ${{ inputs.skip_spfunds || '' }}
+      SKIP_YAHOO: ${{ inputs.skip_yahoo || '' }}
+      AUM: ${{ inputs.aum || '' }}
+      TER: ${{ inputs.ter || '' }}
+      DIVIDEND_YIELD: ${{ inputs.dividend_yield || '' }}
+      SEC_YIELD: ${{ inputs.sec_yield || '' }}
+      PERFORMANCE_YTD: ${{ inputs.performance_ytd || '' }}
+      PERFORMANCE_1Y: ${{ inputs.performance_1y || '' }}
+      PERFORMANCE_3Y: ${{ inputs.performance_3y || '' }}
+      PERFORMANCE_5Y: ${{ inputs.performance_5y || '' }}
+      PERFORMANCE_10Y: ${{ inputs.performance_10y || '' }}
+      TOTAL_RETURN_YTD: ${{ inputs.total_return_ytd || '' }}
+      TOTAL_RETURN_1Y: ${{ inputs.total_return_1y || '' }}
+      TOTAL_RETURN_3Y: ${{ inputs.total_return_3y || '' }}
+      TOTAL_RETURN_5Y: ${{ inputs.total_return_5y || '' }}
+      TOTAL_RETURN_10Y: ${{ inputs.total_return_10y || '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Test updater
+        run: bun test scripts/update-data.test.ts
+      - name: Update data
+        run: bun scripts/update-data.ts
+      - name: Commit changed data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git add api/spfunds
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(data): update SP Funds ETF snapshot"
+          askpass="$(mktemp "$RUNNER_TEMP/spfunds-askpass.XXXXXX")"
+          trap 'rm -f "$askpass"' EXIT
+          cat > "$askpass" <<'ASKPASS'
+          #!/bin/sh
+          case "$1" in
+            *Username*) printf 'x-access-token\n' ;;
+            *Password*) printf '%s\n' "$GH_TOKEN" ;;
+          esac
+          ASKPASS
+          chmod 700 "$askpass"
+          GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 git -c credential.helper= push origin "HEAD:${GITHUB_REF_NAME}"
