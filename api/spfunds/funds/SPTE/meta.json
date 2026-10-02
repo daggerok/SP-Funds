@@ -1,0 +1,409 @@
+{
+  "ticker": "SPTE",
+  "name": "SP Funds S&P Global Technology ETF",
+  "category": null,
+  "fundPage": "https://www.sp-funds.com/spte/",
+  "dataFile": "funds/SPTE/meta.json",
+  "ter": "0.55%",
+  "terValue": 0.55,
+  "nav": "$49.80",
+  "navValue": 49.8,
+  "aum": "$261.47M",
+  "aumValue": 261470000.00000003,
+  "asOfDate": "2026-09-30",
+  "inceptionDate": "2023-11-30",
+  "exchange": "NYSE",
+  "closePrice": "$50.01",
+  "closePriceAsOfDate": "2026-09-30",
+  "premiumDiscount": "0.41%",
+  "sharesOutstanding": 5250000,
+  "midpoint": 261450000,
+  "cusip": "84612A101",
+  "isin": null,
+  "distributions": {
+    "frequency": "Monthly",
+    "exDate": "2026-09-28",
+    "dividend": "0.0065",
+    "paymentsPerYear": 12,
+    "headers": [
+      "Ex-Date",
+      "Record Date",
+      "Payable Date",
+      "Amount"
+    ],
+    "rows": [
+      [
+        "2026-09-28",
+        "2026-09-28",
+        "2026-09-29",
+        "0.0065"
+      ],
+      [
+        "2026-08-26",
+        "2026-08-26",
+        "2026-08-27",
+        "0.0065"
+      ],
+      [
+        "2026-07-27",
+        "2026-07-27",
+        "2026-07-28",
+        "0.0065"
+      ],
+      [
+        "2026-06-25",
+        "2026-06-25",
+        "2026-06-26",
+        "0.0065"
+      ],
+      [
+        "2026-05-27",
+        "2026-05-27",
+        "2026-05-28",
+        "0.0065"
+      ],
+      [
+        "2026-04-24",
+        "2026-04-24",
+        "2026-04-27",
+        "0.0065"
+      ],
+      [
+        "2026-03-24",
+        "2026-03-24",
+        "2026-03-25",
+        "0.0065"
+      ],
+      [
+        "2026-02-20",
+        "2026-02-20",
+        "2026-02-23",
+        "0.0065"
+      ],
+      [
+        "2026-01-23",
+        "2026-01-23",
+        "2026-01-26",
+        "0.0065"
+      ],
+      [
+        "2025-12-26",
+        "2025-12-26",
+        "2025-12-29",
+        "0.2649"
+      ],
+      [
+        "2025-11-25",
+        "2025-11-25",
+        "2025-11-26",
+        "0.0065"
+      ],
+      [
+        "2025-10-27",
+        "2025-10-27",
+        "2025-10-28",
+        "0.0065"
+      ],
+      [
+        "2025-09-25",
+        "2025-09-24",
+        "2025-09-26",
+        "0.0065"
+      ],
+      [
+        "2025-08-26",
+        "2025-08-26",
+        "2025-08-27",
+        "0.0065"
+      ],
+      [
+        "2025-07-25",
+        "2025-07-25",
+        "2025-07-28",
+        "0.0065"
+      ],
+      [
+        "2025-06-25",
+        "2025-06-25",
+        "2025-06-26",
+        "0.0065"
+      ],
+      [
+        "2025-05-28",
+        "2025-05-28",
+        "2025-05-29",
+        "0.0065"
+      ],
+      [
+        "2025-04-24",
+        "2025-04-24",
+        "2025-04-25",
+        "0.0065"
+      ],
+      [
+        "2025-03-25",
+        "2025-03-25",
+        "2025-03-26",
+        "0.0065"
+      ],
+      [
+        "2025-02-27",
+        "2025-02-27",
+        "2025-02-28",
+        "0.0065"
+      ],
+      [
+        "2025-01-27",
+        "2025-01-27",
+        "2025-01-31",
+        "0.0065"
+      ],
+      [
+        "2024-12-27",
+        "2024-12-27",
+        "2024-12-31",
+        "0.0685"
+      ],
+      [
+        "2024-11-26",
+        "2024-11-26",
+        "2024-11-29",
+        "0.0065"
+      ],
+      [
+        "2024-10-28",
+        "2024-10-28",
+        "2024-10-30",
+        "0.0065"
+      ],
+      [
+        "2024-09-26",
+        "2024-09-26",
+        "2024-09-30",
+        "0.0065"
+      ],
+      [
+        "2024-08-27",
+        "2024-08-27",
+        "2024-08-29",
+        "0.0065"
+      ],
+      [
+        "2024-07-26",
+        "2024-07-26",
+        "2024-07-30",
+        "0.0065"
+      ],
+      [
+        "2024-06-26",
+        "2024-06-26",
+        "2024-06-28",
+        "0.0065"
+      ],
+      [
+        "2024-05-29",
+        "2024-05-29",
+        "2024-05-31",
+        "0.0065"
+      ],
+      [
+        "2024-04-25",
+        "2024-04-26",
+        "2024-04-30",
+        "0.005"
+      ],
+      [
+        "2024-03-26",
+        "2024-03-27",
+        "2024-03-28",
+        "0.005"
+      ],
+      [
+        "2024-02-26",
+        "2024-02-27",
+        "2024-02-29",
+        "0.005"
+      ],
+      [
+        "2024-01-26",
+        "2024-01-29",
+        "2024-01-31",
+        "0.005"
+      ]
+    ]
+  },
+  "returns": {
+    "monthEnd": {
+      "asOfDate": "2026-08-31",
+      "ytd": 34.78,
+      "yr1": 51.03,
+      "yr3": 0,
+      "yr5": null,
+      "yr10": null,
+      "sinceInception": 37.44
+    },
+    "quarterEnd": {
+      "asOfDate": "2026-06-30",
+      "ytd": 38.73,
+      "yr1": 58.93,
+      "yr3": 0,
+      "yr5": null,
+      "yr10": null,
+      "sinceInception": 41.92
+    }
+  },
+  "metrics": {
+    "ytd": 34.78,
+    "tr1y": 51.03,
+    "tr3y": 0,
+    "tr5y": null,
+    "tr10y": null,
+    "cagr3y": 0,
+    "cagr5y": null,
+    "cagr10y": null,
+    "siAnn": 37.44,
+    "dividendYield": 0.16,
+    "dividendYieldText": "0.16%",
+    "secYield": 0.09,
+    "secYieldText": "0.09%",
+    "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, \"<TICKER> NAV\" row); cumulative 3/5/10-year figures derived exactly from the published annualized returns"
+  },
+  "holdings": {
+    "pages": [
+      "001.json"
+    ],
+    "pageSize": 250,
+    "totalRows": 108,
+    "asOfDate": "2026-10-01"
+  },
+  "history": {
+    "pages": [
+      "001.json"
+    ],
+    "pageSize": 1000,
+    "totalRows": 710,
+    "asOfDate": "2026-10-01"
+  },
+  "generatedAt": "2026-10-02T01:47:23.668Z",
+  "netTerValue": 0.55,
+  "source": {
+    "provider": "SP Funds (Sharia-compliant ETFs)",
+    "site": "https://www.sp-funds.com/",
+    "catalog": "https://www.sp-funds.com/",
+    "details": "https://www.sp-funds.com/spte/",
+    "holdingsSource": "https://www.sp-funds.com/wp-content/uploads/data/TidalFG_Holdings_SPTE.csv",
+    "historySource": "https://query1.finance.yahoo.com/v8/finance/chart/SPTE (daily market price history)",
+    "distributionsSource": "https://www.sp-funds.com/spte/ Distribution Details table",
+    "yahoo": "https://query1.finance.yahoo.com/v8/finance/chart/SPTE",
+    "trust": "SP Funds Trust",
+    "trustCik": "0001989916"
+  },
+  "identifiers": {
+    "cusip": "84612A101",
+    "isin": null,
+    "indexTicker": "SPSITUT",
+    "benchmark": "S&P Global 1200 Shariah Information Technology (Sector) Capped (USD) TR"
+  },
+  "yields": {
+    "dividendYield": 0.16,
+    "dividendYieldText": "0.16%",
+    "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
+    "distributionRate": 0.16,
+    "secYield": 0.09,
+    "secYieldText": "0.09%",
+    "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
+  },
+  "documents": {
+    "investmentCase": "https://www.sp-funds.com/wp-content/uploads/SPTE-Investment-Case-1.pdf",
+    "prospectus": "https://www.sp-funds.com/wp-content/uploads/spfunds-485bpos_022626-PRO-SPTE.pdf",
+    "summaryProspectus": "https://www.sp-funds.com/wp-content/uploads/spte-497k_022726_web.pdf",
+    "sai": "https://www.sp-funds.com/wp-content/uploads/spfunds-485bpos_022626-SAI-SPTE.pdf",
+    "annualReport": "https://www.sp-funds.com/wp-content/uploads/SP_Financial_Statments_annual_report.pdf",
+    "semiAnnualReport": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Trust-SAR-4.30.2026-Final.pdf",
+    "factsheet": "https://www.sp-funds.com/wp-content/uploads/SPTE-Factsheet-2026-Q2.pdf",
+    "fiscalQ1Holdings": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-SP-Global-Technology-ETF-1.31.2026-SOI.pdf",
+    "fiscalQ3Holdings": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-SP-Global-Technology-ETF-7.31.2026-SOI.pdf",
+    "certificateOfShariaAccreditation": "https://www.sp-funds.com/wp-content/uploads/SPTE-Certificate-of-Sharia-Accreditation-2023.pdf.pdf",
+    "shariaAuditorReport": "https://www.sp-funds.com/wp-content/uploads/SPTE-Shariah-Auditors-Report-2026-SP-Funds.pdf",
+    "proxyVotes": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Trust-Voting-Table.xlsx",
+    "annualTsr": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-SP-Global-Technology-ETF-1.pdf"
+  },
+  "performance": {
+    "benchmark": "SPSITUT",
+    "benchmarkName": "S&P Global 1200 Shariah Information Technology (Sector) Capped (USD) TR",
+    "rows": [
+      {
+        "label": "SPTE MKT",
+        "values": [
+          "SP Funds S&P Global Technology ETF",
+          "SPTE MKT",
+          "5.48",
+          "-2.20",
+          "27.69",
+          "35.14",
+          "141.40",
+          "51.53",
+          "0.00",
+          "-",
+          "-",
+          "37.72",
+          "08/31/2026"
+        ]
+      },
+      {
+        "label": "SPTE NAV",
+        "values": [
+          "SP Funds S&P Global Technology ETF",
+          "SPTE NAV",
+          "5.69",
+          "-2.24",
+          "26.84",
+          "34.78",
+          "140.05",
+          "51.03",
+          "0.00",
+          "-",
+          "-",
+          "37.44",
+          "08/31/2026"
+        ]
+      },
+      {
+        "label": "SPSITUT",
+        "values": [
+          "S&P Global 1200 Shariah Information Technology (Sector) Capped (USD) TR",
+          "SPSITUT",
+          "0.00",
+          "0.00",
+          "0.00",
+          "0.00",
+          "0.00",
+          "0.00",
+          "0.00",
+          "-",
+          "-",
+          "0.00",
+          "08/31/2026"
+        ]
+      },
+      {
+        "label": "SPTR2",
+        "values": [
+          "S&P 500 TR",
+          "SPTR2",
+          "2.72",
+          "1.68",
+          "12.37",
+          "13.14",
+          "74.31",
+          "20.38",
+          "0.00",
+          "-",
+          "-",
+          "22.36",
+          "08/31/2026"
+        ]
+      }
+    ]
+  }
+}

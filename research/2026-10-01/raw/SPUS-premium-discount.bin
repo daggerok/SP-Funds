@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>SPUS Premium Discount</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="description" content="" />
+	<meta name="robots" content="noindex" />
+	<link rel="icon" href="https://www.sp-funds.com/wp-content/uploads/cropped-sp-funds-logo-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://www.sp-funds.com/wp-content/uploads/cropped-sp-funds-logo-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://www.sp-funds.com/wp-content/uploads/cropped-sp-funds-logo-180x180.png" />
+<meta name="msapplication-TileImage" content="https://www.sp-funds.com/wp-content/uploads/cropped-sp-funds-logo-270x270.png" />
+	</head>
+	<body style="margin:0;" >
+	<iframe class="btl-cloaked-url-root-body" style="display:block;border:none;height:100vh;width:100vw;" src="https://www.sp-funds.com/wp-content/uploads/data/Premium-Discount-SPUS.pdf"></iframe>
+		<script>
+	const siteUrl = "https://www.sp-funds.com";
+	const targetUrl = "https://www.sp-funds.com/wp-content/uploads/data/Premium-Discount-SPUS.pdf";
+	const cleanedSiteUrl = siteUrl.replace(/http\:\/\/s?/i, "").replace(/www\./i, "");
+	const cleanedTargetUrl = targetUrl.replace(/http\:\/\/s?/i, "").replace(/www\./i, "");
+	const isSameSite = cleanedTargetUrl.toLowerCase().includes(cleanedSiteUrl.toLowerCase());
+	const rootFavicon = document.querySelector("link[rel='icon']");
+	window.addEventListener("DOMContentLoaded", () => {
+		if (!isSameSite || rootFavicon) {
+		return false;
+		}
+		const iframe = document.querySelector("iframe.btl-cloaked-url-root-body");
+		let x = 0;
+		const intervalId = setInterval(() => {
+		x++;
+		const insideHeadHtml = iframe?.contentWindow?.document?.head?.innerHTML;
+		if (insideHeadHtml || x > 1000) {
+			const favicon = iframe?.contentWindow?.document?.head?.querySelector("link[rel='icon']");
+			document.head.append(favicon);
+			clearInterval(intervalId);
+		}
+		}, 100);
+	})
+	</script>
+	</body>
+</html>

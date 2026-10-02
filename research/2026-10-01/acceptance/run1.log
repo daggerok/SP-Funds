@@ -1,0 +1,41 @@
+# SP Funds live acceptance — run 1
+# revision: a3b8ae2dee83a9c6e5e1b811bd37b30d73c0c990
+# command: TICKERS="SPUS SPRE SPSK SPTE SPWO" VERBOSE=1 bun scripts/update-data.ts
+# date: 2026-10-02T01:47:23Z
+# start: clean api/spfunds (the previous snapshot stays in git history)
+[ config   ] SP Funds updater:
+              MAX_FETCHES=0
+              REQUEST_SLEEP=1
+              CONCURRENCY=2
+              AUM=:
+              DIVIDEND_YIELD=:
+              EDGAR_FALLBACK=true
+              HISTORY_PAGE_SIZE=1000
+              HISTORY_RANGE=max
+              HOLDINGS_PAGE_SIZE=250
+              MAX_RETRIES=2
+              PERFORMANCE_10Y=:
+              PERFORMANCE_1Y=:
+              PERFORMANCE_3Y=:
+              PERFORMANCE_5Y=:
+              PERFORMANCE_YTD=:
+              SEC_UA=Daggerok SP-Funds daggerok@users.noreply.github.com
+              SEC_YIELD=:
+              SKIP_SPFUNDS=false
+              SKIP_YAHOO=false
+              TER=:
+              TICKERS=SPUS,SPRE,SPSK,SPTE,SPWO
+              TOTAL_RETURN_10Y=:
+              TOTAL_RETURN_1Y=:
+              TOTAL_RETURN_3Y=:
+              TOTAL_RETURN_5Y=:
+              TOTAL_RETURN_YTD=:
+              VERBOSE=true
+[ filter   ] 5 of 5 funds pass filters
+[  1/5   ] SPRE  updated   history=1445 holdings=30 netAssets=$198.6M div=4.24 sec=2.24
+[  2/5   ] SPSK  updated   history=1697 holdings=172 netAssets=$453.0M div=3.59 sec=4.58
+[  3/5   ] SPTE  updated   history=710 holdings=108 netAssets=$261.5M div=0.16 sec=0.09
+[  4/5   ] SPUS  updated   history=1705 holdings=219 netAssets=$3.3B div=0.52 sec=0.4
+[  5/5   ] SPWO  updated   history=697 holdings=399 netAssets=$241.4M div=0.92 sec=0.77
+[ done     ] 5 funds updated, 0 failures
+[ done     ] counts: funds=5 holdings=928 history=6,254; processed=5 skipped=0

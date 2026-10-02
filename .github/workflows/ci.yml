@@ -1,0 +1,21 @@
+name: Verify SP Funds
+on:
+  pull_request:
+  push:
+    branches: [main, arena/01a0f9b5-sp-funds]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun test
+      - run: bun build --target=bun scripts/update-data.ts --outfile=/dev/null
+      - run: bun build app.tsx --outfile=/dev/null
+      - run: git diff --check

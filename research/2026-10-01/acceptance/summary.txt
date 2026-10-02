@@ -1,0 +1,43 @@
+# scope: index funds and per-fund directories
+index funds: SPRE,SPSK,SPTE,SPUS,SPWO
+counts: {"funds": 5, "holdings": 928, "history": 6254}
+entries with holdings rows: 5
+entries with history rows: 5
+generatedAt: 2026-10-02T01:47:23.668Z
+per-fund dirs: SPRE,SPSK,SPTE,SPUS,SPWO
+files: 20
+# byte stability (run1 vs run2 sha256 list)
+byte-identical: no
+--- research/2026-10-01/acceptance/hashes1.txt	2026-10-02 01:47:31.027460044 +0000
++++ research/2026-10-01/acceptance/hashes2.txt	2026-10-02 01:47:38.393523966 +0000
+@@ -2,7 +2,7 @@
+ 66b6165c974bc4fdf0aced9f7fe1c47a47886920bc2ab0231b91a505865f7c49  api/spfunds/funds/SPRE/history/002.json
+ a60c4312f083427b5ec918f7bc211c92567d753be71d5cf3f894413fe385e69e  api/spfunds/funds/SPRE/holdings/001.json
+ 3dbcc35f0f17647e7d89d1d144fe189f93a96377ab5a6b9aa2c04cb723b0d36b  api/spfunds/funds/SPRE/meta.json
+-7f48f2603e5b6e04b880999ba3162dd98b6964f8c357b8b71c3d60de99dd10da  api/spfunds/funds/SPSK/history/001.json
++565680ac4c7d00da17b87b8d60b768332b0f7b43b02f141d66c8b2ac00016fb3  api/spfunds/funds/SPSK/history/001.json
+ b4bae392a7116c31ef8efb6d52d2e940db7e7f321768d75b8cf98ac0138e6afe  api/spfunds/funds/SPSK/history/002.json
+ 360be44d175cda2a8ca9787dc70bf7d1ab0d7ee9ab41a1b7d3fce1b1dd2ad090  api/spfunds/funds/SPSK/holdings/001.json
+ e5be5fb4013aaea02b5b10f28a62d154d562b5b241dd414df884dbda4b263da8  api/spfunds/funds/SPSK/meta.json
+@@ -13,7 +13,7 @@
+ 9023293499bbec0d2def01d17d3a9b5af881aaf5980246733f0deb67b6457ebc  api/spfunds/funds/SPUS/history/002.json
+ 12ee5db667e0c953e76ecb8876d553a7a35329ace51af16b8d77f48b9b2b1c2f  api/spfunds/funds/SPUS/holdings/001.json
+ caa701b64c353b69f4d0a82bd1061a00813d2aac6e956598d56cdf1862b5e80b  api/spfunds/funds/SPUS/meta.json
+-4f2b6fd44865905469af22edf8847feb8d8e54e515f1715d677c7fccffd1625b  api/spfunds/funds/SPWO/history/001.json
++86ee85fd7120aa4b84d5f99b604a593f90988f55c077601dc1c826ee7782b481  api/spfunds/funds/SPWO/history/001.json
+ cd0823eb6a5c0ae4f38951c5ab62cfcab3760eb0cee345c4222b740971c67d10  api/spfunds/funds/SPWO/holdings/001.json
+ ebad3d1f12dd0e201fb2f2123b282af0ad9e4da28efa60c02c730349c04f3dae  api/spfunds/funds/SPWO/holdings/002.json
+ ef00c307f6bfb3718ba80ec21f147e1170b8eb0993ebe301fa020ab387960b51  api/spfunds/funds/SPWO/meta.json
+# run1 -> run2 content diff (upstream change identification)
+changed files: 2
+changed value lines: 6
+-      "Adj Close": "16.18",
++      "Adj Close": "16.19",
+-      "Adj Close": "16.18",
++      "Adj Close": "16.19",
+-      "Adj Close": "21.31",
++      "Adj Close": "21.32",
+# run outcome lines
+[ done     ] 5 funds updated, 0 failures
+[ done     ] counts: funds=5 holdings=928 history=6,254; processed=5 skipped=0
+SEC 403 mentions in run1: 0
