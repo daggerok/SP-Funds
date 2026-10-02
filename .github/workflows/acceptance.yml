@@ -66,34 +66,33 @@ jobs:
         run: |
           set -euo pipefail
           dir="research/2026-10-01/acceptance"
-          {
-            echo "# scope: index funds and per-fund directories"
-            python3 - <<'PY'
-          import json
+          python3 - "$dir" <<'PY' > "$dir/summary.txt"
+          import json, pathlib, sys
           index = json.load(open('api/spfunds/index.json'))
+          print('# scope: index funds and per-fund directories')
           print('index funds:', ','.join(f['ticker'] for f in index['funds']))
           print('counts:', json.dumps(index['counts']))
-          print('index entries with holdings:', sum(1 for f in index['funds'] if f['holdings']))
-          print('index entries with history:', sum(1 for f in index['funds'] if f['history']))
+          print('entries with holdings rows:', sum(1 for f in index['funds'] if f['holdings']))
+          print('entries with history rows:', sum(1 for f in index['funds'] if f['history']))
           print('generatedAt:', index['generatedAt'])
+          print('per-fund dirs:', ','.join(sorted(p.name for p in pathlib.Path('api/spfunds/funds').iterdir())))
+          print('files:', len(list(pathlib.Path('api/spfunds').rglob('*.json'))))
           PY
-            echo "# byte stability (run1 vs run2 sha256 list)"
-            if diff -q "$dir/hashes1.txt" "$dir/hashes2.txt" >/dev/null; then
-              echo "byte-identical: yes ($(wc -l < "$dir/hashes1.txt") files)"
-              diff -u "$dir/hashes1.txt" "$dir/hashes2.txt" || true
-            else
-              echo "byte-identical: no"
-              diff -u "$dir/hashes1.txt" "$dir/hashes2.txt" | tee -a "$dir/summary.txt" || true
-            fi
-            echo "# retained/failed lines"
-            grep -E "^\[ (done|failed|error) " "$dir/run1.log" || true
-            grep -cE "403" "$dir/run1.log" | sed 's/^/# SEC 403 mentions: /'
-          } > "$dir/summary.txt"
+          echo "# byte stability (run1 vs run2 sha256 list)" >> "$dir/summary.txt"
+          if diff -q "$dir/hashes1.txt" "$dir/hashes2.txt" >/dev/null; then
+            echo "byte-identical: yes ($(wc -l < "$dir/hashes1.txt") files)" >> "$dir/summary.txt"
+          else
+            echo "byte-identical: no" >> "$dir/summary.txt"
+            diff -u "$dir/hashes1.txt" "$dir/hashes2.txt" >> "$dir/summary.txt" || true
+          fi
+          echo "# run outcome lines" >> "$dir/summary.txt"
+          grep -E "^\[ (done|failed|error) " "$dir/run1.log" >> "$dir/summary.txt" || true
+          echo "SEC 403 mentions in run1: $(grep -c '403' "$dir/run1.log" || true)" >> "$dir/summary.txt"
           cat "$dir/summary.txt" >> "$GITHUB_STEP_SUMMARY"
       - name: Commit the snapshot and evidence
         run: |
           set -euo pipefail
-          git add api/spfunds research/2026-10-01/acceptance
+          git add -A api/spfunds research/2026-10-01/acceptance
           if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
           git config user.name "Daggerok SP Funds"
           git config user.email "daggerok@users.noreply.github.com"
