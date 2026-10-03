@@ -15,29 +15,29 @@
   ],
   "rows": [
     {
-      "Name": "Welltower Inc",
-      "Ticker": "WELL",
-      "Identifier": "95040Q104",
-      "Weight": "13.25%",
-      "Market Value": "$26314359.84",
-      "Shares Held": "114291",
-      "Asset Category": "Equity"
-    },
-    {
       "Name": "Equinix Inc",
       "Ticker": "EQIX",
       "Identifier": "29444U700",
-      "Weight": "13.15%",
-      "Market Value": "$26106856.64",
+      "Weight": "13.39",
+      "Market Value": "26126212.64",
       "Shares Held": "25808",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Welltower Inc",
+      "Ticker": "WELL",
+      "Identifier": "95040Q104",
+      "Weight": "13.3",
+      "Market Value": "25937199.54",
+      "Shares Held": "114291",
       "Asset Category": "Equity"
     },
     {
       "Name": "Goodman Group",
       "Ticker": "GMG AU",
       "Identifier": "B03FYZ4",
-      "Weight": "13.10%",
-      "Market Value": "$26024613.64",
+      "Weight": "12.99",
+      "Market Value": "25344379.84",
       "Shares Held": "1376298",
       "Asset Category": "Equity"
     },
@@ -45,44 +45,35 @@
       "Name": "Weyerhaeuser Co",
       "Ticker": "WY",
       "Identifier": "962166104",
-      "Weight": "10.19%",
-      "Market Value": "$20238396.15",
+      "Weight": "10.12",
+      "Market Value": "19749699.97",
       "Shares Held": "1062383",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Charter Hall Group",
-      "Ticker": "CHC AU",
-      "Identifier": "B15F6S6",
-      "Weight": "5.04%",
-      "Market Value": "$10015533.85",
-      "Shares Held": "763326",
       "Asset Category": "Equity"
     },
     {
       "Name": "EastGroup Properties Inc",
       "Ticker": "EGP",
       "Identifier": "277276101",
-      "Weight": "4.93%",
-      "Market Value": "$9799640.95",
+      "Weight": "4.96",
+      "Market Value": "9670104.04",
       "Shares Held": "49631",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Janus Living Inc",
-      "Ticker": "JAN",
-      "Identifier": "471024109",
-      "Weight": "4.90%",
-      "Market Value": "$9723854.88",
-      "Shares Held": "328176",
+      "Name": "Charter Hall Group",
+      "Ticker": "CHC AU",
+      "Identifier": "B15F6S6",
+      "Weight": "4.95",
+      "Market Value": "9647699.7",
+      "Shares Held": "763326",
       "Asset Category": "Equity"
     },
     {
       "Name": "Terreno Realty Corp",
       "Ticker": "TRNO",
       "Identifier": "88146M101",
-      "Weight": "4.90%",
-      "Market Value": "$9730008.80",
+      "Weight": "4.94",
+      "Market Value": "9644089.28",
       "Shares Held": "150736",
       "Asset Category": "Equity"
     },
@@ -90,17 +81,26 @@
       "Name": "Sun Communities Inc",
       "Ticker": "SUI",
       "Identifier": "866674104",
-      "Weight": "4.87%",
-      "Market Value": "$9666884.36",
+      "Weight": "4.92",
+      "Market Value": "9598820",
       "Shares Held": "87262",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Janus Living Inc",
+      "Ticker": "JAN",
+      "Identifier": "471024109",
+      "Weight": "4.83",
+      "Market Value": "9431778.24",
+      "Shares Held": "328176",
       "Asset Category": "Equity"
     },
     {
       "Name": "Equity LifeStyle Properties Inc",
       "Ticker": "ELS",
       "Identifier": "29472R108",
-      "Weight": "4.80%",
-      "Market Value": "$9523189.12",
+      "Weight": "4.82",
+      "Market Value": "9407271.68",
       "Shares Held": "163264",
       "Asset Category": "Equity"
     },
@@ -108,8 +108,8 @@
       "Name": "IGB Real Estate Investment Trust",
       "Ticker": "IGBREIT MK",
       "Identifier": "B89JCF2",
-      "Weight": "3.95%",
-      "Market Value": "$7843226.19",
+      "Weight": "3.87",
+      "Market Value": "7556265.13",
       "Shares Held": "11308103",
       "Asset Category": "Fund"
     },
@@ -117,8 +117,8 @@
       "Name": "Fermi Inc",
       "Ticker": "FRMI",
       "Identifier": "314911108",
-      "Weight": "3.53%",
-      "Market Value": "$7014979.86",
+      "Weight": "3.46",
+      "Market Value": "6748377.3",
       "Shares Held": "1666266",
       "Asset Category": "Equity"
     },
@@ -126,8 +126,8 @@
       "Name": "KLCCP Stapled Group",
       "Ticker": "KLCCSS MK",
       "Identifier": "B92NSW7",
-      "Weight": "2.97%",
-      "Market Value": "$5904536.24",
+      "Weight": "2.95",
+      "Market Value": "5751530.91",
       "Shares Held": "2827663",
       "Asset Category": "Equity"
     },
@@ -135,17 +135,17 @@
       "Name": "MALAYSIAN RINGGIT",
       "Ticker": "MYR",
       "Identifier": "CASHMYR",
-      "Weight": "2.51%",
-      "Market Value": "$4980530.19",
-      "Shares Held": "20321559",
+      "Weight": "2.84",
+      "Market Value": "5536772.18",
+      "Shares Held": "22620483",
       "Asset Category": "Equity"
     },
     {
       "Name": "RL Commercial REIT Inc",
       "Ticker": "RCR PM",
       "Identifier": "BLFMKR4",
-      "Weight": "2.39%",
-      "Market Value": "$4744808.59",
+      "Weight": "2.41",
+      "Market Value": "4695551.84",
       "Shares Held": "48331469",
       "Asset Category": "Fund"
     },
@@ -153,8 +153,8 @@
       "Name": "Axis Real Estate Investment Trust",
       "Ticker": "AXRB MK",
       "Identifier": "B0CMCL8",
-      "Weight": "2.28%",
-      "Market Value": "$4533427.18",
+      "Weight": "2.32",
+      "Market Value": "4527546.09",
       "Shares Held": "10219497",
       "Asset Category": "Fund"
     },
@@ -162,8 +162,8 @@
       "Name": "Dubai Residential REIT",
       "Ticker": "DUBAIRES UH",
       "Identifier": "BSTQTQ3",
-      "Weight": "1.99%",
-      "Market Value": "$3943720.48",
+      "Weight": "2.02",
+      "Market Value": "3943881.55",
       "Shares Held": "11316167",
       "Asset Category": "Fund"
     },
@@ -171,8 +171,8 @@
       "Name": "Peker Gayrimenkul Yatirim Ortakligi AS",
       "Ticker": "PEKGY TI",
       "Identifier": "BDT8SW3",
-      "Weight": "1.00%",
-      "Market Value": "$1991783.29",
+      "Weight": "0.92",
+      "Market Value": "1791974.33",
       "Shares Held": "26386822",
       "Asset Category": "Equity"
     },
@@ -180,8 +180,8 @@
       "Name": "IMPACT Growth Real Estate Investment Trust",
       "Ticker": "IMPACT TB",
       "Identifier": "BRCFFZ1",
-      "Weight": "0.71%",
-      "Market Value": "$1409228.91",
+      "Weight": "0.72",
+      "Market Value": "1402852.78",
       "Shares Held": "3609401",
       "Asset Category": "Fund"
     },
@@ -189,8 +189,8 @@
       "Name": "SITE Centers Corp",
       "Ticker": "SITC",
       "Identifier": "82981J851",
-      "Weight": "0.52%",
-      "Market Value": "$1026134.67",
+      "Weight": "0.55",
+      "Market Value": "1065718.5",
       "Shares Held": "304491",
       "Asset Category": "Equity"
     },
@@ -198,8 +198,8 @@
       "Name": "INET Freehold and Leasehold Real Estate Investment Trust",
       "Ticker": "INETREIT TB",
       "Identifier": "BNNSJB5",
-      "Weight": "0.41%",
-      "Market Value": "$820756.15",
+      "Weight": "0.42",
+      "Market Value": "817042.6",
       "Shares Held": "2086244",
       "Asset Category": "Fund"
     },
@@ -207,8 +207,8 @@
       "Name": "Citicore Energy REIT Corp",
       "Ticker": "CREIT PM",
       "Identifier": "BM8GQ50",
-      "Weight": "0.34%",
-      "Market Value": "$665399.79",
+      "Weight": "0.34",
+      "Market Value": "659295.23",
       "Shares Held": "14423519",
       "Asset Category": "Fund"
     },
@@ -216,8 +216,8 @@
       "Name": "Avrupakent Gayrimenkul Yatirim Ortakligi AS",
       "Ticker": "AVPGY TI",
       "Identifier": "BNDY4W9",
-      "Weight": "0.25%",
-      "Market Value": "$501916.53",
+      "Weight": "0.27",
+      "Market Value": "531107.05",
       "Shares Held": "510636",
       "Asset Category": "Equity"
     },
@@ -225,17 +225,35 @@
       "Name": "Panora Gayrimenkul Yatirim Ortakligi",
       "Ticker": "PAGYO TI",
       "Identifier": "BB2C7C1",
-      "Weight": "0.24%",
-      "Market Value": "$477058.06",
+      "Weight": "0.24",
+      "Market Value": "468674.74",
       "Shares Held": "191829",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "THAI BAHT",
+      "Ticker": "THB",
+      "Identifier": "CASHTHB",
+      "Weight": "0",
+      "Market Value": "4884.64",
+      "Shares Held": "164637",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "PHILIPPINE PESO",
+      "Ticker": "PHP",
+      "Identifier": "CASHPHP",
+      "Weight": "0",
+      "Market Value": "-1059.88",
+      "Shares Held": "-66547",
       "Asset Category": "Equity"
     },
     {
       "Name": "UAE DIRHAM",
       "Ticker": "AED",
       "Identifier": "CASHAED",
-      "Weight": "0.00%",
-      "Market Value": "$-273.21",
+      "Weight": "0",
+      "Market Value": "-273.22",
       "Shares Held": "-1003",
       "Asset Category": "Equity"
     },
@@ -243,47 +261,29 @@
       "Name": "SINGAPORE DOLLAR",
       "Ticker": "SGD",
       "Identifier": "CASHSGD",
-      "Weight": "0.00%",
-      "Market Value": "$3892.13",
+      "Weight": "0",
+      "Market Value": "3880.89",
       "Shares Held": "4971",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "THAI BAHT",
-      "Ticker": "THB",
-      "Identifier": "CASHTHB",
-      "Weight": "0.00%",
-      "Market Value": "$-566.98",
-      "Shares Held": "-19023",
       "Asset Category": "Equity"
     },
     {
       "Name": "AUSTRALIAN DOLLAR",
       "Ticker": "AUD",
       "Identifier": "CASHAUD",
-      "Weight": "-0.02%",
-      "Market Value": "$-35623.77",
+      "Weight": "-0.02",
+      "Market Value": "-35462.42",
       "Shares Held": "-51206",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "PHILIPPINE PESO",
-      "Ticker": "PHP",
-      "Identifier": "CASHPHP",
-      "Weight": "-0.09%",
-      "Market Value": "$-172206.34",
-      "Shares Held": "-10787866",
       "Asset Category": "Equity"
     },
     {
       "Name": "Cash & Other",
       "Ticker": "Cash&Other",
       "Identifier": "Cash&Other",
-      "Weight": "-2.12%",
-      "Market Value": "$-4206403.00",
-      "Shares Held": "-4206403",
+      "Weight": "-2.54",
+      "Market Value": "-4958953.13",
+      "Shares Held": "-4958953",
       "Asset Category": "Cash"
     }
   ],
-  "asOfDate": "2026-10-01"
+  "asOfDate": "2026-10-02"
 }

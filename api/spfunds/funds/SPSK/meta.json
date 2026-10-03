@@ -6,18 +6,22 @@
   "dataFile": "funds/SPSK/meta.json",
   "ter": "0.50%",
   "terValue": 0.5,
-  "nav": "$17.37",
-  "navValue": 17.37,
-  "aum": "$453.00M",
-  "aumValue": 453000000,
-  "asOfDate": "2026-09-30",
+  "terGross": "—",
+  "terGrossValue": null,
+  "nav": "$17.35",
+  "navValue": 17.35,
+  "aum": "$452.39M",
+  "aumValue": 452390000,
+  "asOfDate": "2026-10-01",
   "inceptionDate": "2019-12-27",
   "exchange": "NYSE",
   "closePrice": "$17.37",
-  "closePriceAsOfDate": "2026-09-30",
-  "premiumDiscount": "-0.02%",
+  "closePriceValue": 17.37,
+  "closePriceAsOfDate": "2026-10-01",
+  "premiumDiscount": "0.12%",
+  "premiumDiscountValue": 0.12,
   "sharesOutstanding": 26075000,
-  "midpoint": 452922750,
+  "midpoint": 452401250,
   "cusip": "886364702",
   "isin": null,
   "distributions": {
@@ -424,10 +428,10 @@
     "cagr5y": 0.39,
     "cagr10y": null,
     "siAnn": 0.77,
-    "dividendYield": 3.59,
-    "dividendYieldText": "3.59%",
-    "secYield": 4.58,
-    "secYieldText": "4.58%",
+    "dividendYield": 3.6,
+    "dividendYieldText": "3.60%",
+    "secYield": 5.04,
+    "secYieldText": "5.04%",
     "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
     "performanceAsOf": "2026-09-30"
   },
@@ -436,8 +440,8 @@
       "001.json"
     ],
     "pageSize": 250,
-    "totalRows": 172,
-    "asOfDate": "2026-10-01"
+    "totalRows": 173,
+    "asOfDate": "2026-10-02"
   },
   "history": {
     "pages": [
@@ -445,10 +449,10 @@
       "002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1697,
-    "asOfDate": "2026-10-01"
+    "totalRows": 1698,
+    "asOfDate": "2026-10-02"
   },
-  "generatedAt": "2026-10-02T01:47:23.668Z",
+  "generatedAt": "2026-10-03T05:19:59Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -469,12 +473,12 @@
     "benchmark": "Bloomberg Global Aggregate Index"
   },
   "yields": {
-    "dividendYield": 3.59,
-    "dividendYieldText": "3.59%",
+    "dividendYield": 3.6,
+    "dividendYieldText": "3.60%",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 3.59,
-    "secYield": 4.58,
-    "secYieldText": "4.58%",
+    "distributionRate": 3.6,
+    "secYield": 5.04,
+    "secYieldText": "5.04%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
   },
   "documents": {
