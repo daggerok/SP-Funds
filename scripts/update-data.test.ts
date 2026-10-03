@@ -3,9 +3,9 @@
  * Offline tests for the SP Funds feed updater. Every sample is a small inline
  * excerpt in the shape the real pages and feeds use; no test performs network I/O.
  */
-import { describe, expect, test } from 'bun:test';
+import { afterEach, describe, expect, spyOn, test } from 'bun:test';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -24,12 +24,16 @@ import {
   resolveControls, round, runUpdater, runtimeControls, samePublishedContent, sanitizeTicker, secHeaders,
   selectionEntryFromIndex, splitPages, spFundsAssetCategory, stableStringify, toIsoDate, trustForTicker,
   installSystemCa, isCertError, updateFund, writeIfChanged, writePages, writeCursor, yahooChartUrl,
+  dayFromHistoryRow, emptyMetrics, formatSheetDate, historyRowsFromDays, isoStamp, mergeHistoryDays, placeholderEntry, tenorAvailable,
   type CatalogFund, type FundOutcome, type JsonRecord, type SheetRow, type Transport, type UpdaterConfig,
 } from './update-data';
 
 // ---------------------------------------------------------------------------
 // Inline samples
 // ---------------------------------------------------------------------------
+
+// main() sets process.exitCode = 1 when every fund failed: never let that leak out of a test file.
+afterEach(() => { process.exitCode = 0; });
 
 const TICKERS = ['SPRE', 'SPSK', 'SPTE', 'SPUS', 'SPWO'];
 const SPFUNDS = 'https://www.sp-funds.com';
@@ -314,9 +318,9 @@ describe('numeric and date parsing', () => {
   });
 
   test('display helpers keep the published precision of weights and money', () => {
-    expect(normalizeWeightText('14.14%')).toBe('14.14%');
-    expect(normalizeWeightText('3.64698555')).toBe('3.64698555%');
-    expect(normalizeWeightText('-2.12%')).toBe('-2.12%');
+    expect(normalizeWeightText('14.14%')).toBe('14.14');
+    expect(normalizeWeightText('3.64698555')).toBe('3.64698555');
+    expect(normalizeWeightText('-2.12%')).toBe('-2.12');
     expect(normalizeWeightText('')).toBe('');
     expect(formatMoneyText(464404792.12)).toBe('$464404792.12');
     expect(formatMoneyText(null)).toBe('—');
@@ -424,15 +428,17 @@ describe('official fund pages', () => {
     expect(page.distributions.every((row) => row.amount !== null)).toBe(true);
   });
 
-  test('SPTE: month-end and quarter-end tables differ and a young fund keeps its published zero', () => {
+  test('SPTE: month-end and quarter-end tables differ and a tenor older than the fund is blank, not zero', () => {
     const spte = parseFundPage(fundPageHtml('SPTE'), 'SPTE');
     expect(spte.name).toBe('SP Funds S&P Global Technology ETF');
     expect(spte.monthEnd!.returns.asOfDate).toBe('2026-08-31');
     expect(spte.monthEnd!.returns.ytd).toBe(34.78);
     expect(spte.quarterEnd!.returns.asOfDate).toBe('2026-06-30');
     expect(spte.quarterEnd!.returns.ytd).toBe(38.73);
-    // Published as 0.00 because the fund is younger than three years: not null.
-    expect(spte.monthEnd!.returns.yr3).toBe(0);
+    // The site prints 0.00 for 3 years because the fund (inception 2023-11-30) is younger than that.
+    expect(spte.monthEnd!.returns.yr3).toBeNull();
+    expect(spte.quarterEnd!.returns.yr3).toBeNull();
+    expect(spte.monthEnd!.returns.yr1).toBe(51.03);
     expect(spte.monthEnd!.returns.yr5).toBeNull();
     expect(spte.documents['prospectus']).toContain('spfunds-485bpos_022626-PRO-SPTE.pdf');
   });
@@ -470,8 +476,8 @@ describe('official holdings CSV', () => {
     expect(parsed.netAssets).toBe(3283824025);
     expect(parsed.sharesOutstanding).toBe(55150000);
     expect(parsed.rows[0]).toEqual({
-      Name: 'NVIDIA Corp', Ticker: 'NVDA', Identifier: '67066G104', Weight: '14.14%',
-      'Market Value': '$464404792.12', 'Shares Held': '2033474', 'Asset Category': 'Equity',
+      Name: 'NVIDIA Corp', Ticker: 'NVDA', Identifier: '67066G104', Weight: '14.14',
+      'Market Value': '464404792.12', 'Shares Held': '2033474', 'Asset Category': 'Equity',
     });
     expect(parsed.rows[1].Ticker).toBe('AAPL');
     expect(parsed.rows.every((row) => Object.keys(row).length === HOLDINGS_HEADERS.length)).toBe(true);
@@ -549,7 +555,7 @@ describe('Yahoo chart feed', () => {
     expect(start(yahooChartUrl('SPUS', 'max', now))).toBe(0);
     expect(start(yahooChartUrl('SPUS', '5y', now))).toBe(Math.floor(seconds - 5 * 365.25 * 86_400));
     expect(start(yahooChartUrl('SPUS', '5y', now))).toBeGreaterThan(start(yahooChartUrl('SPUS', '10y', now)));
-    expect(new URL(yahooChartUrl('SPUS', '5y', now)).searchParams.get('period2')).toBe(String(seconds));
+    expect(new URL(yahooChartUrl('SPUS', '5y', now)).searchParams.get('period2')).toBe(String(seconds + 86_400));
     expect(new URL(yahooChartUrl('SPUS', '5y', now)).searchParams.has('range')).toBe(false);
   });
 });
@@ -605,7 +611,7 @@ describe('derived metrics', () => {
   test('frequency is derived only from the fund own published ex-dates', () => {
     expect(paymentsPerYear('Monthly')).toBe(12);
     expect(paymentsPerYear('Quarterly')).toBe(4);
-    expect(paymentsPerYear('Semi-annually')).toBe(6);
+    expect(paymentsPerYear('Semi-annually')).toBe(2);
     expect(paymentsPerYear('Annually')).toBe(1);
     expect(paymentsPerYear('')).toBeNull();
     const monthly = ['2026-09-28', '2026-08-26', '2026-07-27', '2026-06-26', '2026-05-27', '2026-04-27'];
@@ -1137,10 +1143,10 @@ describe('SEC N-PORT-P fallback', () => {
     expect(parsed.netAssets).toBe(3283824025);
     expect(parsed.holdings.length).toBe(5);
     expect(parsed.holdings[0]).toEqual({
-      Name: 'NVIDIA CORP', Ticker: '—', Identifier: '67066G104', Weight: '14.14%',
-      'Market Value': '$464404792.12', 'Shares Held': '2033474', 'Asset Category': 'EC',
+      Name: 'NVIDIA CORP', Ticker: '—', Identifier: '67066G104', Weight: '14.14',
+      'Market Value': '464404792.12', 'Shares Held': '2033474', 'Asset Category': 'EC',
     });
-    expect(parsed.holdings[3].Weight).toBe('-0.12%');
+    expect(parsed.holdings[3].Weight).toBe('-0.12');
     expect(parsed.totalValue).toBe((464404792.12 + 408383425.06 + 16400000 - 3940000 + 39400000));
   });
 
@@ -1188,11 +1194,11 @@ describe('SEC N-PORT-P fallback', () => {
     expect(result!.asOfDate).toBe('2026-07-31');
     expect(result!.rows.length).toBe(5);
     expect(result!.source).toContain('000200032426004454');
-    expect(result!.rows[0]['Weight']).toBe('14.14%');
+    expect(result!.rows[0]['Weight']).toBe('14.14');
     // The cash row keeps its negative sign, and rows sort by weight descending.
     const cash = result!.rows.find((row) => row['Name'] === 'Cash & Other')!;
-    expect(cash['Market Value']).toBe('$-3940000.00');
-    expect(cash['Weight']).toBe('-0.12%');
+    expect(cash['Market Value']).toBe('-3940000');
+    expect(cash['Weight']).toBe('-0.12');
     expect(Number(result!.rows[0]['Weight'].replace('%', ''))).toBeGreaterThan(Number(result!.rows[1]['Weight'].replace('%', '')));
     // The trust submissions feed is never consulted when the series feed answers.
     expect(calls.some((url) => url.includes('submissions'))).toBe(false);
@@ -1266,7 +1272,7 @@ describe('per-fund update', () => {
     expect(page['headers']).toEqual(HOLDINGS_HEADERS);
     expect(Array.isArray(page['rows'])).toBe(true);
     expect(Object.keys(page['rows'][0])).toEqual(HOLDINGS_HEADERS);
-    expect(page['rows'][0]['Weight']).toBe('14.14%');
+    expect(page['rows'][0]['Weight']).toBe('14.14');
     const history = JSON.parse(await readFile(new URL('funds/SPUS/history/001.json', apiRoot), 'utf8'));
     expect(history['headers']).toEqual(HISTORY_HEADERS);
     expect(Object.keys(history['rows'][0])).toEqual(HISTORY_HEADERS);
@@ -1283,12 +1289,17 @@ describe('per-fund update', () => {
       if (url.endsWith('.com/spus/')) throw new Error('HTTP 503');
       return transport(url, label, init);
     };
+    const metaBefore = await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8');
     const outcome = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, broken, null, new Date('2026-10-02T12:00:00Z'));
     expect(outcome.providers.spFunds).toBe(false);
-    expect(outcome.providers.yahoo).toBe(true);
-    expect(outcome.providers.retained).toEqual(['issuer page', 'holdings']);
+    expect(outcome.providers.retained).toContain('issuer page');
+    expect(outcome.providers.retained).toContain('holdings');
+    expect(outcome.failedSources).toEqual(['issuer page', 'holdings']);
     expect(outcome.reason).toContain('retained');
-    const meta = JSON.parse(await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8'));
+    // Fund-level consistency: nothing new is written next to stale columns.
+    expect(outcome.written).toBe(false);
+    expect(await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8')).toBe(metaBefore);
+    const meta = JSON.parse(metaBefore);
     // Previously published facts survive a transient issuer outage.
     expect(meta['nav']).toBe('$59.54');
     expect(meta['identifiers']['cusip']).toBe('886364801');
@@ -1342,9 +1353,9 @@ describe('offline orchestration', () => {
     expect(index['source']['catalog']).toBe('https://www.sp-funds.com/');
     const spus = index['funds'].find((fund: JsonRecord) => fund['ticker'] === 'SPUS');
     expect(Object.keys(spus).sort()).toEqual([
-      'aum', 'aumValue', 'asOfDate', 'category', 'closePrice', 'closePriceAsOfDate', 'cusip', 'dataFile',
+      'aum', 'aumValue', 'asOfDate', 'category', 'closePrice', 'closePriceAsOfDate', 'closePriceValue', 'cusip', 'dataFile',
       'distributions', 'exchange', 'fundPage', 'history', 'holdings', 'inceptionDate', 'isin', 'metrics', 'name',
-      'nav', 'navValue', 'premiumDiscount', 'returns', 'ter', 'terValue', 'ticker',
+      'nav', 'navValue', 'premiumDiscount', 'premiumDiscountValue', 'returns', 'ter', 'terGrossValue', 'terValue', 'ticker',
     ].sort());
     expect(spus['distributions']).toEqual({ frequency: 'Monthly', exDate: '2026-09-28', dividend: '0.026' });
     expect(spus['metrics']['cagr3y']).toBe(25.32);
@@ -1482,3 +1493,233 @@ async function listFiles(root: URL, prefix = ''): Promise<string[]> {
   }
   return files.sort();
 }
+
+// ---------------------------------------------------------------------------
+// Data contract fixes
+// ---------------------------------------------------------------------------
+
+const stripTables = (html: string, marker: string): string =>
+  html.replace(/<table>[\s\S]*?<\/table>/g, (table) => (table.includes(marker) ? '' : table));
+
+const yahooWindow = (count: number, startEpoch: number): string => JSON.stringify({
+  chart: { result: [{
+    meta: { fullExchangeName: 'NYSEArca', longName: 'X' },
+    timestamp: Array.from({ length: count }, (_, index) => startEpoch + index * 86_400),
+    events: { dividends: {} },
+    indicators: {
+      quote: [{ close: Array.from({ length: count }, () => 60), volume: Array.from({ length: count }, () => 5) }],
+      adjclose: [{ adjclose: Array.from({ length: count }, () => 60) }],
+    },
+  }] },
+});
+
+const quietTransport = (fetcher: typeof fetch): Transport => createTransport(readConfig({ REQUEST_SLEEP: '0' }), async () => {}, fetcher, async () => {});
+const readMeta = async (apiRoot: URL, ticker: string): Promise<JsonRecord> => JSON.parse(await readFile(new URL(`funds/${ticker}/meta.json`, apiRoot), 'utf8'));
+
+describe('young funds and tenors', () => {
+  test('tenorAvailable compares inception + N years with the table date', () => {
+    expect(tenorAvailable('2023-11-30', '2026-08-31', 3)).toBe(false);
+    expect(tenorAvailable('2023-11-30', '2026-11-30', 3)).toBe(true);
+    expect(tenorAvailable('2019-12-17', '2026-09-30', 5)).toBe(true);
+    expect(tenorAvailable('2019-12-17', '2026-09-30', 10)).toBe(false);
+    expect(tenorAvailable(null, '2026-09-30', 10)).toBe(true);
+  });
+
+  test('a fund younger than three years publishes null, not 0, for 3-year total return and CAGR', async () => {
+    const apiRoot = await tempApiRoot();
+    const { fetcher } = sampleFetcher();
+    await updateFund(fundFor('SPTE'), offlineConfig(), apiRoot, quietTransport(fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const meta = await readMeta(apiRoot, 'SPTE');
+    const metrics = meta['metrics'] as JsonRecord;
+    expect(metrics['tr3y']).toBeNull();
+    expect(metrics['cagr3y']).toBeNull();
+    expect(metrics['tr1y']).toBe(51.03);
+    expect(metrics['siAnn']).toBe(37.44);
+    expect((meta['returns'] as JsonRecord)['monthEnd']).toMatchObject({ yr3: null, yr5: null, yr10: null });
+    expect((meta['returns'] as JsonRecord)['quarterEnd']).toMatchObject({ yr3: null });
+  });
+});
+
+describe('retention and fund-level consistency', () => {
+  test('a loaded page without its performance table keeps the published returns, date and basis as one unit', async () => {
+    const apiRoot = await tempApiRoot();
+    const first = sampleFetcher();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(first.fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const before = await readMeta(apiRoot, 'SPUS');
+
+    const second = sampleFetcher({ spus: stripTables(fundPageHtml('SPUS'), 'Fund Ticker') });
+    const outcome = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(second.fetcher), null, new Date('2026-10-02T12:00:00Z'));
+    const after = await readMeta(apiRoot, 'SPUS');
+    expect(after['returns']).toEqual(before['returns']);
+    expect((after['metrics'] as JsonRecord)['tr1y']).toBe(21.21);
+    expect((after['metrics'] as JsonRecord)['performanceAsOf']).toBe('2026-09-30');
+    expect((after['metrics'] as JsonRecord)['returnsBasis']).toBe((before['metrics'] as JsonRecord)['returnsBasis']);
+    expect(after['performance']).toEqual(before['performance']);
+    expect(after['terValue']).toBe(0.45);
+    expect(outcome.reason).toContain('returns (table missing on the page)');
+  });
+
+  test('a page without any fact table keeps TER, NAV and AUM instead of blanking them', async () => {
+    const apiRoot = await tempApiRoot();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher().fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const bare = stripTables(stripTables(stripTables(fundPageHtml('SPUS'), 'Fund Ticker'), 'Fund Inception'), 'Net Assets');
+    const outcome = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher({ spus: bare }).fetcher), null, new Date('2026-10-02T12:00:00Z'));
+    const meta = await readMeta(apiRoot, 'SPUS');
+    expect(meta['terValue']).toBe(0.45);
+    expect(meta['navValue']).toBe(59.54);
+    expect(meta['aumValue']).toBe(3274890000);
+    expect(meta['closePriceValue']).toBe(59.54);
+    expect(meta['inceptionDate']).toBe('2019-12-17');
+    expect(outcome.reason).toContain('pricing (table missing on the page)');
+    expect(((meta['returns'] as JsonRecord)['quarterEnd'] as JsonRecord)['asOfDate']).toBe('2026-09-30');
+  });
+
+  test('an honest blank in a present table is published as null, never filled from the past', async () => {
+    const apiRoot = await tempApiRoot();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher().fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const html = fundPageHtml('SPUS').replace(/<tr><td>30 Day SEC Yield[^]*?<\/tr>/, '');
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher({ spus: html }).fetcher), null, new Date('2026-10-02T12:00:00Z'));
+    expect(((await readMeta(apiRoot, 'SPUS'))['metrics'] as JsonRecord)['secYield']).toBeNull();
+  });
+
+  test('a failed Yahoo request keeps the whole published fund, never a new return next to old history', async () => {
+    const apiRoot = await tempApiRoot();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher().fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const before = await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8');
+    const changed = fundPageHtml('SPUS').replace(/09\/30\/2026/g, '10/31/2026');
+    const { fetcher } = sampleFetcher({ spus: changed });
+    const transport = quietTransport(((url: string, init?: RequestInit) => url.includes('yahoo') ? Promise.resolve(new Response('no', { status: 404 })) : fetcher(url, init)) as typeof fetch);
+    const outcome = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, transport, null, new Date('2026-10-02T12:00:00Z'));
+    expect(outcome.failedSources).toEqual(['Yahoo history']);
+    expect(outcome.written).toBe(false);
+    expect(await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8')).toBe(before);
+  });
+
+  test('an older N-PORT-P filing never replaces fresher published holdings', async () => {
+    const apiRoot = await tempApiRoot();
+    const { fetcher } = sampleFetcher();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const rows = [{ Name: 'Old', Ticker: 'OLD', Identifier: '1', Weight: '100', 'Market Value': '1', 'Shares Held': '1', 'Asset Category': 'Equity' }];
+    const noCsv = quietTransport(((url: string, init?: RequestInit) => url.includes('TidalFG') ? Promise.resolve(new Response('no', { status: 404 })) : fetcher(url, init)) as typeof fetch);
+    const stale = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, noCsv, async () => ({ rows, asOfDate: '2026-07-31', source: 's' }), new Date('2026-10-02T12:00:00Z'));
+    expect(stale.providers.edgar).toBe(false);
+    expect(stale.failedSources).toContain('holdings');
+    expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 6, asOfDate: '2026-10-01' });
+    const fresh = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, noCsv, async () => ({ rows, asOfDate: '2026-10-02', source: 's' }), new Date('2026-10-03T12:00:00Z'));
+    expect(fresh.providers.edgar).toBe(true);
+    expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 1, asOfDate: '2026-10-02' });
+  });
+});
+
+describe('published shapes', () => {
+  test('history is oldest-first with zero-padded month-name dates and the manifest date is the newest day', async () => {
+    expect(formatSheetDate('2026-06-04')).toBe('Jun 04 2026');
+    expect(formatSheetDate('10/1/2026')).toBe('Oct 01 2026');
+    const rows = historyRowsFromDays([
+      { date: '2026-09-30', close: 2, adjClose: 2, volume: 1 }, { date: '2026-09-02', close: 1, adjClose: 1, volume: 1 },
+    ]);
+    expect(rows.map((row) => row['Date'])).toEqual(['Sep 02 2026', 'Sep 30 2026']);
+    expect(dayFromHistoryRow(rows[1])?.date).toBe('2026-09-30');
+    expect(dayFromHistoryRow({ Date: '2026-09-30', Close: '1' })?.date).toBe('2026-09-30');
+
+    const apiRoot = await tempApiRoot();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher().fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    const page = JSON.parse(await readFile(new URL('funds/SPUS/history/001.json', apiRoot), 'utf8'));
+    const dates = page['rows'].map((row: SheetRow) => Date.parse(`${row['Date']} UTC`));
+    expect(dates).toEqual([...dates].sort((a, b) => a - b));
+    expect(page['rows'][0]['Date']).toMatch(/^[A-Z][a-z]{2} \d{2} \d{4}$/);
+    expect(page['asOfDate']).toBe('2026-09-27');
+  });
+
+  test('timestamps carry no milliseconds, AUM no float noise, holdings are plain numbers', async () => {
+    expect(isoStamp(new Date('2026-10-01T12:00:00.987Z'))).toBe('2026-10-01T12:00:00Z');
+    const apiRoot = await tempApiRoot();
+    const { fetcher } = sampleFetcher();
+    await runUpdater(offlineConfig(), { apiRoot, fetcher, now: new Date('2026-10-01T12:00:00.500Z') });
+    const index = JSON.parse(await readFile(new URL('index.json', apiRoot), 'utf8'));
+    expect(index['generatedAt']).toBe('2026-10-01T12:00:00Z');
+    const spte = index['funds'].find((fund: JsonRecord) => fund['ticker'] === 'SPTE');
+    expect(spte['aumValue']).toBe(261470000);
+    expect(spte['closePriceValue']).toBe(49.8);
+    expect(spte['premiumDiscountValue']).toBe(-0.01);
+    expect((await readMeta(apiRoot, 'SPTE'))['generatedAt']).toBe('2026-10-01T12:00:00Z');
+    const holdings = JSON.parse(await readFile(new URL('funds/SPTE/holdings/001.json', apiRoot), 'utf8'));
+    expect(holdings['rows'][0]['Weight']).toBe('10');
+    expect(holdings['rows'][0]['Market Value']).toBe('150000');
+  });
+
+  test('month-name dates parse as UTC whatever the process time zone is', () => {
+    const saved = process.env['TZ'];
+    try {
+      for (const zone of ['Pacific/Auckland', 'America/Los_Angeles']) {
+        process.env['TZ'] = zone;
+        expect(toIsoDate('Jun 04 2026')).toBe('2026-06-04');
+        expect(formatSheetDate('Jun 04 2026')).toBe('Jun 04 2026');
+      }
+    } finally {
+      if (saved === undefined) delete process.env['TZ']; else process.env['TZ'] = saved;
+    }
+  });
+
+  test('a row without a published meta.json gets dataFile null and a full all-null metrics object', async () => {
+    const entry = placeholderEntry('SPWO', 'https://www.sp-funds.com/spwo/');
+    expect(entry['dataFile']).toBeNull();
+    const metrics = entry['metrics'] as JsonRecord;
+    expect(Object.keys(metrics).sort()).toEqual(Object.keys(emptyMetrics()).sort());
+    for (const key of ['ytd', 'tr1y', 'tr3y', 'tr5y', 'tr10y', 'cagr3y', 'cagr5y', 'cagr10y', 'siAnn', 'dividendYield', 'secYield', 'performanceAsOf']) expect(metrics[key]).toBeNull();
+    expect(String(metrics['returnsBasis']).length).toBeGreaterThan(0);
+
+    // A soft deadline in the middle of a first run leaves unprocessed funds as such rows.
+    let tick = 0;
+    const apiRoot = await tempApiRoot();
+    const { fetcher } = sampleFetcher();
+    const summary = await runUpdater(offlineConfig({ CONCURRENCY: '1' }), { apiRoot, fetcher, now: new Date('2026-10-01T12:00:00Z'), deadlineMs: 2500, clock: () => { tick += 1000; return tick; } });
+    expect(summary.deadlineHit).toBe(true);
+    const index = JSON.parse(await readFile(new URL('index.json', apiRoot), 'utf8'));
+    expect(index['funds'].length).toBe(5);
+    const done = index['funds'].filter((fund: JsonRecord) => fund['dataFile'] !== null);
+    expect(done.length).toBe(2);
+    expect(index['funds'].filter((fund: JsonRecord) => fund['dataFile'] === null).every((fund: JsonRecord) => (fund['metrics'] as JsonRecord)['tr1y'] === null)).toBe(true);
+    expect((await listFiles(apiRoot)).some((file) => file.includes('.tmp-'))).toBe(false);
+  });
+});
+
+describe('history range and new funds', () => {
+  test('a shorter HISTORY_RANGE refreshes its window and keeps the older published rows', async () => {
+    const apiRoot = await tempApiRoot();
+    await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(sampleFetcher().fetcher), null, new Date('2026-10-01T12:00:00Z'));
+    // Only the last 10 of the 30 published days come back (a window), with a new close.
+    const windowed = sampleFetcher({ 'yahoo-SPUS': yahooWindow(10, 1_788_000_000 + 20 * 86_400) });
+    await updateFund(fundFor('SPUS'), offlineConfig({ HISTORY_RANGE: '1y' }), apiRoot, quietTransport(windowed.fetcher), null, new Date('2026-10-02T12:00:00Z'));
+    const meta = await readMeta(apiRoot, 'SPUS');
+    expect((meta['history'] as JsonRecord)['totalRows']).toBe(30);
+    const page = JSON.parse(await readFile(new URL('funds/SPUS/history/001.json', apiRoot), 'utf8'));
+    expect(page['rows'][0]['Date']).toBe('Aug 29 2026');
+    expect(page['rows'][29]['Close']).toBe('60');
+    expect(page['rows'][5]['Close']).toBe('59.05');
+    expect(mergeHistoryDays([], [{ date: '2026-01-01', close: 1, adjClose: 1, volume: 1 }]).length).toBe(1);
+  });
+
+  test('tickers missing from the previous index are announced and appended to the step summary', async () => {
+    const apiRoot = await tempApiRoot();
+    const { fetcher } = sampleFetcher();
+    await runUpdater(offlineConfig(), { apiRoot, fetcher, now: new Date('2026-10-01T12:00:00Z') });
+    const indexUrl = new URL('index.json', apiRoot);
+    const index = JSON.parse(await readFile(indexUrl, 'utf8'));
+    index['funds'] = index['funds'].filter((fund: JsonRecord) => fund['ticker'] !== 'SPWO' && fund['ticker'] !== 'SPSK');
+    await writeFile(indexUrl, JSON.stringify(index));
+    const summaryFile = join(await mkdtemp(join(tmpdir(), 'spfunds-summary-')), 'summary.md');
+    const savedSummary = process.env['GITHUB_STEP_SUMMARY'];
+    process.env['GITHUB_STEP_SUMMARY'] = summaryFile;
+    const log = spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const summary = await runUpdater(offlineConfig(), { apiRoot, fetcher, now: new Date('2026-10-02T12:00:00Z') });
+      expect(summary.newFunds).toEqual(['SPSK', 'SPWO']);
+      expect(log.mock.calls.some((call) => call[0] === 'NEW FUNDS: SPSK, SPWO')).toBe(true);
+    } finally {
+      log.mockRestore();
+      if (savedSummary === undefined) delete process.env['GITHUB_STEP_SUMMARY']; else process.env['GITHUB_STEP_SUMMARY'] = savedSummary;
+    }
+    expect(await readFile(summaryFile, 'utf8')).toContain('NEW FUNDS: SPSK, SPWO');
+  });
+});
