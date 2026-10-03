@@ -41,9 +41,12 @@ SEC endpoints have answered HTTP 403 to GitHub-hosted runners, so the N-PORT-P f
 
 - Holdings come from the issuer's own daily CSV, which publishes no asset-class column; the Watchlist category is derived from the row itself (cash lines Cash, options Option, fund units Fund, everything else Equity). Cash cushions keep the provider's negative weight and value
 - SPRE holds foreign listings; their exchange-suffixed tickers (for example `GMG AU`) are kept as published
-- Returns are the official month-end NAV figures as published (3Y/5Y/10Y annualized); cumulative figures are derived from them. A young fund keeps its published `0.00`, while a `-` is unavailable and stays empty rather than becoming 0
+- Returns are the official month-end NAV figures as published (3Y/5Y/10Y annualized); cumulative figures are derived from them. A tenor longer than the fund's age at the table date (for example 3 years for SPTE and SPWO, which began in November and December 2023) is published by the site as `0.00` or `-` and is left empty here, never 0: every tenor is checked as inception + N years <= table date
 - Daily history, closing prices beyond the page's own close and dividends are Yahoo Finance market data; the distribution calendar, frequency and indicated yield are derived estimates, not issuer-reported yields. Official NAV, net assets and the 30-day SEC yield come from the fund page with their as-of dates
-- `HISTORY_RANGE` narrows the Yahoo request window; the published history then covers only that window
+- `HISTORY_RANGE` narrows the Yahoo request window (explicit period1/period2; period2 is now + 1 day so the latest bar is included). Published rows older than the window are kept and only the window is refreshed
+- Fund-level consistency: every fund is either fully updated or fully kept. If the fund page, the holdings (CSV, then an N-PORT-P filing that is not older than the published holdings) or the Yahoo history fails for a fund that already has published files, that fund stays exactly as published and the run reports it; when every processed fund is kept this way the run exits non-zero. A fund page that loads without one of its tables keeps the published values of that section as a unit (returns together with `performanceAsOf` and `returnsBasis`); a table that is present with a blank cell publishes the blank
+- Writes are atomic (temp file + rename) and ordered: pages, then `meta.json`, then the index; stale pages are removed after the new `meta.json`. A rerun with identical upstream data writes nothing (`generatedAt` moves only with content). The run stops taking new funds after 25 minutes and still writes the index; unprocessed funds without files have `dataFile: null` and an all-null `metrics` object. New lineup tickers print `NEW FUNDS: ...` and go to the step summary
+- Published shapes: history rows are oldest first with `Sep 30 2026` dates, holdings `Weight` (percent) and `Market Value` (USD) are plain numbers, `generatedAt` has no milliseconds, index rows carry `closePriceValue`, `premiumDiscountValue` and `terGrossValue`. `terValue` is the net expense ratio (the only one SP Funds publishes), `terGrossValue` stays `null` unless a gross figure appears on the page. A semi-annual distribution frequency means 2 payments per year. `secYield` may legitimately be a published 0.00
 - No ticker exclusions: the five ETFs are the lineup; the site's six target-date mutual funds are out of scope
 
 Each fund carries a derived `metrics` object that powers the catalog columns shared with the sibling sites:
@@ -68,7 +71,7 @@ Defaults below are from `scripts/update-data.config.json`; blank Actions inputs 
 | `CONCURRENCY` | `2` | Parallel fund workers (integer >= 1), each with its own paced request lane. `CONCURRENCY=15 ./scripts/update-data.ts` fetches up to 15 funds at once; the lineup has five funds, so at most five run together |
 | `TICKERS` | all | Space/comma/semicolon allowlist, e.g. SPUS SPSK SPTE. Unknown requested tickers fail before writes |
 | `AUM` | `:` | Net Assets range: USD amounts or K/M/B/T suffixes; nano/micro/small/mid/large presets; inclusive min:max |
-| `TER` | `:` | Gross expense ratio range in % (strict min:max) |
+| `TER` | `:` | Net expense ratio (`terValue`) range in % (strict min:max); funds without a published ratio do not pass an active range |
 | `DIVIDEND_YIELD` | `:` | Distribution-yield range in %, min:max; missing values do not pass an active range |
 | `SEC_YIELD` | `:` | Official 30-day SEC-yield range in %, min:max; missing values do not pass |
 | `HOLDINGS_PAGE_SIZE` | `250` | Current holdings rows per JSON page |

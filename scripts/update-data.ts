@@ -5,7 +5,7 @@
 // Console/reporting shape, config-file precedence and the N-PORT/Python-free helpers follow
 // the shared family conventions; the holdings-CSV contract matches the other TidalFG-hosted brands.
 import { createHash } from 'node:crypto';
-import { appendFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -87,6 +87,9 @@ export type FundDetails = CatalogFund & {
   frequency: string | null;
   midpoint: number | null;
   premiumDiscount: number | null;
+  /** Gross expense ratio when the page publishes one; `terValue` is the net (or only) figure. */
+  terGrossValue?: number | null;
+  closePriceValue?: number | null;
 };
 
 export type Dividend = {
@@ -121,9 +124,11 @@ export const fundPageUrl = (ticker: string): string => `${SPFUNDS_SITE}/${saniti
  * the epoch, `<N>y` starts N years before now, so HISTORY_RANGE really limits the window.
  */
 export const yahooChartUrl = (ticker: string, range: string = 'max', nowMs: number = Date.now()): string => {
-  const period2 = Math.floor(nowMs / 1000);
+  // +1 day: Yahoo excludes the final bar when period2 is exactly now.
+  const nowSec = Math.floor(nowMs / 1000);
+  const period2 = nowSec + 86_400;
   const years = /^(\d+)y$/i.exec(range.trim());
-  const period1 = years ? Math.max(0, Math.floor(period2 - Number(years[1]) * 365.25 * 86_400)) : 0;
+  const period1 = years ? Math.max(0, Math.floor(nowSec - Number(years[1]) * 365.25 * 86_400)) : 0;
   return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sanitizeTicker(ticker))}` +
     `?period1=${period1}&period2=${period2}&interval=1d&events=div%7Csplit&includeAdjustedClose=true`;
 };
@@ -214,6 +219,29 @@ export function formatUsDate(raw: unknown): string | null {
   return `${months[Number(month) - 1]} ${Number(day)} ${year}`;
 }
 
+/** `Sep 30 2026` (zero-padded day, UTC) from an ISO date; the date text the sibling feeds publish. */
+export function formatSheetDate(raw: unknown): string {
+  const iso = toIsoDate(raw);
+  if (!iso) return cleanText(raw);
+  const [year, month, day] = iso.split('-');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[Number(month) - 1]} ${day} ${year}`;
+}
+
+/** ISO timestamp without milliseconds (`2026-10-01T12:00:00Z`). */
+export function isoStamp(date: Date): string {
+  return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+/** True when a fund incepted on `inception` has existed for `years` full years on `asOf` (both ISO dates). */
+export function tenorAvailable(inception: string | null, asOf: string | null, years: number): boolean {
+  if (!inception || !asOf) return true; // unknown age: keep what the provider printed
+  const start = new Date(`${inception}T00:00:00Z`);
+  if (Number.isNaN(start.getTime())) return true;
+  start.setUTCFullYear(start.getUTCFullYear() + years);
+  return start.toISOString().slice(0, 10) <= asOf;
+}
+
 export function epochToIsoDate(epoch: number): string {
   return new Date(epoch * 1000).toISOString().slice(0, 10);
 }
@@ -239,13 +267,24 @@ export function formatPercentText(value: number | null, digits = 2): string {
   return value === null ? '—' : `${value.toFixed(digits)}%`;
 }
 
-/** Weight strings keep the provider's own precision: `14.14%` -> `14.14%`. */
+/** Weight as a plain percent number text, the provider's own precision: `14.14%` -> `14.14`. */
 export function normalizeWeightText(raw: unknown): string {
   const text = cleanText(raw);
   if (!text || text === '—') return '';
   const value = numberOrNull(text);
   if (value === null) return text;
-  return `${text.replace(/%$/, '')}%`;
+  return String(value);
+}
+
+/** Plain numeric text of a money cell (`$30956597.21` -> `30956597.21`), empty when there is none. */
+export function normalizeMoneyCell(raw: unknown): string {
+  const value = numberOrNull(raw);
+  return value === null ? '' : String(value);
+}
+
+/** Holdings rows in the plain-numeric sibling shape (also converts rows published by older runs). */
+export function normalizeHoldingsRow(row: SheetRow): SheetRow {
+  return { ...row, Weight: normalizeWeightText(row['Weight']), 'Market Value': normalizeMoneyCell(row['Market Value']) };
 }
 
 // ---------------------------------------------------------------------------
@@ -651,6 +690,7 @@ export function parseFundPage(html: string, expectedTicker: string): FundPage {
   const holdingsAsOf = singleColumn.length > 1 ? toIsoDate(singleColumn[singleColumn.length - 1].rows[0]?.[0]) : null;
 
   const performance = byHeaders('Fund Name', 'Fund Ticker');
+  const inception = toIsoDate(lookupPattern(details, /fund inception/i) ?? '');
   const readReturns = (table: HtmlTable | undefined): { tickerRow: string; fundName: string | null; returns: OfficialReturnRow } | null => {
     if (!table) return null;
     const indexOf = (header: string): number => table.headers.findIndex((value) => value.toLowerCase() === header.toLowerCase());
@@ -663,12 +703,16 @@ export function parseFundPage(html: string, expectedTicker: string): FundPage {
     const returns = emptyReturns();
     const asOf = row[indexOf('Date')] ?? '';
     returns.asOfDate = toIsoDate(asOf);
+    // A tenor longer than the fund's age at the table date is not published as a number:
+    // the site prints 0.00% for it, which must never become a real zero return.
+    const tenorYears: Partial<Record<NumericReturnKey, number>> = { yr1: 1, yr3: 3, yr5: 5, yr10: 10 };
     for (const [header, key] of Object.entries(slotToKey)) {
       const value = numberOrNull(row[indexOf(header)]);
-      if (value !== null) returns[key] = value;
+      const years = tenorYears[key];
+      if (value !== null && (years === undefined || tenorAvailable(inception, returns.asOfDate, years))) returns[key] = value;
     }
     const annualized = numberOrNull(row[indexOf('Since Inception (Annualized)')]);
-    if (annualized !== null) returns.sinceInception = annualized;
+    if (annualized !== null && tenorAvailable(inception, returns.asOfDate, 1)) returns.sinceInception = annualized;
     const tickerRow = cleanText(row[1] ?? '');
     const fundName = cleanText(row[0] ?? '') || null;
     return { tickerRow, fundName, returns };
@@ -896,7 +940,7 @@ export function parseSpFundsHoldingsCsv(text: string): ParsedHoldings {
       Ticker: ticker,
       Identifier: pick(at.cusip) || ticker,
       Weight: normalizeWeightText(pick(at.weight)),
-      'Market Value': marketValue === null ? '' : formatMoneyText(marketValue),
+      'Market Value': marketValue === null ? '' : String(marketValue),
       'Shares Held': pick(at.shares),
       'Asset Category': spFundsAssetCategory(ticker, name),
     });
@@ -956,11 +1000,34 @@ export function parseYahooChart(json: unknown): ParsedChart {
 }
 
 export function historyRow(day: ChartDay): SheetRow {
-  return { Date: day.date, Close: String(day.close), 'Adj Close': String(day.adjClose), Volume: String(day.volume) };
+  return { Date: formatSheetDate(day.date), Close: String(day.close), 'Adj Close': String(day.adjClose), Volume: String(day.volume) };
 }
 
+/** History sheet rows: oldest first, `Sep 30 2026` dates, like the sibling feeds. */
 export function historyRowsFromDays(days: ChartDay[]): SheetRow[] {
-  return days.map(historyRow);
+  return [...days].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).map(historyRow);
+}
+
+/** A published history row (any date style, any order) back as a chart day, or null when it has no date. */
+export function dayFromHistoryRow(row: SheetRow): ChartDay | null {
+  const date = toIsoDate(row['Date']);
+  if (!date) return null;
+  return {
+    date,
+    close: numberOrNull(row['Close']) ?? 0,
+    adjClose: numberOrNull(row['Adj Close']) ?? 0,
+    volume: numberOrNull(row['Volume']) ?? 0,
+  };
+}
+
+/**
+ * A shorter HISTORY_RANGE window must not erase what is already published: fresh days win
+ * inside the window, published days older than the window are kept.
+ */
+export function mergeHistoryDays(fresh: ChartDay[], published: ChartDay[]): ChartDay[] {
+  if (!fresh.length) return published;
+  const oldest = fresh.reduce((min, day) => (day.date < min ? day.date : min), fresh[0].date);
+  return [...fresh, ...published.filter((day) => day.date < oldest)];
 }
 
 /** Fold Yahoo dividends into the official distribution calendar (official rows win). */
@@ -1057,8 +1124,8 @@ export function parseNport(xml: string): ParsedNport {
       Name: name,
       Ticker: cleanHoldingTicker(tagValue(blockBody, 'ticker')) || '—',
       Identifier: identifier || '—',
-      Weight: weight === null ? '0' : `${weight}%`,
-      'Market Value': value === null ? '' : formatMoneyText(value),
+      Weight: weight === null ? '' : String(weight),
+      'Market Value': value === null ? '' : String(value),
       'Shares Held': balance === null ? '—' : String(balance),
       'Asset Category': tagValue(blockBody, 'assetCat') || '—',
     });
@@ -1265,7 +1332,7 @@ export function paymentsPerYear(frequency: string | null | undefined): number | 
   if (!text) return null;
   if (text === 'monthly') return 12;
   if (text === 'quarterly') return 4;
-  if (text === 'semi-annually' || text === 'semiannually' || text === 'semi-annual' || text === 'semiannual') return 6;
+  if (text === 'semi-annually' || text === 'semiannually' || text === 'semi-annual' || text === 'semiannual') return 2;
   if (text === 'annually' || text === 'annual') return 1;
   if (text === 'weekly') return 52;
   if (text === 'bi-monthly') return 6;
@@ -1335,7 +1402,7 @@ export function deriveMetrics(
   secYield: number | null,
 ): DerivedMetrics {
   const payments = paymentsPerYear(dividendFrequency);
-  const dividendYield = latestDistribution !== null && navValue !== null && navValue > 0 && payments !== null
+  const dividendYield = latestDistribution !== null && latestDistribution > 0 && navValue !== null && navValue > 0 && payments !== null
     ? round((latestDistribution * payments * 100) / navValue, 2)
     : null;
   return {
@@ -1473,7 +1540,10 @@ export async function writeIfChanged(file: URL | string, value: unknown): Promis
     // Missing file: write it.
   }
   await mkdir(dirname(target.pathname), { recursive: true });
-  await writeFile(target, content, 'utf8');
+  // tmp file + rename: a crash never leaves a half-written JSON behind.
+  const tmp = `${target.pathname}.tmp-${process.pid}`;
+  await writeFile(tmp, content, 'utf8');
+  await rename(tmp, target);
   return true;
 }
 
@@ -1522,11 +1592,19 @@ export async function writePages(
   rows: SheetRow[],
   pageSize: number,
   asOfDate: string | null,
+  prune = true,
 ): Promise<PageManifest> {
   const pages = buildPages(ticker, kind, headers, rows, pageSize, asOfDate);
   for (const page of pages) await writeIfChanged(new URL(page.name, dir), page.payload);
-  // Remove page files beyond the freshly written count so a shrinking fund leaves no orphans.
-  const expected = new Set(pages.map((page) => page.name));
+  const manifest: PageManifest = { pages: pages.map((page) => page.name), pageSize, totalRows: rows.length, asOfDate };
+  // updateFund passes prune=false and prunes only AFTER the new meta.json is written.
+  if (prune) await prunePages(dir, manifest);
+  return manifest;
+}
+
+/** Remove page files beyond the freshly written count so a shrinking fund leaves no orphans. */
+export async function prunePages(dir: URL, manifest: PageManifest): Promise<void> {
+  const expected = new Set(manifest.pages);
   try {
     for (const name of await readdir(dir)) {
       if (/^\d{3}\.json$/.test(name) && !expected.has(name)) await rm(new URL(name, dir), { force: true });
@@ -1534,7 +1612,6 @@ export async function writePages(
   } catch {
     // Directory does not exist yet; nothing to prune.
   }
-  return { pages: pages.map((page) => page.name), pageSize, totalRows: rows.length, asOfDate };
 }
 
 export async function readPreviousPages(
@@ -1822,12 +1899,26 @@ export type FundOutcome = {
   reason?: string;
   written: boolean;
   status: UpdateStatus;
+  /** Sources that failed for this fund; non-empty means the fund was kept as published. */
+  failedSources?: string[];
 };
+
+export const RETURNS_BASIS = 'official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns';
+
+/** A metrics object with every key present and nothing known yet (null, never 0). */
+export function emptyMetrics(): DerivedMetrics {
+  return {
+    ytd: null, tr1y: null, tr3y: null, tr5y: null, tr10y: null, cagr3y: null, cagr5y: null, cagr10y: null, siAnn: null,
+    dividendYield: null, dividendYieldText: '—', secYield: null, secYieldText: '—',
+    returnsBasis: RETURNS_BASIS, performanceAsOf: null,
+  };
+}
 
 /** Rebuild a catalog row from a published meta.json (skipped/retained funds). */
 export function entryFromMeta(ticker: string, meta: JsonRecord): JsonRecord {
   const distributions = (meta['distributions'] ?? {}) as JsonRecord;
   const exchange = (meta['exchange'] as string | null) ?? null;
+  const aumValue = numberOrNull(meta['aumValue']);
   return {
     ticker,
     name: (meta['name'] as string | null) ?? null,
@@ -1836,24 +1927,32 @@ export function entryFromMeta(ticker: string, meta: JsonRecord): JsonRecord {
     dataFile: (meta['dataFile'] as string | null) ?? `funds/${ticker}/meta.json`,
     ter: meta['ter'] ?? null,
     terValue: meta['terValue'] ?? null,
+    terGrossValue: meta['terGrossValue'] ?? null,
     nav: meta['nav'] ?? null,
     navValue: meta['navValue'] ?? null,
     aum: meta['aum'] ?? null,
-    aumValue: meta['aumValue'] ?? null,
+    aumValue: aumValue === null ? null : round(aumValue, 2),
     asOfDate: meta['asOfDate'] ?? null,
     inceptionDate: meta['inceptionDate'] ?? null,
     exchange,
     closePrice: meta['closePrice'] ?? null,
+    closePriceValue: meta['closePriceValue'] !== undefined ? meta['closePriceValue'] : parseMoneyNumber(meta['closePrice']),
     closePriceAsOfDate: (meta['closePriceAsOfDate'] as string | null) ?? null,
     premiumDiscount: meta['premiumDiscount'] ?? null,
+    premiumDiscountValue: meta['premiumDiscountValue'] !== undefined ? meta['premiumDiscountValue'] : numberOrNull(meta['premiumDiscount']),
     cusip: (meta['cusip'] as string | null) ?? null,
     isin: (meta['isin'] as string | null) ?? null,
     distributions: { frequency: distributions['frequency'] ?? null, exDate: distributions['exDate'] ?? null, dividend: distributions['dividend'] ?? null },
     returns: (meta['returns'] as JsonRecord | undefined) ?? { monthEnd: emptyReturns(), quarterEnd: emptyReturns() },
-    metrics: (meta['metrics'] as JsonRecord | undefined) ?? null,
+    metrics: (meta['metrics'] as JsonRecord | undefined) ?? emptyMetrics(),
     holdings: Number((meta['holdings'] as JsonRecord | undefined)?.['totalRows'] ?? 0),
     history: Number((meta['history'] as JsonRecord | undefined)?.['totalRows'] ?? 0),
   };
+}
+
+/** A catalog row for a fund that has no funds/<T>/meta.json yet: `dataFile: null`, full empty metrics. */
+export function placeholderEntry(ticker: string, fundPage: string | null): JsonRecord {
+  return { ...entryFromMeta(ticker, { fundPage }), dataFile: null };
 }
 
 /**
@@ -1872,10 +1971,11 @@ export function publishDistributions(
     ? mergedDividends.slice(0, 60).map((row) => [row.exDate, row.recordDate ?? '', row.payDate ?? '', row.amount === null ? '' : String(row.amount)])
     : ((previous['rows'] as string[][] | undefined) ?? []);
   return {
-    frequency: frequency ?? (previous['frequency'] as string | null) ?? null,
+    // Previous values stand in only when there is no calendar at all (source failed), never for an honest null.
+    frequency: mergedDividends.length ? frequency : (frequency ?? (previous['frequency'] as string | null) ?? null),
     exDate: latest?.exDate ?? (previous['exDate'] as string | null) ?? null,
     dividend: latest ? String(latest.amount) : ((previous['dividend'] as string | null) ?? null),
-    paymentsPerYear: paymentsPerYear(frequency) ?? paymentsPerYear((previous['frequency'] as string | null) ?? null),
+    paymentsPerYear: paymentsPerYear(mergedDividends.length ? frequency : (frequency ?? (previous['frequency'] as string | null) ?? null)),
     headers: (previous['headers'] as string[] | undefined) ?? headers,
     rows,
   };
@@ -1947,7 +2047,10 @@ async function readPreviousFund(apiRoot: URL, ticker: string): Promise<PreviousF
 /** Fold a fund page's two-column tables into the shared details shape. */
 export function detailsFromPage(page: FundPage, ticker: string): FundDetails {
   const inception = toIsoDate(lookupPattern(page.details, /fund inception/i) ?? '');
-  const ter = numberOrNull(lookupPattern(page.details, /expense ratio/i));
+  const gross = numberOrNull(lookupPattern(page.details, /gross expense/i));
+  // terValue is the NET (or the only published) expense ratio, terGrossValue the gross one when published.
+  const ter = numberOrNull(lookupPattern(page.details, /net expense/i))
+    ?? numberOrNull(lookupPattern(new Map([...page.details].filter(([key]) => !/gross/i.test(key))), /expense ratio/i));
   const cusip = cleanText(lookupPattern(page.details, /cusip/i)) || null;
   const exchange = cleanText(lookupPattern(page.details, /primary exchange/i)) || null;
   const secYield = numberOrNull(lookupPattern(page.details, /sec yield/i));
@@ -1965,7 +2068,9 @@ export function detailsFromPage(page: FundPage, ticker: string): FundDetails {
     inceptionDate: inception,
     terValue: ter,
     netTerValue: ter,
-    aumValue: netAssets,
+    terGrossValue: gross,
+    closePriceValue: close,
+    aumValue: netAssets === null ? null : round(netAssets, 2),
     officialReturns: page.monthEnd?.returns ?? emptyReturns(),
     cusip,
     isin: null,
@@ -1981,6 +2086,15 @@ export function detailsFromPage(page: FundPage, ticker: string): FundDetails {
   } as FundDetails & { closePrice?: number | null };
 }
 
+/** Previously published official distribution rows as dividends (used when the page lost its table). */
+export function dividendsFromPublished(rows: unknown): FundPage['distributions'] {
+  if (!Array.isArray(rows)) return [];
+  return rows.map((row) => {
+    const cells = Array.isArray(row) ? row.map((cell) => String(cell ?? '')) : [];
+    return { exDate: toIsoDate(cells[0]) ?? '', recordDate: toIsoDate(cells[1]), payDate: toIsoDate(cells[2]), amount: numberOrNull(cells[3]) };
+  }).filter((row) => row.exDate);
+}
+
 export async function updateFund(
   catalogFund: CatalogFund,
   config: UpdaterConfig,
@@ -1993,6 +2107,9 @@ export async function updateFund(
   const dir = new URL(`funds/${ticker}/`, apiRoot);
   const previous = await readPreviousFund(apiRoot, ticker);
   const providers: ProviderState = { spFunds: false, yahoo: false, edgar: false, retained: [] };
+  // Sources that were attempted and failed. With a published fund this keeps the fund as it was:
+  // every fund is either fully updated or fully kept, never a new column next to stale ones.
+  const failedSources: string[] = [];
 
   // Both issuer switches off with something already published: keep every byte.
   if (config.skipSpFunds && config.skipYahoo && previous.meta) {
@@ -2014,6 +2131,7 @@ export async function updateFund(
       providers.spFunds = true;
     } catch (error) {
       providers.retained.push('issuer page');
+      failedSources.push('issuer page');
       outputNote(`[ ${'issuer'.padEnd(9)}] ${ticker}: fund page unavailable (${errorMessage(error)}), keeping the published data`);
     }
   } else {
@@ -2041,15 +2159,22 @@ export async function updateFund(
         try {
           const fallback = await edgar(ticker, catalogFund.name);
           if (fallback && fallback.rows.length) {
-            holdingsRows = fallback.rows;
-            holdingsAsOf = fallback.asOfDate;
-            holdingsSource = `${trustForTicker(ticker).name} Form N-PORT-P (EDGAR, CIK ${trustForTicker(ticker).cik})`;
-            providers.edgar = true;
+            // N-PORT-P is quarterly and lags: it must never replace fresher published holdings.
+            const publishedAsOf = previous.holdings.rows.length ? previous.holdings.asOfDate : null;
+            if (publishedAsOf && (!fallback.asOfDate || fallback.asOfDate < publishedAsOf)) {
+              outputNote(`[ ${'edgar'.padEnd(9)}] ${ticker}: N-PORT-P as of ${fallback.asOfDate ?? 'unknown'} is older than the published holdings (${publishedAsOf}), ignored`);
+            } else {
+              holdingsRows = fallback.rows;
+              holdingsAsOf = fallback.asOfDate;
+              holdingsSource = `${trustForTicker(ticker).name} Form N-PORT-P (EDGAR, CIK ${trustForTicker(ticker).cik})`;
+              providers.edgar = true;
+            }
           }
         } catch (nportError) {
           outputNote(`[ ${'edgar'.padEnd(9)}] ${ticker}: N-PORT-P fallback failed (${errorMessage(nportError)})`);
         }
       }
+      if (!holdingsRows) failedSources.push('holdings');
     }
   }
   if (!holdingsRows || !holdingsRows.length) {
@@ -2060,46 +2185,63 @@ export async function updateFund(
       : null;
     providers.retained.push('holdings');
   }
+  holdingsRows = holdingsRows.map(normalizeHoldingsRow);
 
   // 3) Yahoo Finance daily history + dividends.
   let days: ChartDay[] = [];
   let dividends: Dividend[] = [];
   let yahooExchange: string | null = null;
   let yahooName: string | null = null;
+  const publishedDays = previous.history.rows.map(dayFromHistoryRow).filter((day): day is ChartDay => day !== null);
   if (!config.skipYahoo) {
     try {
       const response = await transport(yahooChartUrl(ticker, config.historyRange, now.getTime()), `${ticker} Yahoo chart`, { headers: yahooHeaders() });
       const chart = parseYahooChart(await response.json());
-      days = chart.days;
+      // A bounded HISTORY_RANGE only refreshes its window: older published days stay.
+      days = mergeHistoryDays(chart.days, publishedDays);
       dividends = chart.dividends;
       yahooExchange = chart.exchange;
       yahooName = chart.longName;
       providers.yahoo = true;
     } catch (error) {
+      failedSources.push('Yahoo history');
       outputNote(`[ ${'chart'.padEnd(9)}] ${ticker}: Yahoo chart unavailable (${errorMessage(error)}), keeping the published history`);
     }
   }
   if (!days.length) {
-    days = previous.history.rows
-      .map((row) => ({
-        date: String(row['Date'] ?? ''),
-        close: numberOrNull(row['Close']) ?? 0,
-        adjClose: numberOrNull(row['Adj Close']) ?? 0,
-        volume: numberOrNull(row['Volume']) ?? 0,
-      }))
-      .filter((day) => day.date);
+    days = publishedDays;
     providers.retained.push('history');
+  }
+
+  if (failedSources.length && previous.meta) {
+    outputNote(`[ ${'keep'.padEnd(9)}] ${ticker}: ${failedSources.join(' + ')} failed, the fund stays exactly as published`);
+    return {
+      entry: entryFromMeta(ticker, previous.meta),
+      providers: { ...providers, retained: [...new Set([...providers.retained, 'all published files'])] },
+      reason: `retained: ${failedSources.join('+')} failed, fund kept as published`,
+      written: false,
+      status: 'unchanged',
+      failedSources,
+    };
   }
 
   const details = page ? detailsFromPage(page, ticker) : null;
   const previousMeta = previous.meta ?? {};
   const previousDetails = previousMeta as JsonRecord;
-  const previousReturns = ((previousDetails['returns'] as JsonRecord | undefined)?.['monthEnd'] ?? emptyReturns()) as OfficialReturnRow;
+  const previousReturnsBlock = (previousDetails['returns'] ?? {}) as JsonRecord;
+  const previousMonthEnd = (previousReturnsBlock['monthEnd'] ?? emptyReturns()) as OfficialReturnRow;
+  const previousQuarterEnd = (previousReturnsBlock['quarterEnd'] ?? previousMonthEnd) as OfficialReturnRow;
   const previousMetrics = (previousDetails['metrics'] ?? {}) as JsonRecord;
+  const previousIdentifiers = (previousDetails['identifiers'] ?? {}) as JsonRecord;
+  const previousDistributions = (previousDetails['distributions'] ?? {}) as JsonRecord;
 
-  // Issuer page first, previously published meta second: a transient site error
-  // must not silently blank a fund, and a fresh page must always win.
-  const merged: FundDetails = details ?? {
+  // Section units of the issuer page. A section the page no longer carries keeps the
+  // published values as ONE unit (returns travel with their date and basis); a section that is
+  // present with an honest blank publishes the blank.
+  const hasDetails = Boolean(page && page.details.size > 0);
+  const hasPricing = Boolean(page && page.pricing.size > 0);
+  const hasReturns = Boolean(page && page.monthEnd);
+  const fromPrevious: FundDetails = {
     ticker,
     name: (previousDetails['name'] as string | null) ?? null,
     category: null,
@@ -2107,36 +2249,56 @@ export async function updateFund(
     inceptionDate: (previousDetails['inceptionDate'] as string | null) ?? null,
     terValue: numberOrNull(previousDetails['terValue']),
     netTerValue: numberOrNull(previousDetails['netTerValue']),
+    terGrossValue: numberOrNull(previousDetails['terGrossValue']),
     aumValue: numberOrNull(previousDetails['aumValue']),
-    officialReturns: previousReturns,
+    officialReturns: previousMonthEnd,
     cusip: (previousDetails['cusip'] as string | null) ?? null,
     isin: (previousDetails['isin'] as string | null) ?? null,
-    indexTicker: (((previousDetails['identifiers'] as JsonRecord | undefined)?.['indexTicker'] as string | null) ?? null),
+    indexTicker: (previousIdentifiers['indexTicker'] as string | null) ?? null,
     exchange: (previousDetails['exchange'] as string | null) ?? null,
     navValue: numberOrNull(previousDetails['navValue']),
     navAsOfDate: (previousDetails['asOfDate'] as string | null) ?? null,
     secYield: numberOrNull(previousMetrics['secYield']),
     distributionRate: numberOrNull(previousMetrics['dividendYield']),
-    frequency: ((previousDetails['distributions'] as JsonRecord | undefined)?.['frequency'] as string | null) ?? null,
-    midpoint: null,
-    premiumDiscount: numberOrNull(previousDetails['premiumDiscount']),
+    frequency: (previousDistributions['frequency'] as string | null) ?? null,
+    midpoint: numberOrNull(previousDetails['midpoint']),
+    premiumDiscount: numberOrNull(previousDetails['premiumDiscountValue'] ?? previousDetails['premiumDiscount']),
+    closePriceValue: numberOrNull(previousDetails['closePriceValue'] ?? previousDetails['closePrice']),
+  };
+  const merged: FundDetails = details === null ? fromPrevious : {
+    ...fromPrevious,
+    name: details.name ?? fromPrevious.name,
+    ...(hasDetails ? {
+      inceptionDate: details.inceptionDate, terValue: details.terValue, netTerValue: details.netTerValue, terGrossValue: details.terGrossValue,
+      cusip: details.cusip, exchange: details.exchange, secYield: details.secYield, indexTicker: details.indexTicker,
+    } : {}),
+    ...(hasPricing ? {
+      aumValue: details.aumValue, navValue: details.navValue, navAsOfDate: details.navAsOfDate, premiumDiscount: details.premiumDiscount,
+      midpoint: details.midpoint, closePriceValue: details.closePriceValue,
+    } : {}),
+    ...(hasReturns ? { officialReturns: details.officialReturns } : {}),
+    frequency: details.frequency,
   };
 
-  const closePriceValue = page ? parseMoneyNumber(lookupPattern(page.pricing, /closing price/i)) : null;
+  const closePriceValue = merged.closePriceValue ?? null;
 
   // The official holdings CSV carries the same NetAssets / SharesOutstanding
   // totals as the Pricing table; use them only when the page did not load.
   const officialNetAssets = parseMoneyNumber(lookupPattern(page?.pricing ?? new Map(), /net assets/i)) ?? csvTotals.netAssets;
   const officialShares = parseMoneyNumber(lookupPattern(page?.pricing ?? new Map(), /shares outstanding/i)) ?? csvTotals.sharesOutstanding;
-  const aumValue = merged.aumValue ?? officialNetAssets;
+  const aumRaw = merged.aumValue ?? officialNetAssets;
+  const aumValue = aumRaw === null ? null : round(aumRaw, 2);
   const sharesValue = officialShares;
   const midpointValue = merged.midpoint
     ?? (sharesValue !== null && merged.navValue !== null ? round(sharesValue * merged.navValue, 6) : null);
   const name = merged.name ?? yahooName;
 
-  const mergedDividends = page ? mergeDividends(page.distributions, dividends) : dividends;
+  const officialDistributions = page && page.distributions.length ? page.distributions : dividendsFromPublished(previousDistributions['rows']);
+  const mergedDividends = mergeDividends(officialDistributions, dividends);
   const officialDistribution = mergedDividends.find((row) => row.amount !== null) ?? null;
-  const frequency = merged.frequency ?? inferDistributionFrequency(mergedDividends.map((row) => row.exDate));
+  const frequency = merged.frequency
+    ?? inferDistributionFrequency(mergedDividends.map((row) => row.exDate))
+    ?? (mergedDividends.length ? null : (previousDistributions['frequency'] as string | null) ?? null);
   const metrics = deriveMetrics(
     merged.officialReturns ?? emptyReturns(),
     frequency,
@@ -2144,6 +2306,12 @@ export async function updateFund(
     merged.navValue,
     merged.secYield,
   );
+  if (!hasReturns && typeof previousMetrics['returnsBasis'] === 'string' && previousMetrics['returnsBasis']) {
+    metrics.returnsBasis = previousMetrics['returnsBasis'];
+  }
+  if (!hasReturns && details !== null) providers.retained.push('returns (table missing on the page)');
+  if (!hasPricing && details !== null) providers.retained.push('pricing (table missing on the page)');
+  if (!hasDetails && details !== null) providers.retained.push('fund details (table missing on the page)');
 
   // Data-dependent selection filters run on the freshly published facts; a fund
   // that has nothing published yet always writes once so later runs can filter it.
@@ -2166,11 +2334,13 @@ export async function updateFund(
     };
   }
 
+  // Write order: pages first, then meta.json, then (in runUpdater) the index row; stale pages go last.
   const holdingsManifest = await writePages(
-    new URL('holdings/', dir), ticker, 'holdings', [...HOLDINGS_HEADERS], holdingsRows, config.holdingsPageSize, holdingsAsOf,
+    new URL('holdings/', dir), ticker, 'holdings', [...HOLDINGS_HEADERS], holdingsRows, config.holdingsPageSize, holdingsAsOf, false,
   );
+  const newestDay = days.reduce<string | null>((max, day) => (max === null || day.date > max ? day.date : max), null);
   const historyManifest = await writePages(
-    new URL('history/', dir), ticker, 'history', [...HISTORY_HEADERS], historyRowsFromDays(days), config.historyPageSize, days[0]?.date ?? null,
+    new URL('history/', dir), ticker, 'history', [...HISTORY_HEADERS], historyRowsFromDays(days), config.historyPageSize, newestDay, false,
   );
 
   const trust = trustForTicker(ticker);
@@ -2182,6 +2352,8 @@ export async function updateFund(
     dataFile: `funds/${ticker}/meta.json`,
     ter: merged.terValue === null ? '—' : `${merged.terValue.toFixed(2)}%`,
     terValue: merged.terValue,
+    terGross: merged.terGrossValue == null ? '—' : `${merged.terGrossValue.toFixed(2)}%`,
+    terGrossValue: merged.terGrossValue ?? null,
     nav: merged.navValue === null ? '—' : `$${merged.navValue.toFixed(2)}`,
     navValue: merged.navValue,
     aum: aumValue === null ? '—' : formatAumDisplay(aumValue),
@@ -2190,21 +2362,23 @@ export async function updateFund(
     inceptionDate: merged.inceptionDate,
     exchange: merged.exchange ?? yahooExchange,
     closePrice: closePriceValue === null ? '—' : `$${closePriceValue.toFixed(2)}`,
+    closePriceValue,
     closePriceAsOfDate: merged.navAsOfDate,
     premiumDiscount: merged.premiumDiscount === null ? '—' : `${merged.premiumDiscount.toFixed(2)}%`,
+    premiumDiscountValue: merged.premiumDiscount,
     sharesOutstanding: sharesValue,
     midpoint: midpointValue,
     cusip: merged.cusip,
     isin: merged.isin,
     distributions: publishDistributions(mergedDividends, frequency, officialDistribution, previousMeta),
     returns: {
-      monthEnd: (page?.monthEnd?.returns ?? merged.officialReturns ?? emptyReturns()),
-      quarterEnd: (page?.quarterEnd?.returns ?? page?.monthEnd?.returns ?? merged.officialReturns ?? emptyReturns()),
+      monthEnd: hasReturns ? page!.monthEnd!.returns : previousMonthEnd,
+      quarterEnd: hasReturns ? (page!.quarterEnd?.returns ?? page!.monthEnd!.returns) : previousQuarterEnd,
     },
     metrics,
     holdings: holdingsManifest,
     history: historyManifest,
-    generatedAt: now.toISOString(),
+    generatedAt: isoStamp(now),
     netTerValue: merged.netTerValue ?? merged.terValue,
     source: {
       provider: 'SP Funds (Sharia-compliant ETFs)',
@@ -2213,7 +2387,7 @@ export async function updateFund(
       details: fundPageUrl(ticker),
       holdingsSource: holdingsSource ?? holdingsCsvProvenanceUrl(ticker),
       historySource: `${yahooChartProvenanceUrl(ticker)} (daily market price history)`,
-      distributionsSource: page ? `${fundPageUrl(ticker)} Distribution Details table` : yahooChartProvenanceUrl(ticker),
+      distributionsSource: page && page.distributions.length ? `${fundPageUrl(ticker)} Distribution Details table` : yahooChartProvenanceUrl(ticker),
       yahoo: yahooChartProvenanceUrl(ticker),
       trust: trust.name,
       trustCik: trust.cik,
@@ -2224,8 +2398,8 @@ export async function updateFund(
       // The performance table's first non-fund row is the fund's declared index:
       // indexTicker keeps the provider nickname (SPSIEUT, ...) and benchmark the
       // index's own published name.
-      indexTicker: merged.indexTicker ?? page?.benchmark ?? null,
-      benchmark: page?.benchmarkName ?? null,
+      indexTicker: merged.indexTicker ?? (hasReturns ? page!.benchmark : (previousIdentifiers['indexTicker'] as string | null)) ?? null,
+      benchmark: hasReturns ? (page!.benchmarkName ?? null) : ((previousIdentifiers['benchmark'] as string | null) ?? null),
     },
     yields: {
       dividendYield: metrics.dividendYield,
@@ -2238,10 +2412,14 @@ export async function updateFund(
       secYieldText: metrics.secYieldText,
       secYieldKind: metrics.secYield === null ? null : 'official SP Funds 30-day SEC yield (fund page Fund Details)',
     },
-    documents: page?.documents ?? (previousMeta['documents'] as JsonRecord | undefined) ?? {},
-    performance: page ? { benchmark: page.benchmark, benchmarkName: page.benchmarkName, rows: page.performanceRows } : (previousMeta['performance'] ?? null),
+    documents: page && Object.keys(page.documents).length ? page.documents : ((previousMeta['documents'] as JsonRecord | undefined) ?? {}),
+    performance: hasReturns
+      ? { benchmark: page!.benchmark, benchmarkName: page!.benchmarkName, rows: page!.performanceRows }
+      : (previousMeta['performance'] ?? null),
   };
   const written = await writeIfChanged(new URL('meta.json', dir), meta);
+  await prunePages(new URL('holdings/', dir), holdingsManifest);
+  await prunePages(new URL('history/', dir), historyManifest);
   const reason = providers.retained.length ? `retained: ${[...new Set(providers.retained)].join(', ')}` : undefined;
   return { entry: entryFromMeta(ticker, meta), providers, reason, written, status: written ? 'updated' : 'unchanged' };
 }
@@ -2290,7 +2468,14 @@ export type RunSummary = {
   written: number;
   failures: string[];
   skipped: string[];
+  /** Funds kept as published because a required source failed. */
+  degraded: string[];
+  newFunds: string[];
+  deadlineHit: boolean;
 };
+
+/** The run stops taking new funds after this long (the workflow timeout is 30 minutes) and still writes the index. */
+export const SOFT_DEADLINE_MS = 25 * 60 * 1000;
 
 export async function runUpdater(
   config: UpdaterConfig,
@@ -2301,12 +2486,17 @@ export async function runUpdater(
     catalogHtml?: string;
     transport?: Transport;
     summary?: (summary: RunSummary) => Promise<void> | void;
+    deadlineMs?: number;
+    clock?: () => number;
   } = {},
 ): Promise<RunSummary> {
   const apiRoot = options.apiRoot ?? API_ROOT;
   const fetcher = options.fetcher ?? fetch;
   const now = options.now ?? new Date();
-  const generatedAt = now.toISOString();
+  const generatedAt = isoStamp(now);
+  const clock = options.clock ?? Date.now;
+  const startedAt = clock();
+  const deadlineMs = options.deadlineMs ?? SOFT_DEADLINE_MS;
   const gate = createRequestGate(config.concurrency, config.requestSleep * 1000);
   const transport = options.transport ?? createTransport(config, gate, fetcher);
   const edgar = config.edgarFallback ? createEdgarFallback(config, transport) : null;
@@ -2335,6 +2525,8 @@ export async function runUpdater(
   if (!catalog.size) throw new Error('catalog: no SP Funds ETFs selected');
   const unknown = config.tickers.filter((ticker) => !catalog.has(ticker));
   if (unknown.length) throw new Error(`catalog: requested tickers absent from the lineup: ${unknown.join(', ')}`);
+  const newFunds = previousIndex.size ? [...catalog.keys()].filter((ticker) => !previousIndex.has(ticker)).sort() : [];
+  if (newFunds.length) console.log(`NEW FUNDS: ${newFunds.join(', ')}`);
   const universe = [...catalog.values()].sort((a, b) => a.ticker.localeCompare(b.ticker));
   const filtered = universe.filter((fund) => !config.tickers.length || config.tickers.includes(fund.ticker));
   const deferred = Boolean(
@@ -2357,14 +2549,19 @@ export async function runUpdater(
 
   const rows = new Map<string, JsonRecord>(previousIndex);
   for (const fund of universe) {
-    if (!rows.has(fund.ticker)) rows.set(fund.ticker, entryFromMeta(fund.ticker, { fundPage: fund.fundPage }));
+    if (!rows.has(fund.ticker)) rows.set(fund.ticker, placeholderEntry(fund.ticker, fund.fundPage));
   }
 
   const reporter = outputCreateReporter(batch.length);
-  const summary: RunSummary = { brand: 'SP Funds', generatedAt, funds: batch.length, holdings: 0, history: 0, written: 0, failures: [], skipped: [] };
+  const summary: RunSummary = { brand: 'SP Funds', generatedAt, funds: batch.length, holdings: 0, history: 0, written: 0, failures: [], skipped: [], degraded: [], newFunds, deadlineHit: false };
   const outcomes: Array<{ ticker: string; status: string; reason?: string }> = [];
   const workers = new Array(Math.max(1, Math.min(config.concurrency, queue.length))).fill(null).map(async () => {
     for (;;) {
+      if (clock() - startedAt > deadlineMs && queue.length) {
+        summary.deadlineHit = true;
+        outputNote(`[ ${'deadline'.padEnd(9)}] soft deadline reached, ${queue.length} fund(s) left for the next run`);
+        queue.length = 0;
+      }
       const fund = queue.shift();
       if (!fund) return;
       const before = await fundDigest(apiRoot, fund.ticker);
@@ -2372,6 +2569,7 @@ export async function runUpdater(
         const outcome = await updateFund(fund, config, apiRoot, transport, edgar, now);
         const changed = (await fundDigest(apiRoot, fund.ticker)) !== before;
         rows.set(fund.ticker, outcome.entry);
+        if (outcome.failedSources?.length) summary.degraded.push(fund.ticker);
         outcomes.push({ ticker: fund.ticker, status: outcome.status === 'updated' && !changed ? 'unchanged' : outcome.status, reason: outcome.reason });
         summary.written += changed ? 1 : 0;
         reporter.result(fund.ticker, outcome.status === 'updated' && !changed ? 'unchanged' : outcome.status, {
@@ -2405,7 +2603,7 @@ export async function runUpdater(
 
   // 4) Progress: only a clean bounded batch advances the cursor, a full pass clears it.
   let progressWritten = false;
-  if (!summary.failures.length) {
+  if (!summary.failures.length && !summary.deadlineHit) {
     if (config.maxFetches > 0 && batch.length) progressWritten = await writeIfChanged(new URL(STATE_FILE, apiRoot), { scope, cursor: batch[batch.length - 1].ticker });
     else if (config.maxFetches === 0) progressWritten = await clearCursor(apiRoot);
   }
@@ -2425,6 +2623,9 @@ export async function runUpdater(
     `- Files written: ${formatCount(summary.written)}`,
     `- Ticker cursor: ${config.maxFetches > 0 ? (batch[batch.length - 1]?.ticker ?? '(none)') : '(full pass)'}`,
     failures ? `- Failures: ${summary.failures.join(', ')}` : `- Failures: none`,
+    ...(summary.degraded.length ? [`- Kept as published (a source failed): ${summary.degraded.join(', ')}`] : []),
+    ...(newFunds.length ? [`- NEW FUNDS: ${newFunds.join(', ')}`] : []),
+    ...(summary.deadlineHit ? [`- Soft deadline reached: remaining funds were left for the next run`] : []),
   ]);
   if (options.summary) await options.summary(summary);
   return summary;
@@ -2482,7 +2683,9 @@ export async function main(argv: string[] = process.argv.slice(2), env: Record<s
   installSystemCa(parseSystemCaMode(controls));
   if (controls['VERBOSE'] !== undefined && env === process.env) process.env['VERBOSE'] = controls['VERBOSE'];
   const summary = await runUpdater(readConfig(controls));
-  return summary.failures.length ? 1 : 0;
+  // Non-zero when a fund threw, or when every processed fund had to be kept because its sources failed.
+  const everyFundDegraded = summary.funds > 0 && summary.degraded.length >= summary.funds;
+  return summary.failures.length || everyFundDegraded ? 1 : 0;
 }
 
 if (import.meta.main) {
