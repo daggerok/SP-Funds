@@ -71,6 +71,16 @@ Each fund carries a derived `metrics` object that powers the catalog columns sha
 - `tr3y` / `tr5y` / `tr10y` - cumulative 3Y/5Y/10Y figures `(1 + CAGR)^n - 1` -> *TR 3Y/5Y/10Y*
 - `siAnn` - since-inception annualized NAV return when the site publishes it
 - `dividendYield` - indicated distribution rate (latest distribution × frequency ÷ NAV) when the page publishes no explicit rate; `—` otherwise
+- `dividendYieldBasis` - code of the definition behind `dividendYield`, `null` exactly when `dividendYield` is `null`; here only `indicated` (SP Funds publishes no distribution yield). The other codes of the shared standard are not produced:
+
+  | Code | Meaning | Used here |
+  | --- | --- | --- |
+  | `official-trailing-12m` | provider-published trailing 12-month distribution yield | no |
+  | `official-distribution-rate` | provider-published distribution rate | no |
+  | `official-other` | provider-published yield with another or unclear definition | no |
+  | `computed-trailing-12m` | updater sums the last 12 months of distributions over price/NAV | no |
+  | `indicated` | latest distribution x inferred payments per year / NAV | yes |
+
 - `secYield` - 30-day SEC yield when published; `—` otherwise
 - `returnsBasis` - mandatory non-empty label of how the returns are computed: here always the official SP Funds month-end NAV total returns from the fund page performance table, with the cumulative 3/5/10-year figures derived from the published annualized ones
 - `performanceAsOf` - mandatory ISO `YYYY-MM-DD` date of that performance table (the month-end `Date` column), not the NAV date; `null` only when the table date is unknown. Both fields are the last two keys of `metrics`

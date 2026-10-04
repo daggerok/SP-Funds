@@ -1382,11 +1382,34 @@ export type DerivedMetrics = {
   siAnn: number | null;
   dividendYield: number | null;
   dividendYieldText: string;
+  /** Which definition stands behind dividendYield; null exactly when dividendYield is null. */
+  dividendYieldBasis: YieldBasis | null;
   secYield: number | null;
   secYieldText: string;
   returnsBasis: string;
   performanceAsOf: string | null;
 };
+
+export type YieldBasis = 'official-trailing-12m' | 'official-distribution-rate' | 'official-other' | 'computed-trailing-12m' | 'indicated';
+
+/**
+ * SP Funds publishes no distribution yield, so every non-null dividendYield is
+ * the updater's own estimate (latest distribution x inferred payments per year / NAV).
+ */
+export function dividendYieldBasisFor(dividendYield: number | null): YieldBasis | null {
+  return dividendYield === null ? null : 'indicated';
+}
+
+/** Metrics from a published meta/index: the basis code always follows the yield it describes (legacy rows get it derived). */
+export function metricsWithYieldBasis(metrics: JsonRecord): JsonRecord {
+  const out: JsonRecord = {};
+  for (const [key, value] of Object.entries(metrics)) {
+    out[key] = value;
+    if (key === 'dividendYieldText' && !('dividendYieldBasis' in metrics)) out['dividendYieldBasis'] = null;
+  }
+  out['dividendYieldBasis'] = dividendYieldBasisFor(numberOrNull(metrics['dividendYield']));
+  return out;
+}
 
 /**
  * The published catalog metrics. Official returns come straight from the fund
@@ -1417,6 +1440,7 @@ export function deriveMetrics(
     siAnn: returns.sinceInception,
     dividendYield,
     dividendYieldText: formatPercentText(dividendYield),
+    dividendYieldBasis: dividendYieldBasisFor(dividendYield),
     secYield,
     secYieldText: secYield === null ? '—' : `${secYield.toFixed(2)}%`,
     returnsBasis: 'official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns',
@@ -1909,7 +1933,7 @@ export const RETURNS_BASIS = 'official SP Funds month-end NAV total returns (fun
 export function emptyMetrics(): DerivedMetrics {
   return {
     ytd: null, tr1y: null, tr3y: null, tr5y: null, tr10y: null, cagr3y: null, cagr5y: null, cagr10y: null, siAnn: null,
-    dividendYield: null, dividendYieldText: '—', secYield: null, secYieldText: '—',
+    dividendYield: null, dividendYieldText: '—', dividendYieldBasis: null, secYield: null, secYieldText: '—',
     returnsBasis: RETURNS_BASIS, performanceAsOf: null,
   };
 }
@@ -1944,7 +1968,7 @@ export function entryFromMeta(ticker: string, meta: JsonRecord): JsonRecord {
     isin: (meta['isin'] as string | null) ?? null,
     distributions: { frequency: distributions['frequency'] ?? null, exDate: distributions['exDate'] ?? null, dividend: distributions['dividend'] ?? null },
     returns: (meta['returns'] as JsonRecord | undefined) ?? { monthEnd: emptyReturns(), quarterEnd: emptyReturns() },
-    metrics: (meta['metrics'] as JsonRecord | undefined) ?? emptyMetrics(),
+    metrics: meta['metrics'] ? metricsWithYieldBasis(meta['metrics'] as JsonRecord) : { ...emptyMetrics() },
     holdings: Number((meta['holdings'] as JsonRecord | undefined)?.['totalRows'] ?? 0),
     history: Number((meta['history'] as JsonRecord | undefined)?.['totalRows'] ?? 0),
   };
@@ -2404,6 +2428,7 @@ export async function updateFund(
     yields: {
       dividendYield: metrics.dividendYield,
       dividendYieldText: metrics.dividendYieldText,
+      dividendYieldBasis: metrics.dividendYieldBasis,
       dividendYieldKind: metrics.dividendYield === null
         ? null
         : 'derived: latest official distribution x inferred payments per year / official NAV',
