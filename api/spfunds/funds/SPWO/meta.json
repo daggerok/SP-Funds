@@ -268,6 +268,7 @@
     "siAnn": 21.72,
     "dividendYield": 0.91,
     "dividendYieldText": "0.91%",
+    "dividendYieldBasis": "indicated",
     "secYield": 0.76,
     "secYieldText": "0.76%",
     "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
@@ -290,7 +291,7 @@
     "totalRows": 698,
     "asOfDate": "2026-10-02"
   },
-  "generatedAt": "2026-10-03T05:19:59Z",
+  "generatedAt": "2026-10-04T03:23:33Z",
   "netTerValue": 0.55,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -313,6 +314,7 @@
   "yields": {
     "dividendYield": 0.91,
     "dividendYieldText": "0.91%",
+    "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
     "distributionRate": 0.91,
     "secYield": 0.76,
