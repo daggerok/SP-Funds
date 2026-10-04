@@ -275,8 +275,8 @@
   },
   "holdings": {
     "pages": [
-      "001.json",
-      "002.json"
+      "holdings/001.json",
+      "holdings/002.json"
     ],
     "pageSize": 250,
     "totalRows": 397,
@@ -284,7 +284,7 @@
   },
   "history": {
     "pages": [
-      "001.json"
+      "history/001.json"
     ],
     "pageSize": 1000,
     "totalRows": 698,
