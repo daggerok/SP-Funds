@@ -26,6 +26,7 @@ import {
   mergeHistoryDays, entryFromMeta, placeholderEntry, tenorAvailable, type CatalogFund, type FundOutcome, type JsonRecord,
   type SheetRow, type Transport, type UpdaterConfig
 } from './update-data';
+import type { DerivedMetrics } from './update-data';
 
 // Portable start state: no control variable from the shell or the workflow leaks in, the zone is pinned,
 // and fetch, process.exitCode and the temp dirs are restored after every test.
@@ -451,6 +452,10 @@ describe('controls', () => {
     expect(fundFilterReasons(entry, config)).toEqual(['performance_1y']);
     expect(fundFilterReasons({ ...entry, aumValue: 1e8, terValue: 0.9 }, config)).toEqual(['aum', 'ter', 'performance_1y']);
     expect(fundFilterReasons(entry, readConfig({}))).toEqual([]);
+    // TOTAL_RETURN_* reads the derived tr* keys of the metrics (it used the official yr* keys, which metrics do not have, and rejected every fund)
+    const withMetrics = { ...entry, metrics: { ytd: 5, tr1y: 10, tr3y: null, tr5y: null, tr10y: null } as DerivedMetrics };
+    expect(fundFilterReasons(withMetrics, readConfig({ TOTAL_RETURN_1Y: '0:20' }))).toEqual([]);
+    expect(fundFilterReasons(withMetrics, readConfig({ TOTAL_RETURN_1Y: '0:5' }))).toEqual(['total_return_1y']);
     const selection = selectionEntryFromIndex({ ticker: 'SPUS', aumValue: 3.28e9, terValue: 0.45, returns: { monthEnd: { yr1: 21.21 } }, metrics: { secYield: 0.4 } })!;
     expect(selection.returns.yr1).toBe(21.21);
     expect(selection.metrics!.secYield).toBe(0.4);

@@ -1699,7 +1699,7 @@ export function fundFilterReasons(entry: SelectionEntry, config: UpdaterConfig):
   for (const period of RETURN_PERIODS) {
     const range = config.totalReturnRanges[period];
     if (range) {
-      const value = entry.metrics ? entry.metrics[periodKey(period)] : null;
+      const value = entry.metrics ? entry.metrics[totalReturnKey(period)] : null;
       if (!matchesRange(value, range)) reasons.push(`total_return_${period.toLowerCase()}`);
     }
   }
@@ -1748,6 +1748,15 @@ export function selectionEntryFromIndex(entry: JsonRecord | undefined): Selectio
     returns,
     metrics,
   };
+}
+
+/** Key of the derived total return of a period in `metrics` (the official returns use periodKey: yr1 vs tr1y). */
+export function totalReturnKey(period: ReturnPeriod): 'ytd' | 'tr1y' | 'tr3y' | 'tr5y' | 'tr10y' {
+  if (period === 'YTD') return 'ytd';
+  if (period === '1Y') return 'tr1y';
+  if (period === '3Y') return 'tr3y';
+  if (period === '5Y') return 'tr5y';
+  return 'tr10y';
 }
 
 export function periodKey(period: ReturnPeriod): NumericReturnKey {
