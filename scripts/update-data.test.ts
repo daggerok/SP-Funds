@@ -937,7 +937,7 @@ describe('pipeline', () => {
     expect(seen.length).toBeGreaterThan(0);
     expect(second.written).toBe(0);
     expect(await listFiles(apiRoot)).toEqual(tree);
-    for (const file of tree) expect(await readFile(new URL(file, apiRoot), 'utf8'), file).toBe(before.get(file));
+    for (const file of tree) expect<string | undefined>(await readFile(new URL(file, apiRoot), 'utf8'), file).toBe(before.get(file));
   });
 
   test('a one-ticker or bounded run keeps every catalog row and the files of unselected funds', async () => {
