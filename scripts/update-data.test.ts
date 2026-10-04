@@ -878,7 +878,7 @@ describe('pipeline', () => {
     expect(distributions['frequency']).toBe('Monthly');
     expect((distributions['rows'] as string[][])[0]).toEqual(['2026-09-28', '2026-09-28', '2026-09-29', '0.026']);
     expect((meta['source'] as JsonRecord)['trustCik']).toBe('0001742912');
-    expect(meta['holdings']).toEqual({ pages: ['001.json', '002.json'], pageSize: 4, totalRows: 6, asOfDate: '2026-10-01' });
+    expect(meta['holdings']).toEqual({ pages: ['holdings/001.json', 'holdings/002.json'], pageSize: 4, totalRows: 6, asOfDate: '2026-10-01' });
     expect((meta['history'] as JsonRecord)['totalRows']).toBe(30);
     expect(((meta['history'] as JsonRecord)['pages'] as string[]).length).toBe(3);
     const holdings = JSON.parse(await readFile(new URL('funds/SPUS/holdings/001.json', apiRoot), 'utf8'));

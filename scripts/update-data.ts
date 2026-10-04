@@ -1596,7 +1596,7 @@ export async function writePages(
 ): Promise<PageManifest> {
   const pages = buildPages(ticker, kind, headers, rows, pageSize, asOfDate);
   for (const page of pages) await writeIfChanged(new URL(page.name, dir), page.payload);
-  const manifest: PageManifest = { pages: pages.map((page) => page.name), pageSize, totalRows: rows.length, asOfDate };
+  const manifest: PageManifest = { pages: pages.map((page) => `${kind}/${page.name}`), pageSize, totalRows: rows.length, asOfDate };
   // updateFund passes prune=false and prunes only AFTER the new meta.json is written.
   if (prune) await prunePages(dir, manifest);
   return manifest;
@@ -1604,7 +1604,7 @@ export async function writePages(
 
 /** Remove page files beyond the freshly written count so a shrinking fund leaves no orphans. */
 export async function prunePages(dir: URL, manifest: PageManifest): Promise<void> {
-  const expected = new Set(manifest.pages);
+  const expected = new Set(manifest.pages.map((page) => page.slice(page.lastIndexOf('/') + 1)));
   try {
     for (const name of await readdir(dir)) {
       if (/^\d{3}\.json$/.test(name) && !expected.has(name)) await rm(new URL(name, dir), { force: true });
