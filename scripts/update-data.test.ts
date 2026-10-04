@@ -23,7 +23,7 @@ import {
   samePublishedContent, sanitizeTicker, secHeaders, selectionEntryFromIndex, splitPages, spFundsAssetCategory,
   stableStringify, toIsoDate, trustForTicker, installSystemCa, isCertError, updateFund, writeIfChanged, writePages,
   writeCursor, yahooChartUrl, dayFromHistoryRow, emptyMetrics, formatSheetDate, historyRowsFromDays, isoStamp,
-  mergeHistoryDays, placeholderEntry, tenorAvailable, type CatalogFund, type FundOutcome, type JsonRecord,
+  mergeHistoryDays, entryFromMeta, placeholderEntry, tenorAvailable, type CatalogFund, type FundOutcome, type JsonRecord,
   type SheetRow, type Transport, type UpdaterConfig
 } from './update-data';
 
@@ -848,6 +848,27 @@ describe('metrics', () => {
     expect(Object.keys(metrics).sort()).toEqual(expected);
     for (const key of expected.filter((name) => name !== 'returnsBasis' && !name.endsWith('Text'))) expect(metrics[key], key).toBeNull();
     expect(String(metrics['returnsBasis']).length).toBeGreaterThan(0);
+  });
+
+  test('dividendYieldBasis: indicated with a yield, null with none, same key set on fresh, rebuilt and placeholder rows', () => {
+    const fresh = deriveMetrics(official, 'Monthly', 0.026, 59.54, 0.4);
+    expect(fresh.dividendYield).toBe(0.52);
+    expect(fresh.dividendYieldBasis).toBe('indicated');
+    const none = deriveMetrics(official, null, 0.026, 59.54, null);
+    expect(none.dividendYield).toBeNull();
+    expect(none.dividendYieldBasis).toBeNull();
+    // a meta published before the key existed gets the code derived from its own yield, never a stale one
+    const { dividendYieldBasis: _drop, ...legacy } = fresh;
+    const rebuilt = entryFromMeta('SPUS', { metrics: legacy })['metrics'] as JsonRecord;
+    expect(rebuilt['dividendYieldBasis']).toBe('indicated');
+    const rebuiltNull = entryFromMeta('SPUS', { metrics: { ...legacy, dividendYield: null, dividendYieldText: '—' } })['metrics'] as JsonRecord;
+    expect(rebuiltNull['dividendYieldBasis']).toBeNull();
+    const placeholder = placeholderEntry('SPWO', null)['metrics'] as JsonRecord;
+    expect(placeholder['dividendYieldBasis']).toBeNull();
+    const keys = Object.keys(fresh).sort();
+    expect(Object.keys(rebuilt).sort()).toEqual(keys);
+    expect(Object.keys(placeholder).sort()).toEqual(keys);
+    expect(Object.keys(none).sort()).toEqual(keys);
   });
 });
 
