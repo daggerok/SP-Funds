@@ -6,11 +6,13 @@ One of the app's features lets you select SP Funds ETFs in the Watchlist and agg
 
 ```bash
 bunx degit daggerok/SP-Funds#main ./12345 && cd $_
-bunx serve . -p 1234
-open http://0:1234
+bun install
+bun run serve
 ```
 
-The application is live at <https://daggerok.github.io/SP-Funds/> (GitHub Pages serves the `main` branch).
+`bun run serve` starts the Parcel dev server (it copies `api/` to `dist/api` first) and prints the local address. `bun run build` writes the production site into `dist`, and `bun run build-github-pages` does the same with the `/SP-Funds/` public URL.
+
+The application is live at <https://daggerok.github.io/SP-Funds/> (GitHub Pages is deployed from `main` by `.github/workflows/github-pages.yml`, which builds `dist` and publishes it).
 
 ### Column types and filters
 
@@ -138,7 +140,7 @@ HISTORY_RANGE=5y CONCURRENCY=15 ./scripts/update-data.ts
 
 ## TypeScript and verification
 
-The browser app is intentionally build-free: `index.html` carries the markup, styles and bootstrap, and `app.tsx` is TypeScript compiled in the browser with Babel standalone - no build step, no bundler, no `tsconfig.json` needed. Bun runs TypeScript out of the box.
+The browser app lives in `src/`: `index.html` carries the markup and bootstrap, `main.tsx` is the TypeScript app and `index.css` holds Tailwind v4 and the component styles. Parcel bundles them into `dist` (`bun run build`) - no `tsconfig.json` is needed. Bun runs the updater TypeScript out of the box.
 
 Verification before every publish:
 
