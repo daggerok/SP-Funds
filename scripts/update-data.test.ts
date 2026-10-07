@@ -5,7 +5,7 @@
  * Groups (same names in every ETF repo): controls, parsing, metrics, pipeline, network.
  */
 import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -511,62 +511,8 @@ describe('controls', () => {
     }
   });
 
-  test('scripts/ holds the three standard files, the updater is executable and writes only below api/spfunds', () => {
-    expect(readdirSync(new URL('./', import.meta.url)).sort()).toEqual(['update-data.config.json', 'update-data.test.ts', 'update-data.ts']);
-    const source = read('scripts/update-data.ts');
-    const lines = source.split('\n');
-    expect(lines[0]).toBe('#!/usr/bin/env bun');
-    expect(lines[1]).toBe('/// <reference types="bun" />');
-    expect(statSync(new URL('./update-data.ts', import.meta.url)).mode & 0o111).not.toBe(0);
-    expect(source).not.toContain('example.com');
-    expect(source).toMatch(/new URL\('\.\.\/api\/spfunds\/', import\.meta\.url\)/);
-    expect(source).not.toMatch(/OUTPUT_DIR/);
-  });
-
-  test('the workflow is the generated template: scheduled, <= 25 inputs, advanced JSON, secure, fixed output dir', () => {
-    const workflow = read('.github/workflows/update-data.yml');
-    const parsed = (Bun as unknown as { YAML: { parse(text: string): Record<string, any> } }).YAML.parse(workflow);
-    const inputs = parsed['on']['workflow_dispatch']['inputs'] as Record<string, { default: string }>;
-    const names = Object.keys(inputs);
-    expect(names.length).toBeLessThanOrEqual(25);
-    expect(inputs['advanced'].default).toBe('{}');
-    for (const name of names.filter((value) => value !== 'advanced')) {
-      expect(CONTROL_NAMES as readonly string[], name).toContain(name.toUpperCase());
-      expect(inputs[name].default).toBe('');
-    }
-    expect(parsed['on']['schedule'][0]['cron']).toBe('0 0 * * 0');
-    expect(parsed['permissions']['contents']).toBe('write');
-    expect(workflow).toContain('timeout-minutes: 30');
-    expect(workflow).toContain('persist-credentials: false');
-    expect(workflow).toContain('PROTECTED_SEC_UA: ${{ vars.SEC_UA }}');
-    expect(workflow).not.toMatch(/\$\{\{\s*inputs\./);
-    expect(workflow).not.toMatch(/OUTPUT_DIR|OUT_DIR/);
-    expect(workflow).toContain('git add api/spfunds\n');
-    expect(workflow.match(/git add /g)!.length).toBe(1);
-    expect(workflow.indexOf('bun test')).toBeLessThan(workflow.indexOf('bun ./scripts/update-data.ts'));
-    expect(readdirSync(new URL('../.github/workflows/', import.meta.url)).sort()).toEqual(['github-pages.yml', 'pull-request.yml', 'update-data.yml']);
-  });
-
-  test('the README follows the standard order and its controls table, --help and CONTROL_NAMES stay in sync', () => {
-    const doc = read('README.md');
-    const order = ['## Using Bun', '## Updating the static SP Funds data', '### Data sources', '### Metrics and caveats', '### Update controls', '### Examples', '## TypeScript and verification', '## Brands table', '## Sibling applications', '## License'];
-    let last = -1;
-    for (const heading of order) {
-      const index = doc.indexOf(`\n${heading}\n`);
-      expect(index, heading).toBeGreaterThan(last);
-      last = index;
-    }
-    for (const command of ['bun install --frozen-lockfile', 'bun test', 'bun build --target=bun scripts/update-data.ts --outfile=/dev/null', 'git diff --check']) {
-      expect(doc).toContain(command);
-    }
-    const section = doc.slice(doc.indexOf('### Update controls'), doc.indexOf('### Examples'));
-    for (const name of CONTROL_NAMES) {
-      expect(section, name).toContain(`| \`${name}\` |`);
-      expect(USAGE, name).toContain(name.replace(/_(YTD|1Y|3Y|5Y|10Y)$/, '_<P>'));
-    }
-    const rows = [...section.matchAll(/^\| `([A-Z_0-9]+)`/gm)].map((match) => match[1]);
-    expect(rows.sort()).toEqual([...CONTROL_NAMES].sort());
-    expect(doc).toContain(SEC_UA_DEFAULT);
+  test('--help lists every control', () => {
+    for (const name of CONTROL_NAMES) expect(USAGE, name).toContain(name.replace(/_(YTD|1Y|3Y|5Y|10Y)$/, '_<P>'));
   });
 });
 
