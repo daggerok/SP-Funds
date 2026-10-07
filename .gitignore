@@ -1,9 +1,5 @@
+.idea/
+.parcel-cache/
+dist/
 node_modules/
 .DS_Store
-.idea/
-coverage/
-dist/
-.env
-.env.*
-!.env.example
-.parcel-cache/
