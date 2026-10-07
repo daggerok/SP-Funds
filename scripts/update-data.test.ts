@@ -544,7 +544,7 @@ describe('controls', () => {
     expect(workflow).toContain('git add api/spfunds\n');
     expect(workflow.match(/git add /g)!.length).toBe(1);
     expect(workflow.indexOf('bun test')).toBeLessThan(workflow.indexOf('bun ./scripts/update-data.ts'));
-    expect(readdirSync(new URL('../.github/workflows/', import.meta.url)).sort()).toEqual(['github-pages.yml', 'update-data.yml']);
+    expect(readdirSync(new URL('../.github/workflows/', import.meta.url)).sort()).toEqual(['github-pages.yml', 'pull-request.yml', 'update-data.yml']);
   });
 
   test('the README follows the standard order and its controls table, --help and CONTROL_NAMES stay in sync', () => {
