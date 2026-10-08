@@ -3123,6 +3123,8 @@ function renderDistributionsTable(fund: FundRow): void {
 // 7. Subtitle
 // =========================================================================
 
+const SUBTITLE_TICKER_CAP = 1;
+
 function renderHeaderSummary(subtitle: HTMLElement, tickers: Iterable<string>, activeTicker: string | null, activate: (ticker: string) => void): void {
   const panel = document.getElementById('app-summary');
   if (!panel) return;
@@ -3132,7 +3134,7 @@ function renderHeaderSummary(subtitle: HTMLElement, tickers: Iterable<string>, a
   const selected = [...tickers].sort();
   if (!selected.length) return;
   subtitle.append(document.createTextNode(`${selected.length} selected: `));
-  selected.forEach((ticker, index) => {
+  selected.slice(0, SUBTITLE_TICKER_CAP).forEach((ticker, index) => {
     if (index) subtitle.append(document.createTextNode(', '));
     const link = document.createElement('a');
     link.href = '#';
@@ -3143,6 +3145,7 @@ function renderHeaderSummary(subtitle: HTMLElement, tickers: Iterable<string>, a
     link.addEventListener('click', event => { event.preventDefault(); activate(ticker); });
     subtitle.append(link);
   });
+  if (selected.length > SUBTITLE_TICKER_CAP) subtitle.append(document.createTextNode(` and ${selected.length - SUBTITLE_TICKER_CAP} more`));
 }
 
 function renderSubtitleDetails(text?: string): void {
