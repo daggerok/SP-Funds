@@ -8,20 +8,20 @@
   "terValue": 0.5,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$18.62",
-  "navValue": 18.62,
-  "aum": "$195.07M",
-  "aumValue": 195070000,
-  "asOfDate": "2026-10-01",
+  "nav": "$18.50",
+  "navValue": 18.5,
+  "aum": "$193.80M",
+  "aumValue": 193800000,
+  "asOfDate": "2026-10-08",
   "inceptionDate": "2020-12-29",
-  "exchange": "NYSE",
-  "closePrice": "$18.66",
-  "closePriceValue": 18.66,
-  "closePriceAsOfDate": "2026-10-01",
-  "premiumDiscount": "0.20%",
-  "premiumDiscountValue": 0.2,
+  "exchange": "NYSE Arca",
+  "closePrice": "$18.51",
+  "closePriceValue": 18.51,
+  "closePriceAsOfDate": "2026-10-08",
+  "premiumDiscount": "0.05%",
+  "premiumDiscountValue": 0.05,
   "sharesOutstanding": 10475000,
-  "midpoint": 195044500,
+  "midpoint": 193787500,
   "cusip": "886364769",
   "isin": null,
   "distributions": {
@@ -428,8 +428,8 @@
     "cagr5y": -0.3,
     "cagr10y": null,
     "siAnn": 3.05,
-    "dividendYield": 4.32,
-    "dividendYieldText": "4.32%",
+    "dividendYield": 4.35,
+    "dividendYieldText": "4.35%",
     "dividendYieldBasis": "indicated",
     "secYield": 2.5,
     "secYieldText": "2.50%",
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 30,
-    "asOfDate": "2026-10-02"
+    "asOfDate": "2026-10-09"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1446,
-    "asOfDate": "2026-10-02"
+    "totalRows": 1451,
+    "asOfDate": "2026-10-09"
   },
-  "generatedAt": "2026-10-04T03:23:33Z",
+  "generatedAt": "2026-10-11T02:53:35Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -474,11 +474,11 @@
     "benchmark": "S&P Global All Equity REIT Shariah Capped Index (USD) TR"
   },
   "yields": {
-    "dividendYield": 4.32,
-    "dividendYieldText": "4.32%",
+    "dividendYield": 4.35,
+    "dividendYieldText": "4.35%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 4.32,
+    "distributionRate": 4.35,
     "secYield": 2.5,
     "secYieldText": "2.50%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
@@ -488,7 +488,7 @@
     "prospectus": "https://www.sp-funds.com/wp-content/uploads/spfunds-PRO_032626_web.pdf",
     "summaryProspectus": "https://www.sp-funds.com/wp-content/uploads/spre-497k_033026.pdf",
     "sai": "https://www.sp-funds.com/wp-content/uploads/spfunds-SAI_032626_web.pdf",
-    "factsheet": "https://www.sp-funds.com/wp-content/uploads/SPRE-Factsheet-2026-Q2.pdf",
+    "factsheet": "https://www.sp-funds.com/wp-content/uploads/SPRE-Factsheet-2026-Q3.pdf",
     "esgWhitepaper": "https://www.sp-funds.com/wp-content/uploads/fund_files-411600123542-ESG-Whitepaper-by-Irfan-Chaudhry-SP-FundsSML-2.pdf",
     "annualReport": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Semi-Annual-Financials-5.31.26-Final.pdf",
     "fiscalQ1Holdings": "https://www.sp-funds.com/wp-content/uploads/SPRE-SOI-2-28-26.pdf",

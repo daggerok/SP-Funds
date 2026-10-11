@@ -8,20 +8,20 @@
   "terValue": 0.45,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$59.71",
-  "navValue": 59.71,
-  "aum": "$3.29B",
-  "aumValue": 3293140000,
-  "asOfDate": "2026-10-01",
+  "nav": "$60.46",
+  "navValue": 60.46,
+  "aum": "$3.35B",
+  "aumValue": 3354270000,
+  "asOfDate": "2026-10-08",
   "inceptionDate": "2019-12-17",
-  "exchange": "NYSE",
-  "closePrice": "$59.72",
-  "closePriceValue": 59.72,
-  "closePriceAsOfDate": "2026-10-01",
-  "premiumDiscount": "0.01%",
-  "premiumDiscountValue": 0.01,
-  "sharesOutstanding": 55150000,
-  "midpoint": 3293006500,
+  "exchange": "NYSE Arca",
+  "closePrice": "$60.48",
+  "closePriceValue": 60.48,
+  "closePriceAsOfDate": "2026-10-08",
+  "premiumDiscount": "0.03%",
+  "premiumDiscountValue": 0.03,
+  "sharesOutstanding": 55475000,
+  "midpoint": 3354018500,
   "cusip": "886364801",
   "isin": null,
   "distributions": {
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 219,
-    "asOfDate": "2026-10-02"
+    "asOfDate": "2026-10-09"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1706,
-    "asOfDate": "2026-10-02"
+    "totalRows": 1711,
+    "asOfDate": "2026-10-09"
   },
-  "generatedAt": "2026-10-04T03:23:33Z",
+  "generatedAt": "2026-10-11T02:53:35Z",
   "netTerValue": 0.45,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -488,7 +488,7 @@
     "prospectus": "https://www.sp-funds.com/wp-content/uploads/spfunds-PRO_032626_web.pdf",
     "summaryProspectus": "https://www.sp-funds.com/wp-content/uploads/spus-497k_033026.pdf",
     "sai": "https://www.sp-funds.com/wp-content/uploads/spfunds-SAI_032626_web.pdf",
-    "factsheet": "https://www.sp-funds.com/wp-content/uploads/SPUS-Factsheet-2026-Q2.pdf",
+    "factsheet": "https://www.sp-funds.com/wp-content/uploads/SPUS-Factsheet-2026-Q3.pdf",
     "esgWhitepaper": "https://www.sp-funds.com/wp-content/uploads/fund_files-411600123542-ESG-Whitepaper-by-Irfan-Chaudhry-SP-FundsSML-2-3.pdf",
     "annualReport": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Semi-Annual-Financials-5.31.26-Final.pdf",
     "fiscalQ1Holdings": "https://www.sp-funds.com/wp-content/uploads/SPUS-SOI-2-28-26.pdf",

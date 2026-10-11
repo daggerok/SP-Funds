@@ -3,7 +3,7 @@
   "kind": "history",
   "page": 1,
   "pageSize": 1000,
-  "totalRows": 711,
+  "totalRows": 716,
   "headers": [
     "Date",
     "Close",
@@ -4276,7 +4276,37 @@
       "Close": "51.4",
       "Adj Close": "51.4",
       "Volume": "40200"
+    },
+    {
+      "Date": "Oct 05 2026",
+      "Close": "51.87",
+      "Adj Close": "51.87",
+      "Volume": "43800"
+    },
+    {
+      "Date": "Oct 06 2026",
+      "Close": "51.87",
+      "Adj Close": "51.87",
+      "Volume": "44000"
+    },
+    {
+      "Date": "Oct 07 2026",
+      "Close": "51.5",
+      "Adj Close": "51.5",
+      "Volume": "46100"
+    },
+    {
+      "Date": "Oct 08 2026",
+      "Close": "50.4",
+      "Adj Close": "50.4",
+      "Volume": "74100"
+    },
+    {
+      "Date": "Oct 09 2026",
+      "Close": "50.61",
+      "Adj Close": "50.61",
+      "Volume": "25500"
     }
   ],
-  "asOfDate": "2026-10-02"
+  "asOfDate": "2026-10-09"
 }
