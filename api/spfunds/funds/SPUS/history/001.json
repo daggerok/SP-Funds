@@ -3,7 +3,7 @@
   "kind": "history",
   "page": 1,
   "pageSize": 1000,
-  "totalRows": 1711,
+  "totalRows": 1712,
   "headers": [
     "Date",
     "Close",
@@ -956,7 +956,7 @@
     {
       "Date": "Aug 04 2020",
       "Close": "22.49",
-      "Adj Close": "21.27",
+      "Adj Close": "21.28",
       "Volume": "5900"
     },
     {
@@ -1472,7 +1472,7 @@
     {
       "Date": "Dec 04 2020",
       "Close": "24.63",
-      "Adj Close": "23.4",
+      "Adj Close": "23.41",
       "Volume": "15600"
     },
     {
@@ -6012,5 +6012,5 @@
       "Volume": "365600"
     }
   ],
-  "asOfDate": "2026-10-09"
+  "asOfDate": "2026-10-12"
 }

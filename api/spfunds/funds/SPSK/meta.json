@@ -8,20 +8,20 @@
   "terValue": 0.5,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$17.39",
-  "navValue": 17.39,
-  "aum": "$467.44M",
-  "aumValue": 467440000,
-  "asOfDate": "2026-10-08",
+  "nav": "$17.42",
+  "navValue": 17.42,
+  "aum": "$471.67M",
+  "aumValue": 471670000,
+  "asOfDate": "2026-10-09",
   "inceptionDate": "2019-12-27",
   "exchange": "NYSE",
-  "closePrice": "$17.47",
-  "closePriceValue": 17.47,
-  "closePriceAsOfDate": "2026-10-08",
-  "premiumDiscount": "0.44%",
-  "premiumDiscountValue": 0.44,
-  "sharesOutstanding": 26875000,
-  "midpoint": 467356250,
+  "closePrice": "$17.45",
+  "closePriceValue": 17.45,
+  "closePriceAsOfDate": "2026-10-09",
+  "premiumDiscount": "0.17%",
+  "premiumDiscountValue": 0.17,
+  "sharesOutstanding": 27075000,
+  "midpoint": 471646500,
   "cusip": "886364702",
   "isin": null,
   "distributions": {
@@ -428,8 +428,8 @@
     "cagr5y": 0.39,
     "cagr10y": null,
     "siAnn": 0.77,
-    "dividendYield": 3.59,
-    "dividendYieldText": "3.59%",
+    "dividendYield": 3.58,
+    "dividendYieldText": "3.58%",
     "dividendYieldBasis": "indicated",
     "secYield": 5.04,
     "secYieldText": "5.04%",
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 174,
-    "asOfDate": "2026-10-09"
+    "asOfDate": "2026-10-12"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1703,
-    "asOfDate": "2026-10-09"
+    "totalRows": 1704,
+    "asOfDate": "2026-10-12"
   },
-  "generatedAt": "2026-10-11T02:53:35Z",
+  "generatedAt": "2026-10-13T02:20:24Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -474,11 +474,11 @@
     "benchmark": "Bloomberg Global Aggregate Index"
   },
   "yields": {
-    "dividendYield": 3.59,
-    "dividendYieldText": "3.59%",
+    "dividendYield": 3.58,
+    "dividendYieldText": "3.58%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 3.59,
+    "distributionRate": 3.58,
     "secYield": 5.04,
     "secYieldText": "5.04%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
