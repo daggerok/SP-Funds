@@ -1829,10 +1829,16 @@ export function outputConfigEntries(config: JsonRecord): Array<[string, string]>
   });
 }
 
+export function outputConfigValue(key: string, value: string): string {
+  if (/TOKEN|PASSWORD|SECRET|COOKIE|SEC_UA/i.test(key)) return '<redacted>';
+  if (key === 'TICKERS' && ['', 'null', 'undefined'].includes(value)) return 'all';
+  return outputClean(value);
+}
+
 export function outputPrintConfig(brand: string, config: JsonRecord, env: Record<string, string | undefined> = process.env): void {
   const entries: Array<[string, string]> = [...outputConfigEntries(config), ['VERBOSE', String(outputVerbose(env))]];
   console.log(`[ config   ] ${brand} updater:\n${entries
-    .map(([key, value]) => `              ${key}=${/TOKEN|PASSWORD|SECRET|COOKIE|SEC_UA/i.test(key) ? '<redacted>' : outputClean(value)}`)
+    .map(([key, value]) => `              ${key}=${outputConfigValue(key, value)}`)
     .join('\n')}`);
 }
 
@@ -1856,18 +1862,32 @@ export function outputScalar(value: unknown): unknown {
 }
 
 /** Monetary display for the console line; the string `'null'` means unavailable. */
+const OUTPUT_UNITS: Record<string, number> = { K: 1e3, M: 1e6, B: 1e9, T: 1e12, THOUSAND: 1e3, MILLION: 1e6, BILLION: 1e9, TRILLION: 1e12 };
+
 export function outputMoney(value: unknown): string {
-  const raw = outputScalar(value);
+  const numeric = value && typeof value === 'object' ? (value as JsonRecord)['value'] : undefined;
+  const raw = typeof numeric === 'number' && Number.isFinite(numeric) ? numeric : outputScalar(value);
   if (raw === null || raw === undefined || raw === '—' || raw === '--') return 'null';
   const text = String(raw).replace(/[$,\s]/g, '');
-  const match = /^([+-]?[\d.]+)([KMBT])?$/i.exec(text);
+  const match = /^([+-]?[\d.]+)(K|M|B|T|Thousand|Million|Billion|Trillion)?$/i.exec(text);
   if (!match) return outputClean(raw);
-  const number = Number(match[1]) * (AMOUNT_SUFFIXES[match[2]?.toUpperCase() ?? ''] ?? 1);
+  const number = Number(match[1]) * (OUTPUT_UNITS[match[2]?.toUpperCase() ?? ''] ?? 1);
   if (!Number.isFinite(number)) return 'null';
   for (const [unit, scale] of [['T', 1e12], ['B', 1e9], ['M', 1e6], ['K', 1e3]] as const) {
     if (Math.abs(number) >= scale) return `$${(number / scale).toFixed(1)}${unit}`;
   }
   return `$${number.toFixed(2)}`;
+}
+
+/** Yields: rounded to 2 decimals without trailing zeros; placeholders are omitted like null. */
+export function outputPercent(value: unknown): unknown {
+  const raw = outputScalar(value);
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'number') return Number.isFinite(raw) ? Number(raw.toFixed(2)) : null;
+  const text = String(raw).trim().replace(/%$/, '').trim();
+  if (['', '-', '—', '--', 'n/a'].includes(text.toLowerCase())) return null;
+  const number = Number(text.replace(/,/g, ''));
+  return Number.isFinite(number) ? Number(number.toFixed(2)) : outputClean(raw);
 }
 
 export function outputFundLine(index: number, total: number, ticker: string, status: string, data: JsonRecord = {}, reason?: unknown): string {
@@ -1882,19 +1902,32 @@ export function outputFundLine(index: number, total: number, ticker: string, sta
     field('holdings', outputCount(data['holdings'] ?? data['holdingsCount'])),
     field('divs', outputCount(data['distributions'])),
     field('netAssets', outputMoney(data['netAssets'] ?? data['aum'])),
-    field('div', outputScalar(data['dividendYield'] ?? yields['dividendYield'] ?? metrics['dividendYield'])),
-    field('sec', outputScalar(data['secYield'] ?? yields['secYield'] ?? metrics['secYield'])),
+    field('div', outputPercent(data['dividendYield'] ?? yields['dividendYield'] ?? metrics['dividendYield'])),
+    field('sec', outputPercent(data['secYield'] ?? yields['secYield'] ?? metrics['secYield'])),
   ].filter((part) => part !== '').join(' ');
   return `[ ${String(index).padStart(width)}/${String(total).padEnd(width)}  ] ${outputClean(ticker).padEnd(5)} ${status.padEnd(9)}${detail ? ` ${detail}` : ''}${reason ? ` reason=${outputClean(reason)}` : ''}`;
 }
 
 export function outputCreateReporter(total: number) {
   let completed = 0;
+  const tally = new Map<string, number>();
   return {
     result(ticker: string, status: string, data: JsonRecord = {}, reason?: unknown): void {
+      tally.set(status, (tally.get(status) ?? 0) + 1);
       console.log(outputFundLine(++completed, total, ticker, status, data, reason));
     },
+    /** First [ done ] line: the statuses of every fund line this reporter printed. */
+    summary(startedAt: number, now: number = Date.now()): string {
+      const order = ['updated', 'unchanged', 'kept', 'skipped', 'failed'];
+      const statuses = [...order, ...[...tally.keys()].filter((status) => !order.includes(status))];
+      return `[ done     ] ${completed} fund${completed === 1 ? '' : 's'}: ${statuses.map((status) => `${tally.get(status) ?? 0} ${status}`).join(', ')} in ${((now - startedAt) / 1000).toFixed(1)}s`;
+    },
   };
+}
+
+/** Second [ done ] line: published totals. */
+export function outputCounts(funds: number, holdings: number, history: number): string {
+  return `[ done     ] counts: ${funds.toLocaleString('en-US')} funds / ${holdings.toLocaleString('en-US')} holdings rows / ${history.toLocaleString('en-US')} history rows`;
 }
 
 export async function outputWriteSummary(lines: string[], env: Record<string, string | undefined> = process.env): Promise<void> {
@@ -2562,6 +2595,7 @@ export async function runUpdater(
   const newFunds = previousIndex.size ? [...catalog.keys()].filter((ticker) => !previousIndex.has(ticker)).sort() : [];
   if (newFunds.length) console.log(`NEW FUNDS: ${newFunds.join(', ')}`);
   const universe = [...catalog.values()].sort((a, b) => a.ticker.localeCompare(b.ticker));
+  console.log(`[ catalog  ] ${universe.length} SP Funds ETFs (${catalogHtml ? 'spfunds.com lineup' : 'known SP Funds tickers'}${previousIndex.size ? ' + published index' : ''})`);
   const filtered = universe.filter((fund) => !config.tickers.length || config.tickers.includes(fund.ticker));
   const deferred = Boolean(
     config.aumRange || config.terRange || config.dividendYieldRange || config.secYieldRange
@@ -2646,9 +2680,9 @@ export async function runUpdater(
   const updated = outcomes.filter((outcome) => outcome.status === 'updated').length;
   const skipped = outcomes.filter((outcome) => outcome.status === 'skipped').length;
   summary.skipped = outcomes.filter((outcome) => outcome.status === 'skipped').map((outcome) => outcome.ticker);
-  console.log(`[ ${'done'.padEnd(9)}] ${updated} funds updated, ${failures} failures`);
-  console.log(`[ ${'done'.padEnd(9)}] counts: funds=${funds.length} holdings=${formatCount(holdingsTotal)} history=${formatCount(historyTotal)}; processed=${outcomes.length} skipped=${skipped}${progressWritten ? '' : ''}`);
   if (failures) console.log(`[ ${'failed'.padEnd(9)}] ${summary.failures.join(', ')}`);
+  console.log(reporter.summary(startedAt, clock()));
+  console.log(outputCounts(funds.length, holdingsTotal, historyTotal));
   await outputWriteSummary([
     `### SP Funds data update`,
     ``,
