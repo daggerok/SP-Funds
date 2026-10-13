@@ -1920,7 +1920,7 @@ export function outputCreateReporter(total: number) {
     summary(startedAt: number, now: number = Date.now()): string {
       const order = ['updated', 'unchanged', 'kept', 'skipped', 'failed'];
       const statuses = [...order, ...[...tally.keys()].filter((status) => !order.includes(status))];
-      return `[ done     ] ${completed} funds: ${statuses.map((status) => `${tally.get(status) ?? 0} ${status}`).join(', ')} in ${((now - startedAt) / 1000).toFixed(1)}s`;
+      return `[ done     ] ${completed} fund${completed === 1 ? '' : 's'}: ${statuses.map((status) => `${tally.get(status) ?? 0} ${status}`).join(', ')} in ${((now - startedAt) / 1000).toFixed(1)}s`;
     },
   };
 }
