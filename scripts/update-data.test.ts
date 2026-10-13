@@ -23,7 +23,7 @@ import {
   samePublishedContent, sanitizeTicker, secHeaders, selectionEntryFromIndex, splitPages, spFundsAssetCategory,
   stableStringify, toIsoDate, trustForTicker, installSystemCa, isCertError, updateFund, writeIfChanged, writePages,
   writeCursor, yahooChartUrl, dayFromHistoryRow, emptyMetrics, formatSheetDate, historyRowsFromDays, isoStamp,
-  mergeHistoryDays, entryFromMeta, placeholderEntry, tenorAvailable, type CatalogFund, type FundOutcome, type JsonRecord,
+  mergeHistoryDays, ADJ_CLOSE_NOISE, entryFromMeta, placeholderEntry, tenorAvailable, type CatalogFund, type FundOutcome, type JsonRecord,
   type SheetRow, type Transport, type UpdaterConfig
 } from './update-data';
 import type { DerivedMetrics } from './update-data';
@@ -889,6 +889,32 @@ describe('pipeline', () => {
     expect(second.written).toBe(0);
     expect(await listFiles(apiRoot)).toEqual(tree);
     for (const file of tree) expect<string | undefined>(await readFile(new URL(file, apiRoot), 'utf8'), file).toBe(before.get(file));
+  });
+
+  test('two runs on the same source data write zero changes even when Yahoo adjusted closes jitter across a cent boundary', async () => {
+    // Yahoo float32 noise seen live: SPDV 2024-11-12 came back as 31.544998 and 31.545001 a minute apart
+    const jittered = (adjclose: number[]) => {
+      const payload = JSON.parse(yahooJson('SPUS'));
+      payload.chart.result[0].indicators.adjclose[0].adjclose.splice(5, adjclose.length, ...adjclose);
+      return sampleFetcher({ 'yahoo-SPUS': JSON.stringify(payload) }).fetcher;
+    };
+    const apiRoot = await tempApiRoot();
+    const config = offlineConfig({ TICKERS: 'SPUS' });
+    await runUpdater(config, { apiRoot, fetcher: jittered([23.915001, 24.984999, 25.995001]), now: NOW });
+    const tree = await listFiles(apiRoot);
+    const read = async () => Promise.all(tree.map((file) => readFile(new URL(file, apiRoot), 'utf8')));
+    const first = await read();
+    const second = await runUpdater(config, { apiRoot, fetcher: jittered([23.914998, 24.985002, 25.994999]), now: day(0.5) });
+    expect(second.written).toBe(0);
+    expect(await listFiles(apiRoot)).toEqual(tree);
+    expect(await read()).toEqual(first);
+    // a real change beyond the noise is still written
+    await runUpdater(config, { apiRoot, fetcher: jittered([23.9, 24.97, 25.98]), now: day(1) });
+    expect(await read()).not.toEqual(first);
+    const fresh = (adjCloseRaw: number) => ({ date: '2024-11-12', close: 33.93, adjClose: round(adjCloseRaw, 2), volume: 3900, adjCloseRaw });
+    const published = [{ date: '2024-11-12', close: 33.93, adjClose: 31.54, volume: 3900 }];
+    expect([31.545001, 31.5452, 31.56].map((raw) => mergeHistoryDays([fresh(raw)], published)[0].adjClose)).toEqual([31.54, 31.55, 31.56]);
+    expect(ADJ_CLOSE_NOISE).toBe(1e-4);
   });
 
   test('a one-ticker or bounded run keeps every catalog row and the files of unselected funds', async () => {
