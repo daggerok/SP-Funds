@@ -100,7 +100,8 @@ export type Dividend = {
   payDate: string | null;
 };
 
-export type ChartDay = { date: string; close: number; adjClose: number; volume: number };
+// adjCloseRaw: Yahoo's unrounded value, only used to tell float noise from a real change (never persisted).
+export type ChartDay = { date: string; close: number; adjClose: number; volume: number; adjCloseRaw?: number };
 export type ParsedChart = {
   days: ChartDay[];
   dividends: Dividend[];
@@ -973,6 +974,7 @@ export function parseYahooChart(json: unknown): ParsedChart {
       // published file would churn forever on a last-digit difference.
       adjClose: round(adjusted ?? close ?? 0, 2),
       volume: numberOrNull(((quote['volume'] as Array<number | null> | undefined) ?? [])[index]) ?? 0,
+      adjCloseRaw: adjusted ?? close ?? 0,
     });
   }
   days.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
@@ -1020,6 +1022,11 @@ export function dayFromHistoryRow(row: SheetRow): ChartDay | null {
   };
 }
 
+// Yahoo's adjusted close is float32 and its last digits move with the request's period2, so a value
+// sitting on a cent boundary (31.544998 vs 31.545001) flips between runs. Within that noise the
+// published cent is kept: a rerun with the same source data changes nothing.
+export const ADJ_CLOSE_NOISE = 1e-4;
+
 /**
  * A shorter HISTORY_RANGE window must not erase what is already published: fresh days win
  * inside the window, published days older than the window are kept.
@@ -1027,7 +1034,13 @@ export function dayFromHistoryRow(row: SheetRow): ChartDay | null {
 export function mergeHistoryDays(fresh: ChartDay[], published: ChartDay[]): ChartDay[] {
   if (!fresh.length) return published;
   const oldest = fresh.reduce((min, day) => (day.date < min ? day.date : min), fresh[0].date);
-  return [...fresh, ...published.filter((day) => day.date < oldest)];
+  const publishedAdj = new Map(published.map((day) => [day.date, day.adjClose]));
+  const merged = fresh.map((day) => {
+    const prior = publishedAdj.get(day.date);
+    const raw = day.adjCloseRaw ?? day.adjClose;
+    return prior !== undefined && prior !== day.adjClose && Math.abs(raw - prior) <= 0.005 + ADJ_CLOSE_NOISE ? { ...day, adjClose: prior } : day;
+  });
+  return [...merged, ...published.filter((day) => day.date < oldest)];
 }
 
 /** Fold Yahoo dividends into the official distribution calendar (official rows win). */
