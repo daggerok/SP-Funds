@@ -8,20 +8,20 @@
   "terValue": 0.5,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$18.80",
-  "navValue": 18.8,
-  "aum": "$199.25M",
-  "aumValue": 199250000,
-  "asOfDate": "2026-10-16",
+  "nav": "$18.58",
+  "navValue": 18.58,
+  "aum": "$196.96M",
+  "aumValue": 196960000,
+  "asOfDate": "2026-10-19",
   "inceptionDate": "2020-12-29",
   "exchange": "NYSE Arca",
-  "closePrice": "$18.71",
-  "closePriceValue": 18.71,
-  "closePriceAsOfDate": "2026-10-16",
-  "premiumDiscount": "-0.46%",
-  "premiumDiscountValue": -0.46,
+  "closePrice": "$18.55",
+  "closePriceValue": 18.55,
+  "closePriceAsOfDate": "2026-10-19",
+  "premiumDiscount": "-0.17%",
+  "premiumDiscountValue": -0.17,
   "sharesOutstanding": 10600000,
-  "midpoint": 199280000,
+  "midpoint": 196948000,
   "cusip": "886364769",
   "isin": null,
   "distributions": {
@@ -428,8 +428,8 @@
     "cagr5y": -0.3,
     "cagr10y": null,
     "siAnn": 3.05,
-    "dividendYield": 4.28,
-    "dividendYieldText": "4.28%",
+    "dividendYield": 4.33,
+    "dividendYieldText": "4.33%",
     "dividendYieldBasis": "indicated",
     "secYield": 2.5,
     "secYieldText": "2.50%",
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 31,
-    "asOfDate": "2026-10-19"
+    "asOfDate": "2026-10-20"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1457,
-    "asOfDate": "2026-10-19"
+    "totalRows": 1458,
+    "asOfDate": "2026-10-20"
   },
-  "generatedAt": "2026-10-20T04:17:13Z",
+  "generatedAt": "2026-10-21T06:28:52Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -474,11 +474,11 @@
     "benchmark": "S&P Global All Equity REIT Shariah Capped Index (USD) TR"
   },
   "yields": {
-    "dividendYield": 4.28,
-    "dividendYieldText": "4.28%",
+    "dividendYield": 4.33,
+    "dividendYieldText": "4.33%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 4.28,
+    "distributionRate": 4.33,
     "secYield": 2.5,
     "secYieldText": "2.50%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
