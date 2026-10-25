@@ -14,7 +14,7 @@ import {
   annualizedFromCumulative, batchSelection, buildCatalog, buildCatalogIndex, yahooHeaders, buildPages,
   catalogIndexEntry, createEdgarFallback, createRequestGate, createTransport, cumulativeFromAnnualized, deriveMetrics,
   performanceAsOf, edgarSeriesFilingsUrl, errorMessage, fillNportTickers, formatAumDisplay, formatMoneyText,
-  formatUsDate, fundFilterReasons, fundPageUrl, holdingsCsvUrl, inferDistributionFrequency, lookupPattern,
+  formatUsDate, fundFilterReasons, fundPageUrl, holdingsCsvUrl, holdingsGuard, inferDistributionFrequency, lookupPattern,
   matchesNportFund, matchesRange, mergeDividends, nameValueMap, normalizeWeightText, nportUrlFor, parseMoneyNumber,
   numberOrNull, outputPrintConfig, pageFileName, parseAumRange, parseCatalogCards, parseCatalogMenu,
   parseCompanyTickerMap, parseCsv, parseEdgarAtomFilings, parseFundPage, parseFundTickerMap, parseHtmlTables,
@@ -76,7 +76,7 @@ type FundSample = {
   asOf: string; month: string[]; quarter: string[]; bench: [string, string]; csv: string[][]; days: number; amount: string;
 };
 // Performance values: 1 Month, 3 Month, 6 Month, YTD, Since Inception (Cumulative), 1 Year, 3 Year, 5 Year, 10 Year, Since Inception (Annualized), Date
-// CSV rows: StockTicker, CUSIP, SecurityName, Shares, Price, MarketValue, Weightings
+// CSV rows: StockTicker, CUSIP, SecurityName, Shares, Price, MarketValue, Weightings (each sample adds up to 74..100%, like a real sheet)
 const SAMPLES: Record<string, FundSample> = {
   SPUS: {
     name: 'SP Funds S&P 500 Sharia Industry Exclusions ETF', cusip: '886364801', inception: '12/17/2019', ter: '0.45%', secYield: '0.40%',
@@ -90,7 +90,7 @@ const SAMPLES: Record<string, FundSample> = {
       ['MSFT', '594918104', 'Microsoft Corp', '623931', '512.9', '320014209.9', '9.75%'],
       ['GOOGL', '02079K305', 'Alphabet Inc', '491250', '344.08', '169029300.0', '5.15%'],
       ['AVGO', '11135F101', 'Broadcom Inc', '399767', '351.19', '140394172.73', '4.28%'],
-      ['MU', '595112103', 'Micron Technology Inc', '94901', '1065.11', '101080004.11', '3.08%'],
+      ['MU', '595112103', 'Micron Technology Inc', '94901', '1065.11', '101080004.11', '54.24%'],
     ],
   },
   SPRE: {
@@ -103,7 +103,7 @@ const SAMPLES: Record<string, FundSample> = {
       ['WELL', '95040Q104', 'Welltower Inc', '114291', '230.24', '26314359.84', '13.25%'],
       ['GMG AU', 'B03FYZ4', 'Goodman Group', '1376298', '27.18', '26024613.64', '13.10%'],
       ['WY', '962166104', 'Weyerhaeuser Co', '1062383', '19.05', '20238396.15', '10.19%'],
-      ['AA AU', 'B0000AA', 'Another Group', '1', '1.0', '1.0', '5.00%'],
+      ['AA AU', 'B0000AA', 'Another Group', '1', '1.0', '1.0', '65.58%'],
       ['Cash&Other', 'Cash&Other', 'Cash & Other', '-4206403', '1.0', '-4206403.0', '-2.12%'],
     ],
   },
@@ -130,7 +130,7 @@ const SAMPLES: Record<string, FundSample> = {
       ['TSM', '874039100', 'Taiwan Semiconductor', '500', '300.0', '150000.0', '10.00%'],
       ['NVDA', '67066G104', 'NVIDIA Corp', '500', '228.38', '114190.0', '9.00%'],
       ['AAPL', '037833100', 'Apple Inc', '500', '333.02', '166510.0', '8.00%'],
-      ['MSFT', '594918104', 'Microsoft Corp', '500', '512.9', '256450.0', '7.00%'],
+      ['MSFT', '594918104', 'Microsoft Corp', '500', '512.9', '256450.0', '73.00%'],
     ],
   },
   SPWO: {
@@ -143,7 +143,7 @@ const SAMPLES: Record<string, FundSample> = {
       ['ASML', 'N07059202', 'ASML Holding', '10', '900.0', '9000.0', '6.00%'],
       ['NOVO', 'K72807132', 'Novo Nordisk', '10', '500.0', '5000.0', '5.00%'],
       ['SHEL', '780259305', 'Shell plc', '10', '300.0', '3000.0', '4.00%'],
-      ['TM', '892331307', 'Toyota Motor', '10', '200.0', '2000.0', '3.00%'],
+      ['TM', '892331307', 'Toyota Motor', '10', '200.0', '2000.0', '85.00%'],
     ],
   },
 };
@@ -688,6 +688,21 @@ describe('parsing', () => {
     expect(parseEdgarAtomFilings('<feed></feed>')).toEqual([]);
   });
 
+  test('holdings guard: header-only, renamed weight column, broken weights, a bad weight sum and a halved sheet are rejected', () => {
+    const headers = ['Name', 'Ticker', 'Weight'];
+    const rows = [{ Name: 'A', Ticker: 'A', Weight: '60%' }, { Name: 'B', Ticker: 'B', Weight: '40%' }];
+    expect(holdingsGuard(headers, rows, 2)).toBeNull();
+    expect(holdingsGuard(headers, [['A', 'A', '60'], ['B', 'B', '40']], null)).toBeNull();
+    expect(holdingsGuard([], [], 0)).toBeNull(); // nothing published before: an empty sheet is honest
+    expect(holdingsGuard(headers, [], 505)).toContain('no holdings rows');
+    expect(holdingsGuard(['Name', 'Ticker', 'Wt'], rows, 2)).toContain('no weight column');
+    expect(holdingsGuard(headers, rows.map((row) => ({ ...row, Weight: '6\u200B0' })), 2)).toContain('numeric weight');
+    const allocation = [{ Name: 'Cash&Collateral', Ticker: '-', Weight: '100' }, { Name: 'Equities', Ticker: '-', Weight: '476' }];
+    expect(holdingsGuard(headers, allocation, 2)).toContain('outside 50..150');
+    expect(holdingsGuard(headers, allocation, 2, ['sum'])).toBeNull();
+    expect(holdingsGuard(headers, rows, 5)).toContain('less than half');
+  });
+
   test('N-PORT reader keeps identifiers, weights, values and balances; a filing only matches its own series and registrant', () => {
     const parsed = parseNport(NPORT_XML);
     expect(parsed.seriesId).toBe('S000070027');
@@ -986,6 +1001,22 @@ describe('pipeline', () => {
     expect(await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8')).toBe(metaBefore);
   });
 
+  test('a fresh holdings CSV that fails the holdings guard keeps the fund exactly as published and reports it', async () => {
+    const apiRoot = await tempApiRoot();
+    const config = offlineConfig({ TICKERS: 'SPUS' });
+    await runUpdater(config, { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+    const tree = await listFiles(apiRoot);
+    const read = async () => Promise.all(tree.map((file) => readFile(new URL(file, apiRoot), 'utf8')));
+    const first = await read();
+    // the issuer renamed its weight column: every position parses without a weight
+    const renamed = holdingsCsv('SPUS').replace('Weightings', 'Weighting (%)');
+    const second = await runUpdater(config, { apiRoot, fetcher: sampleFetcher({ 'csv-SPUS': renamed }).fetcher, now: day(1) });
+    expect(second.degraded).toEqual(['SPUS']); // kept as published because a source failed; main exits 1 when every fund is degraded
+    expect(second.written).toBe(0);
+    expect(await listFiles(apiRoot)).toEqual(tree);
+    expect(await read()).toEqual(first);
+  });
+
   test('a failed Yahoo request keeps the whole published fund, never a new return next to old history', async () => {
     const apiRoot = await publishedSpus();
     const before = await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8');
@@ -1049,7 +1080,7 @@ describe('pipeline', () => {
   test('an older N-PORT-P filing never replaces fresher published holdings (freshness), a newer one does', async () => {
     const apiRoot = await publishedSpus();
     const { fetcher } = sampleFetcher();
-    const rows = [{ Name: 'Old', Ticker: 'OLD', Identifier: '1', Weight: '100', 'Market Value': '1', 'Shares Held': '1', 'Asset Category': 'Equity' }];
+    const rows = ['40', '30', '30'].map((Weight, index) => ({ Name: `Old ${index}`, Ticker: `OLD${index}`, Identifier: String(index), Weight, 'Market Value': '1', 'Shares Held': '1', 'Asset Category': 'Equity' }));
     const noCsv = quietTransport(failing(fetcher, 'TidalFG'));
     const stale = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, noCsv, async () => ({ rows, asOfDate: '2026-07-31', source: 's' }), day(1));
     expect(stale.providers.edgar).toBe(false);
@@ -1057,7 +1088,7 @@ describe('pipeline', () => {
     expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 6, asOfDate: '2026-10-01' });
     const fresh = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, noCsv, async () => ({ rows, asOfDate: '2026-10-02', source: 's' }), day(2));
     expect(fresh.providers.edgar).toBe(true);
-    expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 1, asOfDate: '2026-10-02' });
+    expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 3, asOfDate: '2026-10-02' });
   });
 
   test('a row without a published meta.json has dataFile null; a soft deadline leaves unprocessed funds as such rows', async () => {
