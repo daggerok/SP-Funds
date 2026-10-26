@@ -2317,6 +2317,10 @@ export async function updateFund(
       failedSources,
     };
   }
+  // A new fund that no source answered (issuer page down, skipped or a block page; no holdings CSV or N-PORT-P; Yahoo down
+  // or skipped) is never published as an empty meta.json: it fails and keeps its catalog-only index row (dataFile null).
+  const pageAnswered = Boolean(page && (page.details.size || page.pricing.size || page.monthEnd || page.distributions.length));
+  if (!previous.meta && !pageAnswered && !holdingsFresh && !providers.yahoo) throw new Error('no source answered; no data published for this fund yet');
 
   const details = page ? detailsFromPage(page, ticker) : null;
   const previousMeta = previous.meta ?? {};
