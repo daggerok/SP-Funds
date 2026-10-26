@@ -1272,6 +1272,43 @@ describe('pipeline 4', () => {
   });
 });
 
+describe('pipeline 5', () => {
+  test('a new fund that no source answered is failed with a catalog-only row and no files; that row is never read back as published data', async () => {
+    // SPWO is new and its page is a block page answered with HTTP 200; SPXX is a requested ticker the lineup does not list.
+    // Neither has a holdings CSV, an N-PORT-P filing or a Yahoo chart
+    const silent = (fetcher: typeof fetch): typeof fetch => ((url: string, init?: RequestInit) => {
+      if (url.endsWith('.com/spwo/')) return Promise.resolve(new Response('<html><body>Access denied</body></html>'));
+      return /spwo|spxx/i.test(url) ? Promise.resolve(new Response('no', { status: 404 })) : fetcher(url, init);
+    }) as typeof fetch;
+    const rowOf = async (root: URL, ticker: string): Promise<JsonRecord> => ((await readIndex(root))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === ticker)!;
+    const fresh = await tempApiRoot();
+    const apiRoot = await tempApiRoot();
+    const log = spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      await runUpdater(offlineConfig({ TICKERS: 'SPWO' }), { apiRoot: fresh, fetcher: sampleFetcher().fetcher, now: NOW });
+      await runUpdater(offlineConfig({ TICKERS: 'SPUS' }), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+      const silentRuns: Array<Record<string, string>> = [{ TICKERS: 'SPWO SPXX' }, { TICKERS: 'SPWO', SKIP_SPFUNDS: 'true', SKIP_YAHOO: 'true' }];
+      for (const overrides of silentRuns) {
+        const summary = await runUpdater(offlineConfig(overrides), { apiRoot, fetcher: silent(sampleFetcher().fetcher), now: day(1) });
+        expect(summary.failures).toEqual(overrides.TICKERS.split(' ')); // never reported updated with an empty meta.json
+        expect((await listFiles(apiRoot)).filter((file) => /^funds\/SP(WO|XX)\//.test(file))).toEqual([]);
+        for (const ticker of overrides.TICKERS.split(' ')) {
+          const row = await rowOf(apiRoot, ticker);
+          expect(row).toMatchObject({ dataFile: null, holdings: 0, history: 0 });
+          expect(Object.keys(row['metrics'] as JsonRecord)).toEqual(Object.keys((await rowOf(apiRoot, 'SPUS'))['metrics'] as JsonRecord));
+        }
+      }
+      // the first good refresh publishes exactly what a fund that never had a catalog-only row gets
+      await runUpdater(offlineConfig({ TICKERS: 'SPWO' }), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+      expect(await rowOf(apiRoot, 'SPWO')).toEqual(await rowOf(fresh, 'SPWO'));
+      expect(await readMeta(apiRoot, 'SPWO')).toEqual(await readMeta(fresh, 'SPWO'));
+      expect((await rowOf(fresh, 'SPWO'))['dataFile']).not.toBeNull();
+    } finally {
+      log.mockRestore();
+    }
+  });
+});
+
 // ---------------------------------------------------------------------------
 // network
 // ---------------------------------------------------------------------------
