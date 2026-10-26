@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-26T08:02:40Z",
+  "generatedAt": "2026-10-26T19:38:23Z",
   "provider": "SP Funds",
   "source": {
     "catalog": "https://www.sp-funds.com/",
@@ -14,7 +14,7 @@
   "counts": {
     "funds": 5,
     "holdings": 922,
-    "history": 6334
+    "history": 6335
   },
   "funds": [
     {
@@ -26,18 +26,18 @@
       "ter": "0.50%",
       "terValue": 0.5,
       "terGrossValue": null,
-      "nav": "$18.62",
-      "navValue": 18.62,
-      "aum": "$197.33M",
-      "aumValue": 197330000,
-      "asOfDate": "2026-10-22",
+      "nav": "$18.52",
+      "navValue": 18.52,
+      "aum": "$196.29M",
+      "aumValue": 196290000,
+      "asOfDate": "2026-10-23",
       "inceptionDate": "2020-12-29",
       "exchange": "NYSE Arca",
-      "closePrice": "$18.62",
-      "closePriceValue": 18.62,
-      "closePriceAsOfDate": "2026-10-22",
-      "premiumDiscount": "0.02%",
-      "premiumDiscountValue": 0.02,
+      "closePrice": "$18.48",
+      "closePriceValue": 18.48,
+      "closePriceAsOfDate": "2026-10-23",
+      "premiumDiscount": "-0.18%",
+      "premiumDiscountValue": -0.18,
       "cusip": "886364769",
       "isin": null,
       "distributions": {
@@ -75,8 +75,8 @@
         "cagr5y": -0.3,
         "cagr10y": null,
         "siAnn": 3.05,
-        "dividendYield": 4.32,
-        "dividendYieldText": "4.32%",
+        "dividendYield": 4.34,
+        "dividendYieldText": "4.34%",
         "dividendYieldBasis": "indicated",
         "secYield": 2.5,
         "secYieldText": "2.50%",
@@ -84,7 +84,7 @@
         "performanceAsOf": "2026-09-30"
       },
       "holdings": 30,
-      "history": 1461
+      "history": 1462
     },
     {
       "ticker": "SPSK",
