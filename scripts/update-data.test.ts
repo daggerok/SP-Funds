@@ -10,20 +10,20 @@ import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  CLOSED_FUNDS, CONTROL_NAMES, HISTORY_HEADERS, HOLDINGS_HEADERS, SEC_UA_DEFAULT, SPFUNDS_TRUST, TIDAL_TRUST, USAGE,
+  CLOSED_FUNDS, CONTROL_NAMES, HISTORY_HEADERS, HOLDINGS_GUARD_RELAX, HOLDINGS_HEADERS, SEC_UA_DEFAULT, SPFUNDS_TRUST, TIDAL_TRUST, USAGE,
   annualizedFromCumulative, batchSelection, buildCatalog, buildCatalogIndex, yahooHeaders, buildPages,
   catalogIndexEntry, closedFund, createEdgarFallback, createRequestGate, createTransport, cumulativeFromAnnualized, deriveMetrics,
-  performanceAsOf, edgarSeriesFilingsUrl, errorMessage, fillNportTickers, formatAumDisplay, formatMoneyText,
-  formatUsDate, fundFilterReasons, fundPageUrl, holdingsCsvUrl, holdingsGuard, inferDistributionFrequency, lookupPattern,
-  matchesNportFund, matchesRange, mergeDividends, nameValueMap, normalizeWeightText, nportUrlFor, parseMoneyNumber,
+  performanceAsOf, errorMessage, formatAumDisplay, formatMoneyText,
+  formatUsDate, fundFilterReasons, fundPageUrl, holdingsCsvUrl, holdingsGuard, holdingsWeightCount, inferDistributionFrequency, liveLineup, lookupPattern,
+  matchesRange, mergeDividends, nameValueMap, normalizeWeightText, nportHoldingsSheet, nportIsFresh, nportTickers, parseMoneyNumber,
   numberOrNull, outputPrintConfig, pageFileName, parseAumRange, parseCatalogCards, parseCatalogMenu,
-  parseCompanyTickerMap, parseCsv, parseEdgarAtomFilings, parseFundPage, parseFundTickerMap, parseHtmlTables,
-  parseNport, parseNportAccessions, parseRange, parseSpFundsHoldingsCsv, parseYahooChart, paymentsPerYear, periodKey,
+  parseCsv, parseFundPage, parseHtmlTables, parseNportFiling, parseSecCompanyNames, parseSecFundTickers,
+  parseRange, parseSpFundsHoldingsCsv, parseYahooChart, paymentsPerYear, periodKey,
   readConfig, readCursor, readPreviousIndex, readPreviousPages, resolveControls, round, runUpdater, runtimeControls,
   samePublishedContent, sanitizeTicker, secHeaders, selectionEntryFromIndex, splitPages, spFundsAssetCategory,
   stableStringify, toIsoDate, trustForTicker, installSystemCa, isCertError, updateFund, writeIfChanged, writePages,
   writeCursor, yahooChartUrl, dayFromHistoryRow, emptyMetrics, formatSheetDate, historyRowsFromDays, isoStamp,
-  mergeHistoryDays, ADJ_CLOSE_NOISE, entryFromMeta, placeholderEntry, tenorAvailable, type CatalogFund, type FundOutcome, type JsonRecord,
+  mergeHistoryDays, ADJ_CLOSE_NOISE, entryFromMeta, placeholderEntry, type CatalogFund, type FundOutcome, type JsonRecord,
   type SheetRow, type Transport, type UpdaterConfig
 } from './update-data';
 import type { DerivedMetrics } from './update-data';
@@ -248,16 +248,24 @@ const NPORT_XML = `<?xml version="1.0" encoding="UTF-8"?>
     </genInfo>
     <fundInfo>
       <netAssets>3283824025</netAssets>
-      <invstOrSecs>
-        <invstOrSec><name>NVIDIA CORP</name><identifiers><cusip value="67066G104"/></identifiers><pctVal>14.14000000</pctVal><valUSD>464404792.12</valUSD><balance>2033474</balance><assetCat>EC</assetCat></invstOrSec>
-        <invstOrSec><name>APPLE INC</name><identifiers><cusip value="037833100"/></identifiers><pctVal>12.44000000</pctVal><valUSD>408383425.06</valUSD><balance>1226303</balance><assetCat>EC</assetCat></invstOrSec>
-        <invstOrSec><name>SP Funds S&amp;P Global REIT Sharia ETF</name><identifiers><other value="SPRE"/></identifiers><pctVal>0.50000000</pctVal><valUSD>16400000.00</valUSD><balance>865000</balance><assetCat>EC</assetCat></invstOrSec>
-        <invstOrSec><name>Cash &amp; Other</name><identifiers><other value="CASH"/></identifiers><pctVal>-0.12000000</pctVal><valUSD>-3940000.00</valUSD><balance>0</balance><assetCat>CA</assetCat></invstOrSec>
-        <invstOrSec><name>US TREASURY BILL 0% 09/17/2026</name><identifiers><cusip value="912797XX1"/></identifiers><pctVal>1.20000000</pctVal><valUSD>39400000.00</valUSD><balance>39400000</balance><assetCat>DBT</assetCat></invstOrSec>
-      </invstOrSecs>
     </fundInfo>
+    <invstOrSecs>
+      <invstOrSec><name>NVIDIA CORP</name><lei>549300S4KLFTLO7GSQ80</lei><title>NVIDIA CORP</title><cusip>67066G104</cusip><identifiers><isin value="US67066G1040"/><ticker value="NVDA"/></identifiers><balance>2033474.00000000</balance><units>NS</units><curCd>USD</curCd><valUSD>1313535202.12</valUSD><pctVal>40.00000000</pctVal><assetCat>EC</assetCat><issuerCat>CORP</issuerCat><invCountry>US</invCountry></invstOrSec>
+      <invstOrSec><name>APPLE INC</name><title>APPLE INC</title><cusip>037833100</cusip><identifiers><isin value="US0378331005"/></identifiers><balance>1226303</balance><units>NS</units><curCd>USD</curCd><valUSD>985147207.59</valUSD><pctVal>30.00000000</pctVal><assetCat>EC</assetCat><invCountry>US</invCountry></invstOrSec>
+      <invstOrSec><name>TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD</name><title>TSMC</title><cusip>N/A</cusip><identifiers><isin value="TW0002330008"/><ticker value="2330"/></identifiers><balance>500</balance><units>NS</units><curCd>TWD</curCd><valUSD>656764805.06</valUSD><pctVal>20.00000000</pctVal><assetCat>EC</assetCat><invCountry>TW</invCountry></invstOrSec>
+      <invstOrSec><name>SP Funds S&amp;P Global REIT Sharia ETF</name><cusip>886364108</cusip><identifiers><ticker value="SPRE"/></identifiers><balance>865000</balance><curCd>USD</curCd><valUSD>164191201.25</valUSD><pctVal>5.00000000</pctVal><assetCat>RF</assetCat></invstOrSec>
+      <invstOrSec><name>Cash &amp; Other</name><cusip>000000000</cusip><identifiers><other otherDesc="Internal" value="CASH"/></identifiers><curCd>USD</curCd><valUSD>-3940000.00</valUSD><assetCat>STIV</assetCat></invstOrSec>
+      <invstOrSec><name>US TREASURY BILL 0% 09/17/2026</name><cusip>912797XX1</cusip><identifiers><ticker value="T"/></identifiers><balance>39400000</balance><curCd>USD</curCd><valUSD>131352960.50</valUSD><pctVal>4.00000000</pctVal><assetCat>DBT</assetCat><debtSec><maturityDt>2026-09-17</maturityDt><annualizedRt>0</annualizedRt></debtSec></invstOrSec>
+      <invstOrSec><name>S&amp;P 500 E-MINI DEC26</name><cusip>000000000</cusip><identifiers><other otherDesc="Bloomberg Identifier" value="BBG01VKPGXL9"/></identifiers><curCd>USD</curCd><valUSD>164191.20</valUSD><pctVal>0.00500000</pctVal><assetCat>DE</assetCat><derivativeInfo><futrDeriv derivCat="FUT"><descRefInstrmnt><otherRefInst><identifiers><cusip value="78462F103"/><ticker value="SPY"/></identifiers></otherRefInst></descRefInstrmnt></futrDeriv></derivativeInfo></invstOrSec>
+    </invstOrSecs>
   </formData>
 </edgarSubmission>`;
+/** SEC company_tickers.json excerpt: issuer names for the N-PORT ticker match (the T-bill is no "T" for AT&T). */
+const COMPANY_NAMES = { 0: { cik_str: 320193, ticker: 'AAPL', title: 'Apple Inc.' }, 1: { cik_str: 732717, ticker: 'T', title: 'AT&T INC.' } };
+/** The browse-edgar Atom feed of the SPUS series with one NPORT-P filing in the Tidal Trust I folder. */
+const NPORT_ATOM = `<feed><entry><content><accession-number>0002000324-26-004454</accession-number><filing-date>2026-09-21</filing-date>
+  <filing-href>https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/0002000324-26-004454-index.htm</filing-href>
+  <filing-type>NPORT-P</filing-type><period>2026-07-31</period></content></entry></feed>`;
 
 /** Routes every outbound URL of an offline run to the inline samples. */
 function sampleRoutes(overrides: Record<string, string> = {}): Array<[RegExp, (match: RegExpExecArray) => string]> {
@@ -268,6 +276,7 @@ function sampleRoutes(overrides: Record<string, string> = {}): Array<[RegExp, (m
     [/query1\.finance\.yahoo\.com\/v8\/finance\/chart\/([A-Z]+)/, (match) => overrides[`yahoo-${match[1]}`] ?? yahooJson(match[1])],
     [/data\.sec\.gov\/submissions\/CIK0001742912/, () => overrides['tidal'] ?? EDGAR_SUBMISSIONS],
     [/company_tickers_mf\.json/, () => overrides['series'] ?? JSON.stringify(SERIES_PAYLOAD)],
+    [/company_tickers\.json/, () => overrides['names'] ?? JSON.stringify(COMPANY_NAMES)],
     [/browse-edgar/, () => overrides['atom'] ?? '<feed></feed>'],
     [/primary_doc\.xml$/, () => overrides['nport'] ?? ''],
   ];
@@ -341,17 +350,23 @@ async function publishedSpus(): Promise<URL> {
   return apiRoot;
 }
 
-const yahooWindow = (count: number, startEpoch: number): string => JSON.stringify({
-  chart: { result: [{
-    meta: { fullExchangeName: 'NYSEArca', longName: 'X' },
-    timestamp: Array.from({ length: count }, (_, index) => startEpoch + index * 86_400),
-    events: { dividends: {} },
-    indicators: {
-      quote: [{ close: Array.from({ length: count }, () => 60), volume: Array.from({ length: count }, () => 5) }],
-      adjclose: [{ adjclose: Array.from({ length: count }, () => 60) }],
-    },
-  }] },
-});
+/** The last `days` of a fund's Yahoo sample, as a HISTORY_RANGE window returns them; `adjust` re-scales Adj Close (a new distribution). */
+const yahooWindow = (ticker: string, days: number, adjust = 1): string => {
+  const payload = JSON.parse(yahooJson(ticker));
+  const result = payload.chart.result[0];
+  result.timestamp = result.timestamp.slice(-days);
+  result.indicators.quote[0].close = result.indicators.quote[0].close.slice(-days);
+  result.indicators.quote[0].volume = result.indicators.quote[0].volume.slice(-days);
+  result.indicators.adjclose[0].adjclose = result.indicators.adjclose[0].adjclose.slice(-days).map((value: number) => value * adjust);
+  return JSON.stringify(payload);
+};
+
+/** Every file of a feed with its text. */
+async function snapshot(apiRoot: URL): Promise<Record<string, string>> {
+  const files: Record<string, string> = {};
+  for (const file of await listFiles(apiRoot)) files[file] = await readFile(new URL(file, apiRoot), 'utf8');
+  return files;
+}
 
 // ---------------------------------------------------------------------------
 // controls
@@ -537,8 +552,12 @@ describe('parsing', () => {
   test('dates normalise to UTC whatever the process time zone is; impossible dates are null', () => {
     const saved = process.env['TZ'];
     try {
-      for (const zone of ['Pacific/Kiritimati', 'America/Los_Angeles', 'UTC']) {
+      for (const zone of ['Pacific/Kiritimati', 'Asia/Tokyo', 'America/Los_Angeles', 'UTC']) {
         process.env['TZ'] = zone;
+        // month-name and U.S. dates are plain calendar text (shared calendarIso), the same day in every zone
+        expect(['Oct 24, 2026', 'October 24 2026', '24 Oct 2026', '10/24/2026', '10/24/26', '2026-10-24', 'Sept. 24, 2026'].map((raw) => toIsoDate(raw)))
+          .toEqual([...Array(6).fill('2026-10-24'), '2026-09-24']);
+        expect(toIsoDate('02/30/2026')).toBeNull();
         expect(toIsoDate('10/01/2026')).toBe('2026-10-01');
         expect(toIsoDate('2026-10-01T00:00:00.000Z')).toBe('2026-10-01');
         expect(toIsoDate('Jun 04 2026')).toBe('2026-06-04');
@@ -560,7 +579,7 @@ describe('parsing', () => {
   });
 
   test('the Our ETFs menu yields the five SP Funds ETFs; the menu link wins over cards; non-fund links are ignored', () => {
-    const catalog = buildCatalog(HOME_HTML, []);
+    const catalog = buildCatalog(HOME_HTML);
     expect(catalog.map((fund) => fund.ticker)).toEqual(TICKERS);
     expect(catalog.find((fund) => fund.ticker === 'SPRE')!.fundPage).toBe('https://www.sp-funds.com/spre/');
     expect(parseCatalogCards(HOME_HTML).find((card) => card.ticker === 'SPUS')!.fundPage).toBe('https://www.sp-funds.com/spus/');
@@ -568,18 +587,17 @@ describe('parsing', () => {
       <div class="bdt-ep-advanced-icon-box-content"><h3 class="bdt-ep-advanced-icon-box-title"><span>SPRE</span></h3>
       <a class="bdt-ep-advanced-icon-box-readmore" href="/spre-2/">See Details</a></div>`;
     expect(parseCatalogCards(synthetic)[0].fundPage).toBe('https://www.sp-funds.com/spre-2/');
-    expect(buildCatalog(synthetic, [])[0].fundPage).toBe('https://www.sp-funds.com/spre/');
+    expect(buildCatalog(synthetic)[0].fundPage).toBe('https://www.sp-funds.com/spre/');
     const withOther = HOME_HTML.replace('</ul></li>', '</ul></li><li><a href="#"><span>Target Date Funds</span></a><ul class="sub-menu"><li><a href="/sptax/"><span>SPTAX</span></a></li></ul></li>');
     expect(parseCatalogMenu(withOther).length).toBe(5);
     expect(parseCatalogMenu(withOther).map((card) => card.ticker)).not.toContain('SPTAX');
   });
 
-  test('an explicit TICKERS selection narrows and extends the catalog; unknown markup falls back to the known lineup', () => {
-    expect(buildCatalog(HOME_HTML, ['SPUS', 'SPWO']).map((fund) => fund.ticker)).toEqual(['SPUS', 'SPWO']);
-    const extra = buildCatalog(HOME_HTML, ['SPUS', 'ZZZZ']);
-    expect(extra.find((fund) => fund.ticker === 'ZZZZ')!.fundPage).toBe('https://www.sp-funds.com/zzzz/');
-    expect(buildCatalog('<html>redesigned</html>', []).map((fund) => fund.ticker)).toEqual(TICKERS);
-    expect(buildCatalog('<p>no cards</p>', ['SPUS']).map((fund) => fund.fundPage)).toEqual(['https://www.sp-funds.com/spus/']);
+  test('the catalog is the whole live lineup (TICKERS never adds a fund); unknown markup falls back to the known lineup and is no live lineup', () => {
+    expect(liveLineup(HOME_HTML)).toEqual(['SPRE', 'SPUS', 'SPTE', 'SPSK', 'SPWO']);
+    expect(liveLineup('<html>redesigned</html>')).toBeNull();
+    expect(buildCatalog('<html>redesigned</html>').map((fund) => fund.ticker)).toEqual(TICKERS);
+    expect(buildCatalog('<p>no cards</p>').map((fund) => fund.fundPage)).toContain('https://www.sp-funds.com/spus/');
   });
 });
 
@@ -675,25 +693,37 @@ describe('parsing 3', () => {
     expect(merged[0].payDate).toBe('2026-09-29');
   });
 
-  test('EDGAR: ticker table, validated urls, NPORT-P accessions from the trust feed and the series Atom feed', () => {
-    const map = parseFundTickerMap(SERIES_PAYLOAD);
+  test('SEC EDGAR fallback (shared nport-reader): ticker map, N-PORT sheet with empty missing numbers, own identifiers, tickers only for U.S. equities', () => {
+    const map = parseSecFundTickers(SERIES_PAYLOAD);
     expect(map.get('SPUS')).toEqual({ cik: '0001742912', seriesId: 'S000070027', classId: 'C000220954' });
     expect(map.get('SPTE')!.cik).toBe('0001989916');
     expect(map.has('SPWO')).toBe(false);
-    expect(parseFundTickerMap({ fields: ['symbol', 'cik'], data: [['SPUS', '0'], ['', '1742912']] }).size).toBe(0);
-    expect(nportUrlFor('0001742912', '0002000324-26-004454')).toBe('https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/primary_doc.xml');
-    expect(() => nportUrlFor('1742912', 'not-an-accession')).toThrow('EDGAR');
-    expect(edgarSeriesFilingsUrl('S000070027')).toContain('CIK=S000070027');
-    const filings = parseNportAccessions(JSON.parse(EDGAR_SUBMISSIONS));
-    expect(filings.map((filing) => filing.accession)).toEqual(['0002000324-26-004454', '0002000324-26-003796']);
-    expect(filings[0].reportDate).toBe('2026-07-31');
-    expect(parseNportAccessions({ cik: '1', filings: { recent: { form: ['10-K'], accessionNumber: ['x'] } } })).toEqual([]);
-    const atom = `<feed><entry><filing-type>NPORT-P</filing-type><filing-date>2026-09-21</filing-date>
-      <period>2026-07-31</period><accession-number>0002000324-26-004454</accession-number>
-      <filing-href>https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/0002000324-26-004454-index.htm</filing-href></entry>
-      <entry><filing-type>N-PORT</filing-type><accession-number>0000000000-00-000000</accession-number></entry></feed>`;
-    expect(parseEdgarAtomFilings(atom).map((filing) => filing.url)).toEqual(['https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/primary_doc.xml']);
-    expect(parseEdgarAtomFilings('<feed></feed>')).toEqual([]);
+    expect(parseSecFundTickers({ fields: ['symbol', 'cik', 'seriesId'], data: [['SPUS', '0', 'S000070027'], ['', '1742912', 'S000070027']] }).size).toBe(0);
+    const filing = parseNportFiling(NPORT_XML);
+    expect([filing.seriesId, filing.repPdDate, filing.netAssets, filing.regCik, filing.positions.length]).toEqual(['S000070027', '2026-07-31', 3283824025, '0001742912', 7]);
+    const rows = nportHoldingsSheet(filing, nportTickers(filing.positions, parseSecCompanyNames(COMPANY_NAMES)));
+    expect(Object.keys(rows[0])).toEqual(HOLDINGS_HEADERS);
+    expect(rows[0]).toEqual({ Name: 'NVIDIA CORP', Ticker: 'NVDA', Identifier: '67066G104', Weight: '40', 'Market Value': '1313535202.12', 'Shares Held': '2033474', 'Asset Category': 'EC' });
+    // heaviest first; Apple by its SEC issuer name; TSMC (TWD, TW ISIN) keeps its ISIN and no "2330"; the fund and the T-bill keep no
+    // ticker (no "T" for AT&T); cash has an empty weight and balance, never 0; the future keeps its own id, not SPY's
+    expect(rows.slice(1).map((row) => [row.Name, row.Ticker, row.Identifier, row.Weight, row['Shares Held']])).toEqual([
+      ['APPLE INC', 'AAPL', '037833100', '30', '1226303'],
+      ['TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD', '—', 'TW0002330008', '20', '500'],
+      ['SP Funds S&P Global REIT Sharia ETF', '—', '886364108', '5', '865000'],
+      ['US TREASURY BILL 0% 09/17/2026', '—', '912797XX1', '4', '39400000'],
+      ['S&P 500 E-MINI DEC26', '—', 'BBG01VKPGXL9', '0.005', ''],
+      ['Cash & Other', '—', 'CASH', '', ''],
+    ]);
+    expect(rows[6]['Market Value']).toBe('-3940000');
+  });
+
+  test('N-PORT freshness: a report replaces published holdings only when strictly newer; nothing published accepts any report', () => {
+    expect(nportIsFresh('2026-07-31', '2026-10-23', 218)).toBe(false); // the daily issuer CSV sheet is newer than the quarterly report
+    expect(nportIsFresh('2026-07-31', '2026-07-31', 218)).toBe(false);
+    expect(nportIsFresh('2026-07-31', '2026-04-30', 218)).toBe(true);
+    expect(nportIsFresh('', '2026-04-30', 218)).toBe(false);
+    expect(nportIsFresh('2026-07-31', null, 0)).toBe(true);
+    expect(nportIsFresh('2026-07-31', null, 218)).toBe(false); // published rows without a date cannot be compared: keep them
   });
 
   test('holdings guard: header-only, renamed weight column, broken weights, a bad weight sum and a halved sheet are rejected', () => {
@@ -709,33 +739,6 @@ describe('parsing 3', () => {
     expect(holdingsGuard(headers, allocation, 2)).toContain('outside 50..150');
     expect(holdingsGuard(headers, allocation, 2, ['sum'])).toBeNull();
     expect(holdingsGuard(headers, rows, 5)).toContain('less than half');
-  });
-
-  test('N-PORT reader keeps identifiers, weights, values and balances; a filing only matches its own series and registrant', () => {
-    const parsed = parseNport(NPORT_XML);
-    expect(parsed.seriesId).toBe('S000070027');
-    expect(parsed.repPdDate).toBe('2026-07-31');
-    expect(parsed.netAssets).toBe(3283824025);
-    expect(parsed.holdings.length).toBe(5);
-    expect(parsed.holdings[0]).toEqual({
-      Name: 'NVIDIA CORP', Ticker: '—', Identifier: '67066G104', Weight: '14.14',
-      'Market Value': '464404792.12', 'Shares Held': '2033474', 'Asset Category': 'EC',
-    });
-    expect(parsed.holdings[3].Weight).toBe('-0.12');
-    const map = parseFundTickerMap(SERIES_PAYLOAD);
-    const ref = map.get('SPUS')!;
-    expect(matchesNportFund(parsed, 'SPUS', null, ref, TIDAL_TRUST.cik)).toBe(true);
-    expect(matchesNportFund(parsed, 'SPRE', null, map.get('SPRE')!, TIDAL_TRUST.cik)).toBe(false);
-    expect(matchesNportFund(parsed, 'SPUS', null, { ...ref, cik: '0000000001' }, TIDAL_TRUST.cik)).toBe(false);
-    expect(matchesNportFund(parsed, 'SPUS', 'SP Funds S&P 500 Sharia Industry Exclusions ETF', null, TIDAL_TRUST.cik)).toBe(true);
-    expect(matchesNportFund(parsed, 'SPUS', 'SP Funds Dow Jones Global Sukuk ETF', null, TIDAL_TRUST.cik)).toBe(false);
-    const names = parseCompanyTickerMap({ '0': { cik_str: 320193, ticker: 'AAPL', title: 'Apple Inc.' } });
-    const rows: SheetRow[] = [
-      { 'Name': 'Apple Inc', 'Ticker': '—', 'Identifier': '037833100', 'Weight': '1%', 'Market Value': '', 'Shares Held': '', 'Asset Category': 'EC' },
-      { 'Name': 'US Treasury Bill', 'Ticker': '—', 'Identifier': '912797XX1', 'Weight': '1%', 'Market Value': '', 'Shares Held': '', 'Asset Category': 'DBT' },
-    ];
-    const filled = fillNportTickers(rows, names);
-    expect([filled[0]['Ticker'], filled[1]['Ticker']]).toEqual(['AAPL', '—']);
   });
 });
 
@@ -795,11 +798,18 @@ describe('metrics', () => {
 describe('metrics 2', () => {
   const official = { asOfDate: '2026-09-30', ytd: 17.13, yr1: 21.21, yr3: 25.32, yr5: 16.37, yr10: null, sinceInception: 18.57 };
 
-  test('tenorAvailable compares inception + N years with the table date', () => {
-    expect(tenorAvailable('2023-11-30', '2026-08-31', 3)).toBe(false);
-    expect(tenorAvailable('2023-11-30', '2026-11-30', 3)).toBe(true);
-    expect(tenorAvailable('2019-12-17', '2026-09-30', 10)).toBe(false);
-    expect(tenorAvailable(null, '2026-09-30', 10)).toBe(true);
+  test('a fund younger than one year publishes no 1y, 3y or since-inception return, also when the page lost its fact table', async () => {
+    const young = fundPageHtml('SPWO').replace('<td>11/30/2023</td>', '<td>01/15/2026</td>');
+    const apiRoot = await tempApiRoot();
+    const pick = (meta: JsonRecord): unknown[] => ['ytd', 'tr1y', 'tr3y', 'cagr3y', 'siAnn', 'performanceAsOf'].map((key) => (meta['metrics'] as JsonRecord)[key]);
+    await updateFund(fundFor('SPWO'), offlineConfig(), apiRoot, quietTransport(sampleFetcher({ spwo: young }).fetcher), null, NOW);
+    const meta = await readMeta(apiRoot, 'SPWO');
+    expect(pick(meta)).toEqual([3.3, null, null, null, null, '2026-09-30']);
+    expect((meta['returns'] as JsonRecord)['monthEnd']).toMatchObject({ ytd: 3.3, yr1: null, yr3: null, sinceInception: null });
+    // no fact table on the next page: the inception is the published one and still decides (calendar anniversary, inclusive)
+    const noFacts = stripTables(stripTables(young, 'Fund Inception'), 'Net Assets');
+    await updateFund(fundFor('SPWO'), offlineConfig(), apiRoot, quietTransport(sampleFetcher({ spwo: noFacts }).fetcher), null, day(1));
+    expect(pick(await readMeta(apiRoot, 'SPWO'))).toEqual([3.3, null, null, null, null, '2026-09-30']);
   });
 
   test('a fund younger than three years publishes null, not 0, for 3-year total return and CAGR', async () => {
@@ -973,7 +983,7 @@ describe('pipeline', () => {
     expect(await readCursor(apiRoot)).toBe('SPSK');
     expect((await runUpdater(offlineConfig(), { apiRoot, fetcher, now: day(0.5) })).funds).toBe(5);
     expect(await readCursor(apiRoot)).toBeNull();
-    const catalog = buildCatalog(HOME_HTML, []);
+    const catalog = buildCatalog(HOME_HTML);
     expect(batchSelection(catalog, 2, 'SPTE').map((fund) => fund.ticker)).toEqual(['SPUS', 'SPWO']);
     expect(batchSelection(catalog, 3, null).map((fund) => fund.ticker)).toEqual(['SPRE', 'SPSK', 'SPTE']);
     batchSelection(catalog, 2, 'SPTE').splice(0);
@@ -1066,7 +1076,7 @@ describe('pipeline 2', () => {
     const renamed = holdingsCsv('SPSK').replace('Weightings', 'Weighting (%)'); // the guard would reject these holdings
     // the live lineup no longer lists SPSK
     const home = HOME_HTML.replace(/<li><a href="[^"]*\/spsk\/">[^\n]*<\/li>/, '');
-    expect(buildCatalog(home, []).map((fund) => fund.ticker)).toEqual(['SPRE', 'SPTE', 'SPUS', 'SPWO']);
+    expect(buildCatalog(home).map((fund) => fund.ticker)).toEqual(['SPRE', 'SPTE', 'SPUS', 'SPWO']);
     CLOSED_FUNDS.push(entry);
     try {
       const one = sampleFetcher({ 'csv-SPSK': renamed, home });
@@ -1152,18 +1162,31 @@ describe('pipeline 3', () => {
     expect(((await readMeta(apiRoot, 'SPUS'))['metrics'] as JsonRecord)['secYield']).toBeNull();
   });
 
-  test('an older N-PORT-P filing never replaces fresher published holdings (freshness), a newer one does', async () => {
+  test('EDGAR fallback: the fund own series filing rebuilds a fund with nothing published; a not newer report or another series never replaces holdings', async () => {
+    const notes: string[] = [];
+    const noCsv = failing(sampleFetcher({ atom: NPORT_ATOM, nport: NPORT_XML }).fetcher, 'TidalFG');
+    const edgar = () => createEdgarFallback(offlineConfig(), quietTransport(noCsv), (line) => { notes.push(line); });
+    // SPUS published from the 2026-10-01 issuer CSV: the 2026-07-31 report is not newer, the fund stays exactly as published
     const apiRoot = await publishedSpus();
-    const { fetcher } = sampleFetcher();
-    const rows = ['40', '30', '30'].map((Weight, index) => ({ Name: `Old ${index}`, Ticker: `OLD${index}`, Identifier: String(index), Weight, 'Market Value': '1', 'Shares Held': '1', 'Asset Category': 'Equity' }));
-    const noCsv = quietTransport(failing(fetcher, 'TidalFG'));
-    const stale = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, noCsv, async () => ({ rows, asOfDate: '2026-07-31', source: 's' }), day(1));
-    expect(stale.providers.edgar).toBe(false);
-    expect(stale.failedSources).toContain('holdings');
-    expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 6, asOfDate: '2026-10-01' });
-    const fresh = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, noCsv, async () => ({ rows, asOfDate: '2026-10-02', source: 's' }), day(2));
-    expect(fresh.providers.edgar).toBe(true);
-    expect((await readMeta(apiRoot, 'SPUS'))['holdings']).toMatchObject({ totalRows: 3, asOfDate: '2026-10-02' });
+    const before = await snapshot(apiRoot);
+    const stale = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(noCsv), edgar(), day(1));
+    expect([stale.providers.edgar, stale.failedSources]).toEqual([false, ['holdings']]);
+    expect(await snapshot(apiRoot)).toEqual(before);
+    expect(notes).toContain('[ nport    ] SPUS: N-PORT 2026-07-31 is not newer than the published holdings (2026-10-01)');
+    // nothing published: the report of the fund own series rebuilds the holdings
+    const fresh = await tempApiRoot();
+    const rebuilt = await updateFund(fundFor('SPUS'), offlineConfig(), fresh, quietTransport(noCsv), edgar(), day(1));
+    expect(rebuilt.providers.edgar).toBe(true);
+    const meta = await readMeta(fresh, 'SPUS');
+    expect(meta['holdings']).toMatchObject({ totalRows: 7, asOfDate: '2026-07-31' });
+    expect((meta['source'] as JsonRecord)['holdingsSource']).toBe('Tidal Trust I Form N-PORT-P (EDGAR accession 0002000324-26-004454, report period 2026-07-31)');
+    const page = JSON.parse(await readFile(new URL('funds/SPUS/holdings/001.json', fresh), 'utf8'));
+    expect(page['rows'].map((row: SheetRow) => row['Ticker'])).toEqual(['NVDA', 'AAPL', '—', '—', '—', '—', '—']);
+    // SPRE gets no rows from the SPUS series filing
+    notes.length = 0;
+    const other = await updateFund(fundFor('SPRE'), offlineConfig(), await tempApiRoot(), quietTransport(noCsv), edgar(), day(1));
+    expect(other.providers.edgar).toBe(false);
+    expect(notes).toContain('[ nport    ] SPRE: no N-PORT-P filing of its own: 0002000324-26-004454 names series S000070027, not S000070034');
   });
 
   test('a row without a published meta.json has dataFile null; a soft deadline leaves unprocessed funds as such rows', async () => {
@@ -1183,34 +1206,91 @@ describe('pipeline 3', () => {
 });
 
 describe('pipeline 4', () => {
-  test('a shorter HISTORY_RANGE refreshes its window and keeps the older published rows', async () => {
-    const apiRoot = await publishedSpus();
-    const windowed = sampleFetcher({ 'yahoo-SPUS': yahooWindow(10, 1_788_000_000 + 20 * 86_400) });
-    await updateFund(fundFor('SPUS'), offlineConfig({ HISTORY_RANGE: '1y' }), apiRoot, quietTransport(windowed.fetcher), null, day(1));
-    expect(((await readMeta(apiRoot, 'SPUS'))['history'] as JsonRecord)['totalRows']).toBe(30);
-    const page = JSON.parse(await readFile(new URL('funds/SPUS/history/001.json', apiRoot), 'utf8'));
-    expect(page['rows'][0]['Date']).toBe('Aug 29 2026');
-    expect(page['rows'][29]['Close']).toBe('60');
-    expect(page['rows'][5]['Close']).toBe('59.05');
-    expect(mergeHistoryDays([], [{ date: '2026-01-01', close: 1, adjClose: 1, volume: 1 }]).length).toBe(1);
+  test('a HISTORY_RANGE run after a full run keeps the older history and writes nothing; a re-adjusted window rescales it, one that does not join keeps the fund (Q25)', async () => {
+    const apiRoot = await tempApiRoot();
+    await runUpdater(offlineConfig({ TICKERS: 'SPUS' }), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+    const first = await snapshot(apiRoot);
+    const windowed = offlineConfig({ TICKERS: 'SPUS', HISTORY_RANGE: '1y' });
+    const second = await runUpdater(windowed, { apiRoot, fetcher: sampleFetcher({ 'yahoo-SPUS': yahooWindow('SPUS', 5) }).fetcher, now: day(0.5) });
+    expect(second.written).toBe(0);
+    expect(await snapshot(apiRoot)).toEqual(first);
+    // a distribution re-adjusted the whole Yahoo series by 0.98: the older published days are rescaled by the overlap, never left behind
+    await runUpdater(windowed, { apiRoot, fetcher: sampleFetcher({ 'yahoo-SPUS': yahooWindow('SPUS', 10, 0.98) }).fetcher, now: day(1) });
+    const history = JSON.parse(await readFile(new URL('funds/SPUS/history/001.json', apiRoot), 'utf8'));
+    expect(history['totalRows']).toBe(30);
+    expect([history['rows'][0]['Adj Close'], history['rows'][29]['Adj Close']]).toEqual(['56.96', '57.25']);
+    // a window that does not overlap the published days cannot be joined: the fund stays as published
+    const gap = JSON.parse(yahooWindow('SPUS', 10));
+    gap.chart.result[0].timestamp = gap.chart.result[0].timestamp.map((epoch: number) => epoch + 100 * 86_400);
+    const before = await snapshot(apiRoot);
+    const kept = await runUpdater(windowed, { apiRoot, fetcher: sampleFetcher({ 'yahoo-SPUS': JSON.stringify(gap) }).fetcher, now: day(2) });
+    expect(kept.degraded).toEqual(['SPUS']);
+    expect(await snapshot(apiRoot)).toEqual(before);
   });
 
-  test('tickers missing from the previous index are reported as new funds', async () => {
+  test('a relaxed guard still keeps numeric published weights from an all-blank weight sheet (Q24)', async () => {
     const apiRoot = await tempApiRoot();
-    const { fetcher } = sampleFetcher();
-    await runUpdater(offlineConfig(), { apiRoot, fetcher, now: NOW });
-    const index = await readIndex(apiRoot);
-    index['funds'] = (index['funds'] as JsonRecord[]).filter((fund) => fund['ticker'] !== 'SPWO' && fund['ticker'] !== 'SPSK');
-    await writeFile(new URL('index.json', apiRoot), JSON.stringify(index));
+    const config = offlineConfig({ TICKERS: 'SPUS' });
+    await runUpdater(config, { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+    const first = await snapshot(apiRoot);
+    const blank = holdingsCsv('SPUS', SAMPLES['SPUS'].csv.map((row) => [...row.slice(0, 6), '-']));
+    HOLDINGS_GUARD_RELAX['SPUS'] = ['numeric', 'sum'];
     const log = spyOn(console, 'log').mockImplementation(() => {});
     try {
-      const summary = await runUpdater(offlineConfig(), { apiRoot, fetcher, now: day(1) });
-      expect(summary.newFunds).toEqual(['SPSK', 'SPWO']);
+      const second = await runUpdater(config, { apiRoot, fetcher: sampleFetcher({ 'csv-SPUS': blank }).fetcher, now: day(1) });
+      expect(second.failures).toEqual(['SPUS']);
+    } finally {
+      delete HOLDINGS_GUARD_RELAX['SPUS'];
+      log.mockRestore();
+    }
+    expect(await snapshot(apiRoot)).toEqual(first);
+    expect(holdingsWeightCount(HOLDINGS_HEADERS, [{ Weight: '-' }, { Weight: '2' }])).toBe(1);
+  });
+
+  test('TICKERS outside the live lineup and the published feed stops the run before any fund request; a stale catalog-only row is dropped (Q27)', async () => {
+    const apiRoot = await tempApiRoot();
+    await runUpdater(offlineConfig({ TICKERS: 'SPUS' }), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+    const index = await readIndex(apiRoot);
+    index['funds'] = [...(index['funds'] as JsonRecord[]), placeholderEntry('NOPE', null)]; // an earlier mistyped TICKERS entry
+    await writeFile(new URL('index.json', apiRoot), JSON.stringify(index));
+    const before = await snapshot(apiRoot);
+    const { fetcher, seen } = sampleFetcher();
+    await expect(runUpdater(offlineConfig({ TICKERS: 'NOPE' }), { apiRoot, fetcher, now: day(1) }))
+      .rejects.toThrow('TICKERS: NOPE not in the SP Funds lineup or published feed; nothing was fetched or written');
+    expect(seen).toEqual([`${SPFUNDS}/`]);
+    expect(await snapshot(apiRoot)).toEqual(before);
+    await runUpdater(offlineConfig({ TICKERS: 'SPUS' }), { apiRoot, fetcher, now: day(1) });
+    expect(tickersOf(await readIndex(apiRoot))).toEqual(TICKERS);
+  });
+
+  test('NEW FUNDS announces a fund on its first successful publish, a failed new fund as not published yet (Q28)', async () => {
+    const apiRoot = await tempApiRoot();
+    await runUpdater(offlineConfig({ TICKERS: 'SPUS' }), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+    const index = await readIndex(apiRoot);
+    index['funds'] = (index['funds'] as JsonRecord[]).filter((fund) => fund['ticker'] !== 'SPSK'); // SPSK is new in the lineup
+    await writeFile(new URL('index.json', apiRoot), JSON.stringify(index));
+    const down = (fetcher: typeof fetch): typeof fetch => ((url: string, init?: RequestInit) => (/spsk/i.test(url) ? Promise.resolve(new Response('no', { status: 404 })) : fetcher(url, init))) as typeof fetch;
+    const summaryFile = new URL('../summary.md', apiRoot).pathname;
+    process.env['GITHUB_STEP_SUMMARY'] = summaryFile;
+    const lines: string[] = [];
+    const log = spyOn(console, 'log').mockImplementation((line: unknown) => { if (/^NEW FUNDS/.test(String(line))) lines.push(String(line)); });
+    try {
+      const run = await runUpdater(offlineConfig(), { apiRoot, fetcher: down(sampleFetcher().fetcher), now: day(1) });
+      expect([run.failures, run.newFunds]).toEqual([['SPSK'], ['SPRE', 'SPTE', 'SPWO']]);
+      expect(lines).toEqual(['NEW FUNDS: SPRE, SPTE, SPWO', 'NEW FUNDS (not published yet): SPSK']);
+      expect(readFileSync(summaryFile, 'utf8')).toContain('### NEW FUNDS\n\nNEW FUNDS: SPRE, SPTE, SPWO\nNEW FUNDS (not published yet): SPSK\n');
+      lines.length = 0;
+      await runUpdater(offlineConfig(), { apiRoot, fetcher: down(sampleFetcher().fetcher), now: day(2) });
+      expect(lines).toEqual([]);
+      await runUpdater(offlineConfig(), { apiRoot, fetcher: sampleFetcher().fetcher, now: day(3) });
+      expect(lines).toEqual(['NEW FUNDS: SPSK']);
     } finally {
       log.mockRestore();
     }
   });
+});
 
+describe('pipeline 5', () => {
   test('published shapes: history oldest-first with month-name dates, second-precision stamps, plain numbers', async () => {
     const rows = historyRowsFromDays([
       { date: '2026-09-30', close: 2, adjClose: 2, volume: 1 }, { date: '2026-09-02', close: 1, adjClose: 1, volume: 1 },
@@ -1264,7 +1344,7 @@ describe('pipeline 4', () => {
   });
 
   test('the catalog index carries the provider, trust and per-fund provenance', () => {
-    const index = buildCatalogIndex('SP Funds', buildCatalog(HOME_HTML, []), HOLDINGS_TOTAL, HISTORY_TOTAL, '2026-10-01T00:00:00.000Z');
+    const index = buildCatalogIndex('SP Funds', buildCatalog(HOME_HTML), HOLDINGS_TOTAL, HISTORY_TOTAL, '2026-10-01T00:00:00.000Z');
     expect(index['counts']).toEqual({ funds: 5, holdings: HOLDINGS_TOTAL, history: HISTORY_TOTAL });
     expect((index['source'] as JsonRecord)['trustCik']).toBe('0001742912');
     expect((index['source'] as JsonRecord)['nportTrustCik']).toContain('0001989916');
@@ -1272,13 +1352,12 @@ describe('pipeline 4', () => {
   });
 });
 
-describe('pipeline 5', () => {
+describe('pipeline 6', () => {
   test('a new fund that no source answered is failed with a catalog-only row and no files; that row is never read back as published data', async () => {
-    // SPWO is new and its page is a block page answered with HTTP 200; SPXX is a requested ticker the lineup does not list.
-    // Neither has a holdings CSV, an N-PORT-P filing or a Yahoo chart
+    // SPWO is new and its page is a block page answered with HTTP 200; it has no holdings CSV, N-PORT-P filing or Yahoo chart
     const silent = (fetcher: typeof fetch): typeof fetch => ((url: string, init?: RequestInit) => {
       if (url.endsWith('.com/spwo/')) return Promise.resolve(new Response('<html><body>Access denied</body></html>'));
-      return /spwo|spxx/i.test(url) ? Promise.resolve(new Response('no', { status: 404 })) : fetcher(url, init);
+      return /spwo/i.test(url) ? Promise.resolve(new Response('no', { status: 404 })) : fetcher(url, init);
     }) as typeof fetch;
     const rowOf = async (root: URL, ticker: string): Promise<JsonRecord> => ((await readIndex(root))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === ticker)!;
     const fresh = await tempApiRoot();
@@ -1287,11 +1366,11 @@ describe('pipeline 5', () => {
     try {
       await runUpdater(offlineConfig({ TICKERS: 'SPWO' }), { apiRoot: fresh, fetcher: sampleFetcher().fetcher, now: NOW });
       await runUpdater(offlineConfig({ TICKERS: 'SPUS' }), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
-      const silentRuns: Array<Record<string, string>> = [{ TICKERS: 'SPWO SPXX' }, { TICKERS: 'SPWO', SKIP_SPFUNDS: 'true', SKIP_YAHOO: 'true' }];
+      const silentRuns: Array<Record<string, string>> = [{ TICKERS: 'SPWO' }, { TICKERS: 'SPWO', SKIP_SPFUNDS: 'true', SKIP_YAHOO: 'true' }];
       for (const overrides of silentRuns) {
         const summary = await runUpdater(offlineConfig(overrides), { apiRoot, fetcher: silent(sampleFetcher().fetcher), now: day(1) });
         expect(summary.failures).toEqual(overrides.TICKERS.split(' ')); // never reported updated with an empty meta.json
-        expect((await listFiles(apiRoot)).filter((file) => /^funds\/SP(WO|XX)\//.test(file))).toEqual([]);
+        expect((await listFiles(apiRoot)).filter((file) => /^funds\/SPWO\//.test(file))).toEqual([]);
         for (const ticker of overrides.TICKERS.split(' ')) {
           const row = await rowOf(apiRoot, ticker);
           expect(row).toMatchObject({ dataFile: null, holdings: 0, history: 0 });
@@ -1411,28 +1490,28 @@ describe('network 2', () => {
     expect(start(chart[0])).toBe(Math.floor(seconds - 5 * 365.25 * 86_400));
   });
 
-  test('the EDGAR fallback walks the series feed, rejects other series and reports the filing URL', async () => {
+  test('the EDGAR fallback reads the series feed through the shared reader, refuses another series and reports the filing URL', async () => {
     const calls: string[] = [];
-    const atom = '<feed><entry><filing-type>NPORT-P</filing-type><accession-number>0002000324-26-004454</accession-number><filing-href>https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/x-index.htm</filing-href></entry></feed>';
+    const notes: string[] = [];
     const transport: Transport = async (url) => {
       calls.push(url);
-      if (url.includes('browse-edgar')) return new Response(atom, { status: 200 });
+      if (url.includes('browse-edgar')) return new Response(NPORT_ATOM, { status: 200 });
       if (url.includes('primary_doc.xml')) return new Response(NPORT_XML, { status: 200 });
-      if (url.includes('company_tickers')) return new Response(JSON.stringify(SERIES_PAYLOAD), { status: 200 });
+      if (url.includes('company_tickers_mf')) return new Response(JSON.stringify(SERIES_PAYLOAD), { status: 200 });
+      if (url.includes('company_tickers')) return new Response(JSON.stringify(COMPANY_NAMES), { status: 200 });
       return new Response(EDGAR_SUBMISSIONS, { status: 200 });
     };
-    const fallback = createEdgarFallback(readConfig({ SEC_UA: 'tests' }), transport, () => {});
-    const result = await fallback('SPUS', null);
-    expect(result!.asOfDate).toBe('2026-07-31');
-    expect(result!.rows.length).toBe(5);
-    expect(result!.source).toContain('000200032426004454');
+    const fallback = createEdgarFallback(readConfig({ SEC_UA: 'tests' }), transport, (line) => { notes.push(line); });
+    const result = await fallback('SPUS', null, { asOf: null, rows: 0 });
+    expect([result!.asOfDate, result!.rows.length, result!.accession]).toEqual(['2026-07-31', 7, '0002000324-26-004454']);
+    expect(result!.source).toBe('https://www.sec.gov/Archives/edgar/data/1742912/000200032426004454/primary_doc.xml');
     expect(Number(result!.rows[0]['Weight'])).toBeGreaterThan(Number(result!.rows[1]['Weight'])); // sorted by weight descending
     const cash = result!.rows.find((row) => row['Name'] === 'Cash & Other')!;
-    expect([cash['Market Value'], cash['Weight']]).toEqual(['-3940000', '-0.12']);
-    expect(calls.some((url) => url.includes('submissions'))).toBe(false);
-    calls.length = 0;
-    expect(await fallback('SPRE', null)).toBeNull(); // another series' filing is rejected, rows are never mixed
-    expect(calls.filter((url) => url.includes('primary_doc.xml')).length).toBe(1);
+    expect([cash['Market Value'], cash['Weight']]).toEqual(['-3940000', '']);
+    expect(calls.filter((url) => url.includes('company_tickers_mf')).length).toBe(1);
+    expect(await fallback('SPRE', null, { asOf: null, rows: 0 })).toBeNull(); // another series' filing is rejected, rows are never mixed
+    expect(calls.filter((url) => url.includes('company_tickers_mf')).length).toBe(1); // one SEC table load per run
+    expect(notes).toEqual(['[ nport    ] SPRE: no N-PORT-P filing of its own: 0002000324-26-004454 names series S000070027, not S000070034']);
   });
 
   test('the EDGAR fallback refuses a registrant outside the two verified trusts', async () => {
@@ -1442,6 +1521,6 @@ describe('network 2', () => {
       }
       throw new Error(`unexpected request ${url}`);
     };
-    expect(await createEdgarFallback(readConfig({ SEC_UA: 'tests' }), transport, () => {})('SPUS', null)).toBeNull();
+    expect(await createEdgarFallback(readConfig({ SEC_UA: 'tests' }), transport, () => {})('SPUS', null, { asOf: null, rows: 0 })).toBeNull();
   });
 });
