@@ -10,9 +10,9 @@ import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  CONTROL_NAMES, HISTORY_HEADERS, HOLDINGS_HEADERS, SEC_UA_DEFAULT, SPFUNDS_TRUST, TIDAL_TRUST, USAGE,
+  CLOSED_FUNDS, CONTROL_NAMES, HISTORY_HEADERS, HOLDINGS_HEADERS, SEC_UA_DEFAULT, SPFUNDS_TRUST, TIDAL_TRUST, USAGE,
   annualizedFromCumulative, batchSelection, buildCatalog, buildCatalogIndex, yahooHeaders, buildPages,
-  catalogIndexEntry, createEdgarFallback, createRequestGate, createTransport, cumulativeFromAnnualized, deriveMetrics,
+  catalogIndexEntry, closedFund, createEdgarFallback, createRequestGate, createTransport, cumulativeFromAnnualized, deriveMetrics,
   performanceAsOf, edgarSeriesFilingsUrl, errorMessage, fillNportTickers, formatAumDisplay, formatMoneyText,
   formatUsDate, fundFilterReasons, fundPageUrl, holdingsCsvUrl, holdingsGuard, inferDistributionFrequency, lookupPattern,
   matchesNportFund, matchesRange, mergeDividends, nameValueMap, normalizeWeightText, nportUrlFor, parseMoneyNumber,
@@ -438,6 +438,10 @@ describe('controls', () => {
     expect(filters.totalReturnRanges['3Y']).toBeUndefined();
     expect(filters.secYieldRange!.min).toBe(0.4);
   });
+});
+
+describe('controls 2', () => {
+  const file = JSON.parse(read('scripts/update-data.config.json'));
 
   test('filters AND together and report every failing dimension; a true zero is not missing data', () => {
     expect(matchesRange(0, { min: 0, max: 1 })).toBe(true);
@@ -577,7 +581,9 @@ describe('parsing', () => {
     expect(buildCatalog('<html>redesigned</html>', []).map((fund) => fund.ticker)).toEqual(TICKERS);
     expect(buildCatalog('<p>no cards</p>', ['SPUS']).map((fund) => fund.fundPage)).toEqual(['https://www.sp-funds.com/spus/']);
   });
+});
 
+describe('parsing 2', () => {
   test('SPUS fund page: identity, pricing, month-end NAV returns, benchmark, documents and distribution calendar', () => {
     const page = parseFundPage(fundPageHtml('SPUS'), 'SPUS');
     expect(page.name).toBe('SP Funds S&P 500 Sharia Industry Exclusions ETF');
@@ -647,7 +653,9 @@ describe('parsing', () => {
     const truncated = holdingsCsv('SPUS').split('\n').slice(0, 4).join('\n');
     expect(parseSpFundsHoldingsCsv(truncated).rows.length).toBe(3);
   });
+});
 
+describe('parsing 3', () => {
   test('Yahoo chart: newest first, cents-rounded closes, first trade date; an empty result fails; official dates win in dividends', () => {
     const chart = parseYahooChart(JSON.parse(yahooJson('SPUS')));
     expect(chart.days.length).toBe(30);
@@ -782,6 +790,10 @@ describe('metrics', () => {
     expect(inferDistributionFrequency([], asOf)).toBeNull();
     expect(inferDistributionFrequency(['2020-01-01', '2020-02-01', '2020-03-01'], asOf)).toBeNull();
   });
+});
+
+describe('metrics 2', () => {
+  const official = { asOfDate: '2026-09-30', ytd: 17.13, yr1: 21.21, yr3: 25.32, yr5: 16.37, yr10: null, sinceInception: 18.57 };
 
   test('tenorAvailable compares inception + N years with the table date', () => {
     expect(tenorAvailable('2023-11-30', '2026-08-31', 3)).toBe(false);
@@ -967,7 +979,9 @@ describe('pipeline', () => {
     batchSelection(catalog, 2, 'SPTE').splice(0);
     expect(catalog.length).toBe(5); // the batch never mutates the catalog
   });
+});
 
+describe('pipeline 2', () => {
   test('a filter run skips out-of-range funds but keeps their published entries', async () => {
     const apiRoot = await tempApiRoot();
     const { fetcher } = sampleFetcher();
@@ -1001,7 +1015,7 @@ describe('pipeline', () => {
     expect(await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8')).toBe(metaBefore);
   });
 
-  test('a fresh holdings CSV that fails the holdings guard keeps the fund exactly as published and reports it', async () => {
+  test('holdings that fail the guard fail the fund: a published fund stays exactly as published, a new fund gets a catalog-only row', async () => {
     const apiRoot = await tempApiRoot();
     const config = offlineConfig({ TICKERS: 'SPUS' });
     await runUpdater(config, { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
@@ -1009,12 +1023,71 @@ describe('pipeline', () => {
     const read = async () => Promise.all(tree.map((file) => readFile(new URL(file, apiRoot), 'utf8')));
     const first = await read();
     // the issuer renamed its weight column: every position parses without a weight
-    const renamed = holdingsCsv('SPUS').replace('Weightings', 'Weighting (%)');
-    const second = await runUpdater(config, { apiRoot, fetcher: sampleFetcher({ 'csv-SPUS': renamed }).fetcher, now: day(1) });
-    expect(second.degraded).toEqual(['SPUS']); // kept as published because a source failed; main exits 1 when every fund is degraded
+    const renamed = (ticker: string): string => holdingsCsv(ticker).replace('Weightings', 'Weighting (%)');
+    const lines: string[] = [];
+    const log = spyOn(console, 'log').mockImplementation((line: unknown) => { lines.push(String(line)); });
+    let second;
+    try {
+      second = await runUpdater(config, { apiRoot, fetcher: sampleFetcher({ 'csv-SPUS': renamed('SPUS') }).fetcher, now: day(1) });
+    } finally {
+      log.mockRestore();
+    }
+    expect(second.failures).toEqual(['SPUS']); // a failure, so main exits 1 like for any other failed fund
+    expect(second.degraded).toEqual([]);
+    expect(lines.filter((line) => /\] SPUS +failed .*holdings guard/.test(line))).toHaveLength(1);
+    expect(lines.filter((line) => /^\[ done +\] 1 fund: .*\b1 failed\b/.test(line))).toHaveLength(1);
     expect(second.written).toBe(0);
     expect(await listFiles(apiRoot)).toEqual(tree);
     expect(await read()).toEqual(first);
+
+    const fresh = await tempApiRoot();
+    const newFund = await runUpdater(offlineConfig({ TICKERS: 'SPRE SPWO' }), { apiRoot: fresh, fetcher: sampleFetcher({ 'csv-SPWO': renamed('SPWO') }).fetcher, now: NOW });
+    expect(newFund.failures).toEqual(['SPWO']);
+    expect((await listFiles(fresh)).filter((file) => file.startsWith('funds/SPWO/'))).toEqual([]);
+    const row = ((await readIndex(fresh))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === 'SPWO')!;
+    expect(row).toMatchObject({ dataFile: null, holdings: 0 });
+    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual(Object.keys(emptyMetrics()).sort());
+    expect(String((row['metrics'] as JsonRecord)['returnsBasis'])).not.toBe('');
+  });
+
+  test('a closed fund is never fetched or reported failed: its files stay as published, its index row says closed, a rerun writes nothing', async () => {
+    const entry = { ticker: 'SPSK', closed: '2026-10-01', source: 'https://www.sec.gov/Archives/edgar/data/1/notice.htm' };
+    expect(() => closedFund([{ ...entry, closed: 'soon' }], 'SPSK')).toThrow('CLOSED_FUNDS');
+    expect(closedFund([entry], 'spsk')).toEqual(entry);
+    const apiRoot = await tempApiRoot();
+    await runUpdater(offlineConfig(), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
+    const snapshot = async (): Promise<Record<string, string>> => {
+      const files: Record<string, string> = {};
+      for (const file of await listFiles(apiRoot)) files[file] = await readFile(new URL(file, apiRoot), 'utf8');
+      return files;
+    };
+    const first = await snapshot();
+    const firstRow = ((await readIndex(apiRoot))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === 'SPSK')!;
+    const renamed = holdingsCsv('SPSK').replace('Weightings', 'Weighting (%)'); // the guard would reject these holdings
+    // the live lineup no longer lists SPSK
+    const home = HOME_HTML.replace(/<li><a href="[^"]*\/spsk\/">[^\n]*<\/li>/, '');
+    expect(buildCatalog(home, []).map((fund) => fund.ticker)).toEqual(['SPRE', 'SPTE', 'SPUS', 'SPWO']);
+    CLOSED_FUNDS.push(entry);
+    try {
+      const one = sampleFetcher({ 'csv-SPSK': renamed, home });
+      const summary = await runUpdater(offlineConfig({ TICKERS: 'SPSK' }), { apiRoot, fetcher: one.fetcher, now: day(1) });
+      expect(one.seen.filter((url) => /spsk/i.test(url))).toEqual([]);
+      expect([summary.funds, summary.failures, summary.degraded]).toEqual([0, [], []]);
+      const closed = await snapshot();
+      expect(Object.keys(closed)).toEqual(Object.keys(first));
+      for (const path of Object.keys(first)) if (path !== 'index.json') expect([path, closed[path]]).toEqual([path, first[path]]);
+      const rows = (await readIndex(apiRoot))['funds'] as JsonRecord[];
+      expect(rows.map((row) => row['ticker'])).toEqual(TICKERS);
+      expect(rows.find((row) => row['ticker'] === 'SPSK')).toMatchObject({ status: 'closed', closedDate: '2026-10-01', closedSource: entry.source, dataFile: firstRow['dataFile'] });
+      expect(rows.filter((row) => row['status'] === 'closed')).toHaveLength(1);
+      const all = sampleFetcher({ 'csv-SPSK': renamed, home });
+      const rerun = await runUpdater(offlineConfig({ TICKERS: '' }), { apiRoot, fetcher: all.fetcher, now: day(1.5) });
+      expect(all.seen.filter((url) => /spsk/i.test(url))).toEqual([]);
+      expect([rerun.funds, rerun.failures, rerun.written]).toEqual([4, [], 0]);
+      expect(await snapshot()).toEqual(closed);
+    } finally {
+      CLOSED_FUNDS.splice(CLOSED_FUNDS.indexOf(entry), 1);
+    }
   });
 
   test('a failed Yahoo request keeps the whole published fund, never a new return next to old history', async () => {
@@ -1027,7 +1100,9 @@ describe('pipeline', () => {
     expect(outcome.written).toBe(false);
     expect(await readFile(new URL('funds/SPUS/meta.json', apiRoot), 'utf8')).toBe(before);
   });
+});
 
+describe('pipeline 3', () => {
   test('on a first run a failing Yahoo request does not stop the other funds', async () => {
     const apiRoot = await tempApiRoot();
     const { fetcher } = sampleFetcher();
@@ -1105,7 +1180,9 @@ describe('pipeline', () => {
     expect(funds.filter((fund) => fund['dataFile'] === null).every((fund) => (fund['metrics'] as JsonRecord)['tr1y'] === null)).toBe(true);
     expect((await listFiles(apiRoot)).some((file) => file.includes('.tmp-'))).toBe(false);
   });
+});
 
+describe('pipeline 4', () => {
   test('a shorter HISTORY_RANGE refreshes its window and keeps the older published rows', async () => {
     const apiRoot = await publishedSpus();
     const windowed = sampleFetcher({ 'yahoo-SPUS': yahooWindow(10, 1_788_000_000 + 20 * 86_400) });
@@ -1266,7 +1343,9 @@ describe('network', () => {
     expect(secHeaders(readConfig({}))['User-Agent']).toBe('daggerok ETF feed daggerok@gmail.com');
     expect(yahooHeaders()['User-Agent']).toContain('Mozilla');
   });
+});
 
+describe('network 2', () => {
   test('CONCURRENCY=1 keeps one request in flight, CONCURRENCY=N overlaps up to N (one worker per fund at most)', async () => {
     const peak = async (concurrency: string): Promise<number> => {
       const run = sampleFetcher({}, 20);
