@@ -15,29 +15,29 @@
   ],
   "rows": [
     {
-      "Name": "Apple Inc",
-      "Ticker": "AAPL",
-      "Identifier": "037833100",
-      "Weight": "12.33",
-      "Market Value": "30916016.26",
-      "Shares Held": "88783",
-      "Asset Category": "Equity"
-    },
-    {
       "Name": "Taiwan Semiconductor Manufacturing Co Ltd",
       "Ticker": "TSM",
       "Identifier": "874039100",
-      "Weight": "11.53",
-      "Market Value": "28896250.95",
+      "Weight": "11.76",
+      "Market Value": "30799542.27",
       "Shares Held": "70077",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Apple Inc",
+      "Ticker": "AAPL",
+      "Identifier": "037833100",
+      "Weight": "11.39",
+      "Market Value": "29838598.89",
+      "Shares Held": "86783",
       "Asset Category": "Equity"
     },
     {
       "Name": "NVIDIA Corp",
       "Ticker": "NVDA",
       "Identifier": "67066G104",
-      "Weight": "11.26",
-      "Market Value": "28211409.61",
+      "Weight": "10.93",
+      "Market Value": "28632832.58",
       "Shares Held": "132941",
       "Asset Category": "Equity"
     },
@@ -45,8 +45,8 @@
       "Name": "Microsoft Corp",
       "Ticker": "MSFT",
       "Identifier": "594918104",
-      "Weight": "9.39",
-      "Market Value": "23538746.84",
+      "Weight": "9.16",
+      "Market Value": "23987314.73",
       "Shares Held": "45173",
       "Asset Category": "Equity"
     },
@@ -55,7 +55,7 @@
       "Ticker": "ASML NA",
       "Identifier": "B929F46",
       "Weight": "5.59",
-      "Market Value": "14017012.07",
+      "Market Value": "14632000.09",
       "Shares Held": "8818",
       "Asset Category": "Equity"
     },
@@ -63,8 +63,8 @@
       "Name": "Broadcom Inc",
       "Ticker": "AVGO",
       "Identifier": "11135F101",
-      "Weight": "3.98",
-      "Market Value": "9973570.2",
+      "Weight": "4.14",
+      "Market Value": "10855097.55",
       "Shares Held": "30855",
       "Asset Category": "Equity"
     },
@@ -72,8 +72,8 @@
       "Name": "MediaTek Inc",
       "Ticker": "2454 TT",
       "Identifier": "6372480",
-      "Weight": "3.85",
-      "Market Value": "9637942.91",
+      "Weight": "3.91",
+      "Market Value": "10238371.11",
       "Shares Held": "78387",
       "Asset Category": "Equity"
     },
@@ -81,89 +81,98 @@
       "Name": "Micron Technology Inc",
       "Ticker": "MU",
       "Identifier": "595112103",
-      "Weight": "2.5",
-      "Market Value": "6273789.25",
+      "Weight": "2.75",
+      "Market Value": "7202159.75",
       "Shares Held": "7325",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "SAP SE",
-      "Ticker": "SAP",
-      "Identifier": "803054204",
-      "Weight": "2.36",
-      "Market Value": "5923325.8",
-      "Shares Held": "24620",
       "Asset Category": "Equity"
     },
     {
       "Name": "Advanced Micro Devices Inc",
       "Ticker": "AMD",
       "Identifier": "007903107",
-      "Weight": "2.15",
-      "Market Value": "5377454.91",
+      "Weight": "2.34",
+      "Market Value": "6123944.28",
       "Shares Held": "10587",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "SAP SE",
+      "Ticker": "SAP",
+      "Identifier": "803054204",
+      "Weight": "2.23",
+      "Market Value": "5833216.6",
+      "Shares Held": "24620",
       "Asset Category": "Equity"
     },
     {
       "Name": "Shopify Inc",
       "Ticker": "SHOP CN",
       "Identifier": "BX865C7",
-      "Weight": "1.97",
-      "Market Value": "4945675.64",
+      "Weight": "1.88",
+      "Market Value": "4924782.71",
       "Shares Held": "29359",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Delta Electronics Inc",
-      "Ticker": "2308 TT",
-      "Identifier": "6260734",
-      "Weight": "1.79",
-      "Market Value": "4493502.18",
-      "Shares Held": "93943",
       "Asset Category": "Equity"
     },
     {
       "Name": "Advantest Corp",
       "Ticker": "ATEYY",
       "Identifier": "00762U200",
-      "Weight": "1.5",
-      "Market Value": "3750098",
+      "Weight": "1.71",
+      "Market Value": "4465426.89",
       "Shares Held": "18428",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Tokyo Electron Ltd",
-      "Ticker": "TELWY",
-      "Identifier": "889110201",
-      "Weight": "1.39",
-      "Market Value": "3479082.5",
-      "Shares Held": "117935",
+      "Name": "Delta Electronics Inc",
+      "Ticker": "2308 TT",
+      "Identifier": "6260734",
+      "Weight": "1.71",
+      "Market Value": "4490860.17",
+      "Shares Held": "93943",
       "Asset Category": "Equity"
     },
     {
       "Name": "ASE Technology Holding Co Ltd",
       "Ticker": "ASX",
       "Identifier": "00215W100",
-      "Weight": "1.33",
-      "Market Value": "3325912.98",
+      "Weight": "1.48",
+      "Market Value": "3870537.84",
       "Shares Held": "88127",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Tokyo Electron Ltd",
+      "Ticker": "TELWY",
+      "Identifier": "889110201",
+      "Weight": "1.43",
+      "Market Value": "3736180.8",
+      "Shares Held": "117935",
       "Asset Category": "Equity"
     },
     {
       "Name": "Cisco Systems Inc",
       "Ticker": "CSCO",
       "Identifier": "17275R102",
-      "Weight": "1.08",
-      "Market Value": "2704693.54",
+      "Weight": "1.09",
+      "Market Value": "2843937.94",
       "Shares Held": "25786",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Kioxia Holdings Corp",
+      "Ticker": "KXIAY",
+      "Identifier": "49726J108",
+      "Weight": "1.04",
+      "Market Value": "2721024.81",
+      "Shares Held": "289779",
       "Asset Category": "Equity"
     },
     {
       "Name": "Elite Material Co Ltd",
       "Ticker": "2383 TT",
       "Identifier": "6316121",
-      "Weight": "0.99",
-      "Market Value": "2477326.3",
+      "Weight": "0.94",
+      "Market Value": "2469726.13",
       "Shares Held": "15936",
       "Asset Category": "Equity"
     },
@@ -171,26 +180,17 @@
       "Name": "Keyence Corp",
       "Ticker": "6861 JP",
       "Identifier": "6490995",
-      "Weight": "0.99",
-      "Market Value": "2475996.82",
+      "Weight": "0.93",
+      "Market Value": "2424296.02",
       "Shares Held": "4844",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Kioxia Holdings Corp",
-      "Ticker": "KXIAY",
-      "Identifier": "49726J108",
-      "Weight": "0.88",
-      "Market Value": "2202320.4",
-      "Shares Held": "289779",
       "Asset Category": "Equity"
     },
     {
       "Name": "United Microelectronics Corp",
       "Ticker": "UMC",
       "Identifier": "910873405",
-      "Weight": "0.88",
-      "Market Value": "2207238.01",
+      "Weight": "0.86",
+      "Market Value": "2241781.94",
       "Shares Held": "119117",
       "Asset Category": "Equity"
     },
@@ -198,35 +198,35 @@
       "Name": "Applied Materials Inc",
       "Ticker": "AMAT",
       "Identifier": "038222105",
-      "Weight": "0.77",
-      "Market Value": "1933861.42",
+      "Weight": "0.82",
+      "Market Value": "2141984",
       "Shares Held": "5149",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Lam Research Corp",
-      "Ticker": "LRCX",
-      "Identifier": "512807306",
-      "Weight": "0.75",
-      "Market Value": "1874571.75",
-      "Shares Held": "8145",
       "Asset Category": "Equity"
     },
     {
       "Name": "Palo Alto Networks Inc",
       "Ticker": "PANW",
       "Identifier": "697435105",
-      "Weight": "0.75",
-      "Market Value": "1874687.44",
+      "Weight": "0.8",
+      "Market Value": "2083696.18",
       "Shares Held": "5282",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Lam Research Corp",
+      "Ticker": "LRCX",
+      "Identifier": "512807306",
+      "Weight": "0.79",
+      "Market Value": "2067363.9",
+      "Shares Held": "8145",
       "Asset Category": "Equity"
     },
     {
       "Name": "Murata Manufacturing Co Ltd",
       "Ticker": "MRAAY",
       "Identifier": "626425102",
-      "Weight": "0.73",
-      "Market Value": "1821783.6",
+      "Weight": "0.74",
+      "Market Value": "1948674",
       "Shares Held": "90636",
       "Asset Category": "Equity"
     },
@@ -234,8 +234,8 @@
       "Name": "Infineon Technologies AG",
       "Ticker": "IFNNY",
       "Identifier": "45662N103",
-      "Weight": "0.71",
-      "Market Value": "1777552.8",
+      "Weight": "0.73",
+      "Market Value": "1923516.8",
       "Shares Held": "32080",
       "Asset Category": "Equity"
     },
@@ -243,8 +243,8 @@
       "Name": "Texas Instruments Inc",
       "Ticker": "TXN",
       "Identifier": "882508104",
-      "Weight": "0.66",
-      "Market Value": "1657714.5",
+      "Weight": "0.7",
+      "Market Value": "1837601.73",
       "Shares Held": "5931",
       "Asset Category": "Equity"
     },
@@ -252,71 +252,53 @@
       "Name": "Crowdstrike Holdings Inc",
       "Ticker": "CRWD",
       "Identifier": "22788C105",
-      "Weight": "0.63",
-      "Market Value": "1568500.48",
+      "Weight": "0.67",
+      "Market Value": "1757822.72",
       "Shares Held": "6592",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "International Business Machines Corp",
-      "Ticker": "IBM",
-      "Identifier": "459200101",
-      "Weight": "0.62",
-      "Market Value": "1545434.3",
-      "Shares Held": "6130",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Xiaomi Corp",
-      "Ticker": "XIACY",
-      "Identifier": "98421U108",
-      "Weight": "0.56",
-      "Market Value": "1403138.28",
-      "Shares Held": "84121",
       "Asset Category": "Equity"
     },
     {
       "Name": "Oracle Corp",
       "Ticker": "ORCL",
       "Identifier": "68389X105",
-      "Weight": "0.56",
-      "Market Value": "1391736.44",
+      "Weight": "0.61",
+      "Market Value": "1602370.44",
       "Shares Held": "11086",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Salesforce Inc",
-      "Ticker": "CRM",
-      "Identifier": "79466L302",
-      "Weight": "0.53",
-      "Market Value": "1331292.51",
-      "Shares Held": "5319",
+      "Name": "International Business Machines Corp",
+      "Ticker": "IBM",
+      "Identifier": "459200101",
+      "Weight": "0.59",
+      "Market Value": "1552238.6",
+      "Shares Held": "6130",
       "Asset Category": "Equity"
     },
     {
       "Name": "MARVELL TECHNOLOGY INC",
       "Ticker": "MRVL",
       "Identifier": "573874104",
-      "Weight": "0.51",
-      "Market Value": "1275343.29",
+      "Weight": "0.55",
+      "Market Value": "1436166.55",
       "Shares Held": "5707",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Constellation Software Inc/Canada",
-      "Ticker": "CSU CN",
-      "Identifier": "B15C4L6",
-      "Weight": "0.5",
-      "Market Value": "1248400.3",
-      "Shares Held": "514",
+      "Name": "Xiaomi Corp",
+      "Ticker": "XIACY",
+      "Identifier": "98421U108",
+      "Weight": "0.52",
+      "Market Value": "1360236.57",
+      "Shares Held": "84121",
       "Asset Category": "Equity"
     },
     {
       "Name": "KLA CORP",
       "Ticker": "KLAC",
       "Identifier": "482480100",
-      "Weight": "0.5",
-      "Market Value": "1260102.92",
+      "Weight": "0.52",
+      "Market Value": "1353355.48",
       "Shares Held": "8524",
       "Asset Category": "Equity"
     },
@@ -324,8 +306,8 @@
       "Name": "Analog Devices Inc",
       "Ticker": "ADI",
       "Identifier": "032654105",
-      "Weight": "0.49",
-      "Market Value": "1218615.84",
+      "Weight": "0.52",
+      "Market Value": "1352904.93",
       "Shares Held": "3159",
       "Asset Category": "Equity"
     },
@@ -333,81 +315,126 @@
       "Name": "Sandisk Corp",
       "Ticker": "SNDK",
       "Identifier": "80004C200",
-      "Weight": "0.48",
-      "Market Value": "1200405.36",
+      "Weight": "0.51",
+      "Market Value": "1337341.04",
       "Shares Held": "952",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Fujitsu Ltd",
-      "Ticker": "FJTSY",
-      "Identifier": "359590304",
-      "Weight": "0.47",
-      "Market Value": "1190293.13",
-      "Shares Held": "40691",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "QUALCOMM Inc",
-      "Ticker": "QCOM",
-      "Identifier": "747525103",
-      "Weight": "0.47",
-      "Market Value": "1184922.48",
-      "Shares Held": "6856",
+      "Name": "Salesforce Inc",
+      "Ticker": "CRM",
+      "Identifier": "79466L302",
+      "Weight": "0.49",
+      "Market Value": "1287783.09",
+      "Shares Held": "5319",
       "Asset Category": "Equity"
     },
     {
       "Name": "Arista Networks Inc",
       "Ticker": "ANET",
       "Identifier": "040413205",
-      "Weight": "0.46",
-      "Market Value": "1154038.22",
+      "Weight": "0.48",
+      "Market Value": "1259613.12",
       "Shares Held": "6746",
       "Asset Category": "Equity"
     },
     {
-      "Name": "ServiceNow Inc",
-      "Ticker": "NOW",
-      "Identifier": "81762P102",
-      "Weight": "0.42",
-      "Market Value": "1058023",
-      "Shares Held": "6739",
+      "Name": "QUALCOMM Inc",
+      "Ticker": "QCOM",
+      "Identifier": "747525103",
+      "Weight": "0.48",
+      "Market Value": "1254442.32",
+      "Shares Held": "6856",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Constellation Software Inc/Canada",
+      "Ticker": "CSU CN",
+      "Identifier": "B15C4L6",
+      "Weight": "0.47",
+      "Market Value": "1225123.35",
+      "Shares Held": "514",
       "Asset Category": "Equity"
     },
     {
       "Name": "Nokia Oyj",
       "Ticker": "NOK",
       "Identifier": "654902204",
-      "Weight": "0.42",
-      "Market Value": "1052366.12",
+      "Weight": "0.47",
+      "Market Value": "1231321.78",
       "Shares Held": "133549",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Accenture PLC",
-      "Ticker": "ACN",
-      "Identifier": "G1151C101",
-      "Weight": "0.41",
-      "Market Value": "1032631.34",
-      "Shares Held": "3991",
+      "Name": "Fujitsu Ltd",
+      "Ticker": "FJTSY",
+      "Identifier": "359590304",
+      "Weight": "0.44",
+      "Market Value": "1158472.77",
+      "Shares Held": "40691",
       "Asset Category": "Equity"
     },
     {
       "Name": "ASM International NV",
       "Ticker": "ASM NA",
       "Identifier": "5165294",
-      "Weight": "0.38",
-      "Market Value": "953742.41",
+      "Weight": "0.4",
+      "Market Value": "1034959.62",
       "Shares Held": "1201",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "ServiceNow Inc",
+      "Ticker": "NOW",
+      "Identifier": "81762P102",
+      "Weight": "0.39",
+      "Market Value": "1011726.07",
+      "Shares Held": "6739",
       "Asset Category": "Equity"
     },
     {
       "Name": "Seagate Technology Holdings PLC",
       "Ticker": "STX",
       "Identifier": "G7997R103",
-      "Weight": "0.37",
-      "Market Value": "920186.62",
+      "Weight": "0.38",
+      "Market Value": "1000191.01",
       "Shares Held": "1433",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Accenture PLC",
+      "Ticker": "ACN",
+      "Identifier": "G1151C101",
+      "Weight": "0.37",
+      "Market Value": "971409.4",
+      "Shares Held": "3991",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Cash & Other",
+      "Ticker": "Cash&Other",
+      "Identifier": "Cash&Other",
+      "Weight": "0.36",
+      "Market Value": "933432.6",
+      "Shares Held": "933433",
+      "Asset Category": "Cash"
+    },
+    {
+      "Name": "Renesas Electronics Corp",
+      "Ticker": "RNECY",
+      "Identifier": "75972B101",
+      "Weight": "0.34",
+      "Market Value": "891138.54",
+      "Shares Held": "89382",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Celestica Inc",
+      "Ticker": "CLS CN",
+      "Identifier": "BSCB6L9",
+      "Weight": "0.34",
+      "Market Value": "881973.11",
+      "Shares Held": "2944",
       "Asset Category": "Equity"
     },
     {
@@ -415,133 +442,115 @@
       "Ticker": "DSCSY",
       "Identifier": "25461D100",
       "Weight": "0.33",
-      "Market Value": "823624.71",
+      "Market Value": "861974.18",
       "Shares Held": "25397",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Celestica Inc",
-      "Ticker": "CLS CN",
-      "Identifier": "BSCB6L9",
-      "Weight": "0.32",
-      "Market Value": "790206.18",
-      "Shares Held": "2944",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "TDK Corp",
-      "Ticker": "6762 JP",
-      "Identifier": "6869302",
-      "Weight": "0.32",
-      "Market Value": "800254.84",
-      "Shares Held": "45248",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Renesas Electronics Corp",
-      "Ticker": "RNECY",
-      "Identifier": "75972B101",
-      "Weight": "0.32",
-      "Market Value": "813376.2",
-      "Shares Held": "89382",
       "Asset Category": "Equity"
     },
     {
       "Name": "Ibiden Co Ltd",
       "Ticker": "4062 JP",
       "Identifier": "6456102",
-      "Weight": "0.29",
-      "Market Value": "721244.31",
+      "Weight": "0.31",
+      "Market Value": "805382.32",
       "Shares Held": "13188",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Adobe Inc",
-      "Ticker": "ADBE",
-      "Identifier": "00724F101",
-      "Weight": "0.28",
-      "Market Value": "712628.7",
-      "Shares Held": "2634",
+      "Name": "TDK Corp",
+      "Ticker": "6762 JP",
+      "Identifier": "6869302",
+      "Weight": "0.3",
+      "Market Value": "797981.07",
+      "Shares Held": "45248",
       "Asset Category": "Equity"
     },
     {
       "Name": "Telefonaktiebolaget LM Ericsson",
       "Ticker": "ERIC",
       "Identifier": "294821608",
-      "Weight": "0.28",
-      "Market Value": "710521.38",
+      "Weight": "0.29",
+      "Market Value": "757410.32",
       "Shares Held": "68451",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Fortinet Inc",
-      "Ticker": "FTNT",
-      "Identifier": "34959E109",
-      "Weight": "0.28",
-      "Market Value": "689498.28",
-      "Shares Held": "3986",
       "Asset Category": "Equity"
     },
     {
       "Name": "STMicroelectronics NV",
       "Ticker": "STMMI IM",
       "Identifier": "5962343",
-      "Weight": "0.27",
-      "Market Value": "677150.14",
+      "Weight": "0.28",
+      "Market Value": "731838.85",
       "Shares Held": "15143",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "FUJIFILM Holdings Corp",
-      "Ticker": "FUJIY",
-      "Identifier": "35958N107",
-      "Weight": "0.27",
-      "Market Value": "674871.12",
-      "Shares Held": "62604",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Kyocera Corp",
-      "Ticker": "6971 JP",
-      "Identifier": "6499260",
-      "Weight": "0.26",
-      "Market Value": "657839.04",
-      "Shares Held": "29398",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Canon Inc",
-      "Ticker": "CAJPY",
-      "Identifier": "138006309",
-      "Weight": "0.25",
-      "Market Value": "621468.75",
-      "Shares Held": "19887",
       "Asset Category": "Equity"
     },
     {
       "Name": "Corning Inc",
       "Ticker": "GLW",
       "Identifier": "219350105",
-      "Weight": "0.25",
-      "Market Value": "631481.07",
+      "Weight": "0.26",
+      "Market Value": "668201.6",
       "Shares Held": "5093",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Fortinet Inc",
+      "Ticker": "FTNT",
+      "Identifier": "34959E109",
+      "Weight": "0.26",
+      "Market Value": "693882.88",
+      "Shares Held": "3986",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "FUJIFILM Holdings Corp",
+      "Ticker": "FUJIY",
+      "Identifier": "35958N107",
+      "Weight": "0.26",
+      "Market Value": "684261.72",
+      "Shares Held": "62604",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Adobe Inc",
+      "Ticker": "ADBE",
+      "Identifier": "00724F101",
+      "Weight": "0.25",
+      "Market Value": "657867.84",
+      "Shares Held": "2634",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Kyocera Corp",
+      "Ticker": "6971 JP",
+      "Identifier": "6499260",
+      "Weight": "0.25",
+      "Market Value": "662537.24",
+      "Shares Held": "29398",
       "Asset Category": "Equity"
     },
     {
       "Name": "Cadence Design Systems Inc",
       "Ticker": "CDNS",
       "Identifier": "127387108",
-      "Weight": "0.22",
-      "Market Value": "561085.8",
+      "Weight": "0.24",
+      "Market Value": "620537.52",
       "Shares Held": "1812",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Canon Inc",
+      "Ticker": "CAJPY",
+      "Identifier": "138006309",
+      "Weight": "0.22",
+      "Market Value": "581893.62",
+      "Shares Held": "19887",
       "Asset Category": "Equity"
     },
     {
       "Name": "Synopsys Inc",
       "Ticker": "SNPS",
       "Identifier": "871607107",
-      "Weight": "0.21",
-      "Market Value": "515003.12",
+      "Weight": "0.22",
+      "Market Value": "587423.91",
       "Shares Held": "1219",
       "Asset Category": "Equity"
     },
@@ -549,17 +558,26 @@
       "Name": "Hexagon AB",
       "Ticker": "HXGBY",
       "Identifier": "428263107",
-      "Weight": "0.2",
-      "Market Value": "511901.81",
+      "Weight": "0.21",
+      "Market Value": "548147.04",
       "Shares Held": "49651",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Lumentum Holdings Inc",
+      "Ticker": "LITE",
+      "Identifier": "55024U109",
+      "Weight": "0.2",
+      "Market Value": "524607.3",
+      "Shares Held": "574",
       "Asset Category": "Equity"
     },
     {
       "Name": "Lasertec Corp",
       "Ticker": "LSRCY",
       "Identifier": "51809L109",
-      "Weight": "0.18",
-      "Market Value": "439678.56",
+      "Weight": "0.2",
+      "Market Value": "515808",
       "Shares Held": "9552",
       "Asset Category": "Equity"
     },
@@ -567,8 +585,8 @@
       "Name": "Nomura Research Institute Ltd",
       "Ticker": "NRILY",
       "Identifier": "65538C206",
-      "Weight": "0.18",
-      "Market Value": "444662.22",
+      "Weight": "0.17",
+      "Market Value": "432551.23",
       "Shares Held": "11111",
       "Asset Category": "Equity"
     },
@@ -576,8 +594,8 @@
       "Name": "Dassault Systemes SE",
       "Ticker": "DASTY",
       "Identifier": "237545108",
-      "Weight": "0.18",
-      "Market Value": "452531.72",
+      "Weight": "0.17",
+      "Market Value": "444633.84",
       "Shares Held": "16804",
       "Asset Category": "Equity"
     },
@@ -586,35 +604,8 @@
       "Ticker": "TEL",
       "Identifier": "G87052109",
       "Weight": "0.17",
-      "Market Value": "421216.82",
+      "Market Value": "447126.04",
       "Shares Held": "2021",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Lumentum Holdings Inc",
-      "Ticker": "LITE",
-      "Identifier": "55024U109",
-      "Weight": "0.17",
-      "Market Value": "431957.96",
-      "Shares Held": "574",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "NXP Semiconductors NV",
-      "Ticker": "NXPI",
-      "Identifier": "N6596X109",
-      "Weight": "0.16",
-      "Market Value": "393780.24",
-      "Shares Held": "1656",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Autodesk Inc",
-      "Ticker": "ADSK",
-      "Identifier": "052769106",
-      "Weight": "0.16",
-      "Market Value": "392368.05",
-      "Shares Held": "1539",
       "Asset Category": "Equity"
     },
     {
@@ -622,35 +613,26 @@
       "Ticker": "HALMY",
       "Identifier": "40637C308",
       "Weight": "0.16",
-      "Market Value": "408377.76",
+      "Market Value": "428352",
       "Shares Held": "4656",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Sage Group PLC/The",
-      "Ticker": "SGPYY",
-      "Identifier": "78663S201",
+      "Name": "NXP Semiconductors NV",
+      "Ticker": "NXPI",
+      "Identifier": "N6596X109",
       "Weight": "0.16",
-      "Market Value": "392140.8",
-      "Shares Held": "6144",
+      "Market Value": "416798.64",
+      "Shares Held": "1656",
       "Asset Category": "Equity"
     },
     {
-      "Name": "CGI Inc",
-      "Ticker": "GIB/A CN",
-      "Identifier": "BJ2L575",
-      "Weight": "0.16",
-      "Market Value": "392176.57",
-      "Shares Held": "4788",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Logitech International SA",
-      "Ticker": "LOGN SW",
-      "Identifier": "B18ZRK2",
-      "Weight": "0.15",
-      "Market Value": "386026.11",
-      "Shares Held": "3530",
+      "Name": "Autodesk Inc",
+      "Ticker": "ADSK",
+      "Identifier": "052769106",
+      "Weight": "0.14",
+      "Market Value": "373022.82",
+      "Shares Held": "1539",
       "Asset Category": "Equity"
     },
     {
@@ -658,8 +640,26 @@
       "Ticker": "7735 JP",
       "Identifier": "6251028",
       "Weight": "0.14",
-      "Market Value": "360253.41",
+      "Market Value": "365849.46",
       "Shares Held": "4812",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "CGI Inc",
+      "Ticker": "GIB/A CN",
+      "Identifier": "BJ2L575",
+      "Weight": "0.14",
+      "Market Value": "378298.9",
+      "Shares Held": "4788",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Sage Group PLC/The",
+      "Ticker": "SGPYY",
+      "Identifier": "78663S201",
+      "Weight": "0.14",
+      "Market Value": "375889.92",
+      "Shares Held": "6144",
       "Asset Category": "Equity"
     },
     {
@@ -667,7 +667,7 @@
       "Ticker": "MPWR",
       "Identifier": "609839105",
       "Weight": "0.14",
-      "Market Value": "353882.79",
+      "Market Value": "366999.66",
       "Shares Held": "303",
       "Asset Category": "Equity"
     },
@@ -675,72 +675,72 @@
       "Name": "Teradyne Inc",
       "Ticker": "TER",
       "Identifier": "880770102",
-      "Weight": "0.14",
-      "Market Value": "338390",
+      "Weight": "0.13",
+      "Market Value": "343311.04",
       "Shares Held": "1096",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Obic Co Ltd",
-      "Ticker": "4684 JP",
-      "Identifier": "6136749",
+      "Name": "Logitech International SA",
+      "Ticker": "LOGN SW",
+      "Identifier": "B18ZRK2",
       "Weight": "0.13",
-      "Market Value": "313354.76",
-      "Shares Held": "8302",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "BE Semiconductor Industries NV",
-      "Ticker": "BESI NA",
-      "Identifier": "BG0SCK9",
-      "Weight": "0.13",
-      "Market Value": "313774.55",
-      "Shares Held": "1782",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "CANADIAN DOLLAR",
-      "Ticker": "CAD",
-      "Identifier": "CASHCAD",
-      "Weight": "0.12",
-      "Market Value": "298522.55",
-      "Shares Held": "418947",
+      "Market Value": "348769.02",
+      "Shares Held": "3530",
       "Asset Category": "Equity"
     },
     {
       "Name": "Ciena Corp",
       "Ticker": "CIEN",
       "Identifier": "171779309",
-      "Weight": "0.12",
-      "Market Value": "299732.56",
+      "Weight": "0.13",
+      "Market Value": "337422.09",
       "Shares Held": "929",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Roper Technologies Inc",
-      "Ticker": "ROP",
-      "Identifier": "776696106",
+      "Name": "BE Semiconductor Industries NV",
+      "Ticker": "BESI NA",
+      "Identifier": "BG0SCK9",
       "Weight": "0.12",
-      "Market Value": "291401.64",
-      "Shares Held": "668",
+      "Market Value": "320684.97",
+      "Shares Held": "1782",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Cash & Other",
-      "Ticker": "Cash&Other",
-      "Identifier": "Cash&Other",
-      "Weight": "0.11",
-      "Market Value": "279348.64",
-      "Shares Held": "279349",
-      "Asset Category": "Cash"
+      "Name": "Obic Co Ltd",
+      "Ticker": "4684 JP",
+      "Identifier": "6136749",
+      "Weight": "0.12",
+      "Market Value": "317011.21",
+      "Shares Held": "8302",
+      "Asset Category": "Equity"
     },
     {
       "Name": "Everpure Inc",
       "Ticker": "P",
       "Identifier": "74624M102",
-      "Weight": "0.11",
-      "Market Value": "263610",
+      "Weight": "0.12",
+      "Market Value": "301455",
       "Shares Held": "2175",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Coherent Corp",
+      "Ticker": "COHR",
+      "Identifier": "19247G107",
+      "Weight": "0.11",
+      "Market Value": "288466.36",
+      "Shares Held": "1204",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Microchip Technology Inc",
+      "Ticker": "MCHP",
+      "Identifier": "595017104",
+      "Weight": "0.11",
+      "Market Value": "278227.22",
+      "Shares Held": "3494",
       "Asset Category": "Equity"
     },
     {
@@ -748,44 +748,26 @@
       "Ticker": "NTAP",
       "Identifier": "64110D104",
       "Weight": "0.11",
-      "Market Value": "280300.69",
+      "Market Value": "295007.54",
       "Shares Held": "1319",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Workday Inc",
-      "Ticker": "WDAY",
-      "Identifier": "98138H101",
+      "Name": "Roper Technologies Inc",
+      "Ticker": "ROP",
+      "Identifier": "776696106",
       "Weight": "0.11",
-      "Market Value": "281596.59",
-      "Shares Held": "1341",
+      "Market Value": "294360.88",
+      "Shares Held": "668",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Microchip Technology Inc",
-      "Ticker": "MCHP",
-      "Identifier": "595017104",
-      "Weight": "0.1",
-      "Market Value": "260372.88",
-      "Shares Held": "3494",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Coherent Corp",
-      "Ticker": "COHR",
-      "Identifier": "19247G107",
-      "Weight": "0.1",
-      "Market Value": "250215.28",
-      "Shares Held": "1204",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Cognizant Technology Solutions Corp",
-      "Ticker": "CTSH",
-      "Identifier": "192446102",
-      "Weight": "0.1",
-      "Market Value": "240253.48",
-      "Shares Held": "3259",
+      "Name": "CANADIAN DOLLAR",
+      "Ticker": "CAD",
+      "Identifier": "CASHCAD",
+      "Weight": "0.11",
+      "Market Value": "298448.12",
+      "Shares Held": "418947",
       "Asset Category": "Equity"
     },
     {
@@ -793,8 +775,35 @@
       "Ticker": "TWLO",
       "Identifier": "90138F102",
       "Weight": "0.1",
-      "Market Value": "252615.48",
+      "Market Value": "252754.92",
       "Shares Held": "996",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Workday Inc",
+      "Ticker": "WDAY",
+      "Identifier": "98138H101",
+      "Weight": "0.1",
+      "Market Value": "274046.76",
+      "Shares Held": "1341",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Flex Ltd",
+      "Ticker": "FLEX",
+      "Identifier": "Y2573F102",
+      "Weight": "0.09",
+      "Market Value": "223272",
+      "Shares Held": "2400",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Cognizant Technology Solutions Corp",
+      "Ticker": "CTSH",
+      "Identifier": "192446102",
+      "Weight": "0.08",
+      "Market Value": "216267.24",
+      "Shares Held": "3259",
       "Asset Category": "Equity"
     },
     {
@@ -802,17 +811,8 @@
       "Ticker": "ON",
       "Identifier": "682189105",
       "Weight": "0.08",
-      "Market Value": "209657.49",
+      "Market Value": "216528.69",
       "Shares Held": "2863",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Omron Corp",
-      "Ticker": "OMRNY",
-      "Identifier": "682151303",
-      "Weight": "0.08",
-      "Market Value": "189224.64",
-      "Shares Held": "5445",
       "Asset Category": "Equity"
     },
     {
@@ -820,7 +820,7 @@
       "Ticker": "JBL",
       "Identifier": "466313103",
       "Weight": "0.07",
-      "Market Value": "178095.06",
+      "Market Value": "193759.38",
       "Shares Held": "666",
       "Asset Category": "Equity"
     },
@@ -829,35 +829,17 @@
       "Ticker": "XRO AU",
       "Identifier": "B8P4LP4",
       "Weight": "0.07",
-      "Market Value": "185798.92",
+      "Market Value": "187603.37",
       "Shares Held": "4160",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Flex Ltd",
-      "Ticker": "FLEX",
-      "Identifier": "Y2573F102",
+      "Name": "Omron Corp",
+      "Ticker": "OMRNY",
+      "Identifier": "682151303",
       "Weight": "0.07",
-      "Market Value": "184056",
-      "Shares Held": "2400",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Qnity Electronics Inc",
-      "Ticker": "Q",
-      "Identifier": "74743L100",
-      "Weight": "0.06",
-      "Market Value": "147396.9",
-      "Shares Held": "1355",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "VeriSign Inc",
-      "Ticker": "VRSN",
-      "Identifier": "92343E102",
-      "Weight": "0.06",
-      "Market Value": "147726.15",
-      "Shares Held": "485",
+      "Market Value": "193460.85",
+      "Shares Held": "5445",
       "Asset Category": "Equity"
     },
     {
@@ -865,26 +847,26 @@
       "Ticker": "WTC AU",
       "Identifier": "BZ8GX83",
       "Weight": "0.06",
-      "Market Value": "152072.25",
+      "Market Value": "152800.88",
       "Shares Held": "5290",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Temenos AG",
-      "Ticker": "TMSNY",
-      "Identifier": "87974R208",
+      "Name": "VeriSign Inc",
+      "Ticker": "VRSN",
+      "Identifier": "92343E102",
       "Weight": "0.06",
-      "Market Value": "142998.7",
-      "Shares Held": "1585",
+      "Market Value": "148899.85",
+      "Shares Held": "485",
       "Asset Category": "Equity"
     },
     {
-      "Name": "F5 Inc",
-      "Ticker": "FFIV",
-      "Identifier": "315616102",
-      "Weight": "0.05",
-      "Market Value": "126022.4",
-      "Shares Held": "280",
+      "Name": "Qnity Electronics Inc",
+      "Ticker": "Q",
+      "Identifier": "74743L100",
+      "Weight": "0.06",
+      "Market Value": "166380.45",
+      "Shares Held": "1355",
       "Asset Category": "Equity"
     },
     {
@@ -892,17 +874,8 @@
       "Ticker": "FSLR",
       "Identifier": "336433107",
       "Weight": "0.05",
-      "Market Value": "117820",
+      "Market Value": "121294.4",
       "Shares Held": "688",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "PTC Inc",
-      "Ticker": "PTC",
-      "Identifier": "69370C100",
-      "Weight": "0.05",
-      "Market Value": "135800",
-      "Shares Held": "700",
       "Asset Category": "Equity"
     },
     {
@@ -910,8 +883,26 @@
       "Ticker": "CDW",
       "Identifier": "12514G108",
       "Weight": "0.05",
-      "Market Value": "120172.6",
+      "Market Value": "118741.8",
       "Shares Held": "730",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Temenos AG",
+      "Ticker": "TMSNY",
+      "Identifier": "87974R208",
+      "Weight": "0.05",
+      "Market Value": "143537.6",
+      "Shares Held": "1585",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "PTC Inc",
+      "Ticker": "PTC",
+      "Identifier": "69370C100",
+      "Weight": "0.05",
+      "Market Value": "136479",
+      "Shares Held": "700",
       "Asset Category": "Equity"
     },
     {
@@ -919,8 +910,35 @@
       "Ticker": "FICO",
       "Identifier": "303250104",
       "Weight": "0.04",
-      "Market Value": "109494.91",
+      "Market Value": "92857.94",
       "Shares Held": "133",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Tyler Technologies Inc",
+      "Ticker": "TYL",
+      "Identifier": "902252105",
+      "Weight": "0.04",
+      "Market Value": "92029.5",
+      "Shares Held": "255",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "F5 Inc",
+      "Ticker": "FFIV",
+      "Identifier": "315616102",
+      "Weight": "0.04",
+      "Market Value": "102348.4",
+      "Shares Held": "280",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "GoDaddy Inc",
+      "Ticker": "GDDY",
+      "Identifier": "380237107",
+      "Weight": "0.04",
+      "Market Value": "95992.54",
+      "Shares Held": "901",
       "Asset Category": "Equity"
     },
     {
@@ -928,7 +946,7 @@
       "Ticker": "ZBRA",
       "Identifier": "989207105",
       "Weight": "0.04",
-      "Market Value": "107180.64",
+      "Market Value": "107331.3",
       "Shares Held": "279",
       "Asset Category": "Equity"
     },
@@ -937,35 +955,8 @@
       "Ticker": "IT",
       "Identifier": "366651107",
       "Weight": "0.04",
-      "Market Value": "110186.8",
+      "Market Value": "103005.2",
       "Shares Held": "470",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Tyler Technologies Inc",
-      "Ticker": "TYL",
-      "Identifier": "902252105",
-      "Weight": "0.04",
-      "Market Value": "100074.75",
-      "Shares Held": "255",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "GoDaddy Inc",
-      "Ticker": "GDDY",
-      "Identifier": "380237107",
-      "Weight": "0.04",
-      "Market Value": "103371.73",
-      "Shares Held": "901",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Skyworks Solutions Inc",
-      "Ticker": "SWKS",
-      "Identifier": "83088M102",
-      "Weight": "0.03",
-      "Market Value": "75386.85",
-      "Shares Held": "915",
       "Asset Category": "Equity"
     },
     {
@@ -973,8 +964,17 @@
       "Ticker": "TRMB",
       "Identifier": "896239100",
       "Weight": "0.03",
-      "Market Value": "87693.7",
+      "Market Value": "88159.5",
       "Shares Held": "1370",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Skyworks Solutions Inc",
+      "Ticker": "SWKS",
+      "Identifier": "83088M102",
+      "Weight": "0.03",
+      "Market Value": "79815.45",
+      "Shares Held": "915",
       "Asset Category": "Equity"
     },
     {
@@ -982,10 +982,10 @@
       "Ticker": "JPY",
       "Identifier": "CASHJPY",
       "Weight": "0",
-      "Market Value": "170.16",
+      "Market Value": "169.07",
       "Shares Held": "26752",
       "Asset Category": "Equity"
     }
   ],
-  "asOfDate": "2026-10-23"
+  "asOfDate": "2026-10-29"
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-26T19:38:23Z",
+  "generatedAt": "2026-10-29T20:41:03Z",
   "provider": "SP Funds",
   "source": {
     "catalog": "https://www.sp-funds.com/",
@@ -13,8 +13,8 @@
   },
   "counts": {
     "funds": 5,
-    "holdings": 922,
-    "history": 6335
+    "holdings": 925,
+    "history": 6354
   },
   "funds": [
     {
@@ -26,23 +26,23 @@
       "ter": "0.50%",
       "terValue": 0.5,
       "terGrossValue": null,
-      "nav": "$18.52",
-      "navValue": 18.52,
-      "aum": "$196.29M",
-      "aumValue": 196290000,
-      "asOfDate": "2026-10-23",
+      "nav": "$18.32",
+      "navValue": 18.32,
+      "aum": "$194.15M",
+      "aumValue": 194150000,
+      "asOfDate": "2026-10-28",
       "inceptionDate": "2020-12-29",
       "exchange": "NYSE Arca",
-      "closePrice": "$18.48",
-      "closePriceValue": 18.48,
-      "closePriceAsOfDate": "2026-10-23",
-      "premiumDiscount": "-0.18%",
-      "premiumDiscountValue": -0.18,
+      "closePrice": "$18.37",
+      "closePriceValue": 18.37,
+      "closePriceAsOfDate": "2026-10-28",
+      "premiumDiscount": "0.30%",
+      "premiumDiscountValue": 0.3,
       "cusip": "886364769",
       "isin": null,
       "distributions": {
         "frequency": "Monthly",
-        "exDate": "2026-09-28",
+        "exDate": "2026-10-27",
         "dividend": "0.067"
       },
       "returns": {
@@ -75,8 +75,8 @@
         "cagr5y": -0.3,
         "cagr10y": null,
         "siAnn": 3.05,
-        "dividendYield": 4.34,
-        "dividendYieldText": "4.34%",
+        "dividendYield": 4.39,
+        "dividendYieldText": "4.39%",
         "dividendYieldBasis": "indicated",
         "secYield": 2.5,
         "secYieldText": "2.50%",
@@ -84,7 +84,7 @@
         "performanceAsOf": "2026-09-30"
       },
       "holdings": 30,
-      "history": 1462
+      "history": 1465
     },
     {
       "ticker": "SPSK",
@@ -95,23 +95,23 @@
       "ter": "0.50%",
       "terValue": 0.5,
       "terGrossValue": null,
-      "nav": "$17.49",
-      "navValue": 17.49,
-      "aum": "$476.55M",
-      "aumValue": 476550000,
-      "asOfDate": "2026-10-22",
+      "nav": "$17.44",
+      "navValue": 17.44,
+      "aum": "$479.29M",
+      "aumValue": 479290000,
+      "asOfDate": "2026-10-28",
       "inceptionDate": "2019-12-27",
       "exchange": "NYSE",
-      "closePrice": "$17.50",
-      "closePriceValue": 17.5,
-      "closePriceAsOfDate": "2026-10-22",
-      "premiumDiscount": "0.07%",
-      "premiumDiscountValue": 0.07,
+      "closePrice": "$17.45",
+      "closePriceValue": 17.45,
+      "closePriceAsOfDate": "2026-10-28",
+      "premiumDiscount": "0.03%",
+      "premiumDiscountValue": 0.03,
       "cusip": "886364702",
       "isin": null,
       "distributions": {
         "frequency": "Monthly",
-        "exDate": "2026-09-28",
+        "exDate": "2026-10-27",
         "dividend": "0.052"
       },
       "returns": {
@@ -144,8 +144,8 @@
         "cagr5y": 0.39,
         "cagr10y": null,
         "siAnn": 0.77,
-        "dividendYield": 3.57,
-        "dividendYieldText": "3.57%",
+        "dividendYield": 3.58,
+        "dividendYieldText": "3.58%",
         "dividendYieldBasis": "indicated",
         "secYield": 5.04,
         "secYieldText": "5.04%",
@@ -153,7 +153,7 @@
         "performanceAsOf": "2026-09-30"
       },
       "holdings": 176,
-      "history": 1713
+      "history": 1717
     },
     {
       "ticker": "SPTE",
@@ -164,23 +164,23 @@
       "ter": "0.55%",
       "terValue": 0.55,
       "terGrossValue": null,
-      "nav": "$46.20",
-      "navValue": 46.2,
-      "aum": "$250.64M",
-      "aumValue": 250640000,
-      "asOfDate": "2026-10-22",
+      "nav": "$48.28",
+      "navValue": 48.28,
+      "aum": "$261.89M",
+      "aumValue": 261890000,
+      "asOfDate": "2026-10-28",
       "inceptionDate": "2023-11-30",
       "exchange": "NYSE Arca",
-      "closePrice": "$46.16",
-      "closePriceValue": 46.16,
-      "closePriceAsOfDate": "2026-10-22",
-      "premiumDiscount": "-0.09%",
-      "premiumDiscountValue": -0.09,
+      "closePrice": "$48.48",
+      "closePriceValue": 48.48,
+      "closePriceAsOfDate": "2026-10-28",
+      "premiumDiscount": "0.42%",
+      "premiumDiscountValue": 0.42,
       "cusip": "84612A101",
       "isin": null,
       "distributions": {
         "frequency": "Monthly",
-        "exDate": "2026-09-28",
+        "exDate": "2026-10-27",
         "dividend": "0.0065"
       },
       "returns": {
@@ -213,8 +213,8 @@
         "cagr5y": null,
         "cagr10y": null,
         "siAnn": 38.74,
-        "dividendYield": 0.17,
-        "dividendYieldText": "0.17%",
+        "dividendYield": 0.16,
+        "dividendYieldText": "0.16%",
         "dividendYieldBasis": "indicated",
         "secYield": 0.09,
         "secYieldText": "0.09%",
@@ -222,7 +222,7 @@
         "performanceAsOf": "2026-09-30"
       },
       "holdings": 108,
-      "history": 726
+      "history": 730
     },
     {
       "ticker": "SPUS",
@@ -233,23 +233,23 @@
       "ter": "0.45%",
       "terValue": 0.45,
       "terGrossValue": null,
-      "nav": "$58.66",
-      "navValue": 58.66,
-      "aum": "$3.31B",
-      "aumValue": 3309750000,
-      "asOfDate": "2026-10-23",
+      "nav": "$60.06",
+      "navValue": 60.06,
+      "aum": "$3.39B",
+      "aumValue": 3393630000,
+      "asOfDate": "2026-10-28",
       "inceptionDate": "2019-12-17",
       "exchange": "NYSE Arca",
-      "closePrice": "$58.66",
-      "closePriceValue": 58.66,
-      "closePriceAsOfDate": "2026-10-23",
-      "premiumDiscount": "0.00%",
-      "premiumDiscountValue": 0,
+      "closePrice": "$60.11",
+      "closePriceValue": 60.11,
+      "closePriceAsOfDate": "2026-10-28",
+      "premiumDiscount": "0.08%",
+      "premiumDiscountValue": 0.08,
       "cusip": "886364801",
       "isin": null,
       "distributions": {
         "frequency": "Monthly",
-        "exDate": "2026-09-28",
+        "exDate": "2026-10-27",
         "dividend": "0.026"
       },
       "returns": {
@@ -282,8 +282,8 @@
         "cagr5y": 16.37,
         "cagr10y": null,
         "siAnn": 18.57,
-        "dividendYield": 0.53,
-        "dividendYieldText": "0.53%",
+        "dividendYield": 0.52,
+        "dividendYieldText": "0.52%",
         "dividendYieldBasis": "indicated",
         "secYield": 0.39,
         "secYieldText": "0.39%",
@@ -291,7 +291,7 @@
         "performanceAsOf": "2026-09-30"
       },
       "holdings": 218,
-      "history": 1721
+      "history": 1725
     },
     {
       "ticker": "SPWO",
@@ -302,23 +302,23 @@
       "ter": "0.55%",
       "terValue": 0.55,
       "terGrossValue": null,
-      "nav": "$31.29",
-      "navValue": 31.29,
-      "aum": "$236.25M",
-      "aumValue": 236250000,
-      "asOfDate": "2026-10-23",
+      "nav": "$32.31",
+      "navValue": 32.31,
+      "aum": "$247.16M",
+      "aumValue": 247160000,
+      "asOfDate": "2026-10-28",
       "inceptionDate": "2023-12-19",
       "exchange": "NYSE Arca",
-      "closePrice": "$31.36",
-      "closePriceValue": 31.36,
-      "closePriceAsOfDate": "2026-10-23",
-      "premiumDiscount": "0.22%",
-      "premiumDiscountValue": 0.22,
+      "closePrice": "$32.56",
+      "closePriceValue": 32.56,
+      "closePriceAsOfDate": "2026-10-28",
+      "premiumDiscount": "0.78%",
+      "premiumDiscountValue": 0.78,
       "cusip": "84612A200",
       "isin": null,
       "distributions": {
         "frequency": "Monthly",
-        "exDate": "2026-09-28",
+        "exDate": "2026-10-27",
         "dividend": "0.0255"
       },
       "returns": {
@@ -351,16 +351,16 @@
         "cagr5y": null,
         "cagr10y": null,
         "siAnn": 21.72,
-        "dividendYield": 0.98,
-        "dividendYieldText": "0.98%",
+        "dividendYield": 0.95,
+        "dividendYieldText": "0.95%",
         "dividendYieldBasis": "indicated",
         "secYield": 0.76,
         "secYieldText": "0.76%",
         "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
         "performanceAsOf": "2026-09-30"
       },
-      "holdings": 390,
-      "history": 713
+      "holdings": 393,
+      "history": 717
     }
   ]
 }
