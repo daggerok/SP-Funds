@@ -1116,21 +1116,21 @@ export function createEdgarFallback(config: UpdaterConfig, transport: Transport,
     try {
       ref = (await fundTable()).get(sanitizeTicker(ticker)) ?? null;
     } catch (error) {
-      output(`[ ${'edgar'.padEnd(9)}] fund ticker table: ${errorMessage(error)}`);
+      output(`[ ${'edgar'.padEnd(8)} ] fund ticker table: ${errorMessage(error)}`);
     }
     // The registrants are verified: never silently publish another trust's filing.
     if (ref && ![TIDAL_TRUST.cik, SPFUNDS_TRUST.cik].some((cik) => Number(cik) === Number(ref!.cik))) {
-      output(`[ ${'edgar'.padEnd(9)}] ${ticker}: SEC lists registrant CIK ${ref.cik}, not an SP Funds trust`);
+      output(`[ ${'edgar'.padEnd(8)} ] ${ticker}: SEC lists registrant CIK ${ref.cik}, not an SP Funds trust`);
       return null;
     }
     const fund = ref ? { ticker, cik: ref.cik, seriesId: ref.seriesId } : { ticker, cik: trustForTicker(ticker).cik, name };
     const read = await readNportHoldings(fund, published, getText, { cache: state.reader });
     if ('problem' in read) {
-      output(`[ ${'nport'.padEnd(9)}] ${read.problem}`);
+      output(`[ ${'nport'.padEnd(8)} ] ${read.problem}`);
       return null;
     }
-    if (read.loose) output(`[ ${'nport'.padEnd(9)}] ${ticker}: series "${read.filing.seriesName}" matched the fund name loosely`);
-    const names = await companyNames().catch((error: unknown) => { output(`[ ${'edgar'.padEnd(9)}] company ticker table: ${errorMessage(error)}`); return null; });
+    if (read.loose) output(`[ ${'nport'.padEnd(8)} ] ${ticker}: series "${read.filing.seriesName}" matched the fund name loosely`);
+    const names = await companyNames().catch((error: unknown) => { output(`[ ${'edgar'.padEnd(8)} ] company ticker table: ${errorMessage(error)}`); return null; });
     return {
       rows: nportHoldingsSheet(read.filing, nportTickers(read.filing.positions, names, await loadUsListings())),
       asOfDate: read.filing.repPdDate || null,
@@ -1346,7 +1346,7 @@ export function createTransport(config: UpdaterConfig, gate: () => Promise<void>
         lastError = new Error(`${label}: HTTP ${response.status}`);
       }
       if (attempt === config.maxRetries) break;
-      outputNote(`[ ${'retry'.padEnd(9)}] ${label}: ${errorMessage(lastError)}, retry ${attempt + 1}/${config.maxRetries}`);
+      outputNote(`[ ${'retry'.padEnd(8)} ] ${label}: ${errorMessage(lastError)}, retry ${attempt + 1}/${config.maxRetries}`);
       await wait(500 * 2 ** attempt);
     }
     throw lastError instanceof Error ? lastError : new Error(`${label}: request failed`);
@@ -1737,7 +1737,7 @@ export function outputFundLine(index: number, total: number, ticker: string, sta
     field('div', outputPercent(data['dividendYield'] ?? yields['dividendYield'] ?? metrics['dividendYield'])),
     field('sec', outputPercent(data['secYield'] ?? yields['secYield'] ?? metrics['secYield'])),
   ].filter((part) => part !== '').join(' ');
-  return `[ ${String(index).padStart(width)}/${String(total).padEnd(width)}  ] ${outputClean(ticker).padEnd(5)} ${status.padEnd(9)}${detail ? ` ${detail}` : ''}${reason ? ` reason=${outputClean(reason)}` : ''}`;
+  return `[ ${`${String(index).padStart(width)}/${total}`.padEnd(8)} ] ${outputClean(ticker).padEnd(5)} ${status.padEnd(9)}${detail ? ` ${detail}` : ''}${reason ? ` reason=${outputClean(reason)}` : ''}`;
 }
 
 export function outputCreateReporter(total: number) {
@@ -2041,7 +2041,7 @@ export async function updateFund(
     } catch (error) {
       providers.retained.push('issuer page');
       failedSources.push('issuer page');
-      outputNote(`[ ${'issuer'.padEnd(9)}] ${ticker}: fund page unavailable (${errorMessage(error)}), keeping the published data`);
+      outputNote(`[ ${'issuer'.padEnd(8)} ] ${ticker}: fund page unavailable (${errorMessage(error)}), keeping the published data`);
     }
   } else {
     providers.retained.push('issuer page (SKIP_SPFUNDS)');
@@ -2065,7 +2065,7 @@ export async function updateFund(
       csvTotals = { netAssets: parsed.netAssets, sharesOutstanding: parsed.sharesOutstanding };
       providers.spFunds = true;
     } catch (error) {
-      outputNote(`[ ${'holdings'.padEnd(9)}] ${ticker}: official holdings CSV unavailable (${errorMessage(error)}), trying EDGAR`);
+      outputNote(`[ ${'holdings'.padEnd(8)} ] ${ticker}: official holdings CSV unavailable (${errorMessage(error)}), trying EDGAR`);
       if (config.edgarFallback && edgar) {
         try {
           // N-PORT-P is quarterly and lags: the reader takes the fund's own newest filing only when its report period is strictly
@@ -2080,7 +2080,7 @@ export async function updateFund(
             providers.edgar = true;
           }
         } catch (nportError) {
-          outputNote(`[ ${'edgar'.padEnd(9)}] ${ticker}: N-PORT-P fallback failed (${errorMessage(nportError)})`);
+          outputNote(`[ ${'edgar'.padEnd(8)} ] ${ticker}: N-PORT-P fallback failed (${errorMessage(nportError)})`);
         }
       }
       if (!holdingsRows) failedSources.push('holdings');
@@ -2131,7 +2131,7 @@ export async function updateFund(
       providers.yahoo = true;
     } catch (error) {
       failedSources.push('Yahoo history');
-      outputNote(`[ ${'chart'.padEnd(9)}] ${ticker}: Yahoo chart unavailable (${errorMessage(error)}), keeping the published history`);
+      outputNote(`[ ${'chart'.padEnd(8)} ] ${ticker}: Yahoo chart unavailable (${errorMessage(error)}), keeping the published history`);
     }
   }
   if (!days.length) {
@@ -2140,7 +2140,7 @@ export async function updateFund(
   }
 
   if (failedSources.length && previous.meta) {
-    outputNote(`[ ${'keep'.padEnd(9)}] ${ticker}: ${failedSources.join(' + ')} failed, the fund stays exactly as published`);
+    outputNote(`[ ${'keep'.padEnd(8)} ] ${ticker}: ${failedSources.join(' + ')} failed, the fund stays exactly as published`);
     return {
       entry: entryFromMeta(ticker, previous.meta),
       providers: { ...providers, retained: [...new Set([...providers.retained, 'all published files'])] },
@@ -2445,7 +2445,7 @@ export async function runUpdater(
       const response = await transport(SPFUNDS_LINEUP_URL, 'lineup homepage', { headers: browserHeaders() });
       catalogHtml = await response.text();
     } catch (error) {
-      outputNote(`[ ${'catalog'.padEnd(9)}] homepage unavailable (${errorMessage(error)}), using the known SP Funds tickers`);
+      outputNote(`[ ${'catalog'.padEnd(8)} ] homepage unavailable (${errorMessage(error)}), using the known SP Funds tickers`);
       catalogHtml = '';
     }
   }
@@ -2471,7 +2471,7 @@ export async function runUpdater(
     || Object.keys(config.performanceRanges).length || Object.keys(config.totalReturnRanges).length,
   );
   outputPrintFilter(filtered.length, universe.length);
-  if (deferred) console.log(`[ ${'filter'.padEnd(9)}] range filters are evaluated per fund against freshly parsed facts`);
+  if (deferred) console.log(`[ ${'filter'.padEnd(8)} ] range filters are evaluated per fund against freshly parsed facts`);
 
   // 2) Bounded batches resume from a cursor that is only valid for the same scope.
   const scope = stableContentKey({
@@ -2481,7 +2481,7 @@ export async function runUpdater(
   });
   const cursor = config.maxFetches > 0 ? await readCursor(apiRoot, scope) : null;
   const batch = batchSelection(filtered, config.maxFetches, cursor);
-  if (config.maxFetches > 0) console.log(`[ ${'cursor'.padEnd(9)}] ${batch.length} selected for this batch; after ${cursor ?? 'start'}`);
+  if (config.maxFetches > 0) console.log(`[ ${'cursor'.padEnd(8)} ] ${batch.length} selected for this batch; after ${cursor ?? 'start'}`);
   const queue = [...batch];
 
   // Filtered, bounded, skipped and failed funds keep their published row; a stale catalog-only row is dropped (Q27).
@@ -2497,7 +2497,7 @@ export async function runUpdater(
     for (;;) {
       if (clock() - startedAt > deadlineMs && queue.length) {
         summary.deadlineHit = true;
-        outputNote(`[ ${'deadline'.padEnd(9)}] soft deadline reached, ${queue.length} fund(s) left for the next run`);
+        outputNote(`[ ${'deadline'.padEnd(8)} ] soft deadline reached, ${queue.length} fund(s) left for the next run`);
         queue.length = 0;
       }
       const fund = queue.shift();
@@ -2518,7 +2518,7 @@ export async function runUpdater(
           yields: outcome.entry['metrics'],
         }, outcome.reason);
       } catch (error) {
-        outputNote(`[ ${'error'.padEnd(9)}] ${fund.ticker}: ${errorMessage(error)}`);
+        outputNote(`[ ${'error'.padEnd(8)} ] ${fund.ticker}: ${errorMessage(error)}`);
         outcomes.push({ ticker: fund.ticker, status: 'failed', reason: errorMessage(error) });
         summary.failures.push(fund.ticker);
         reporter.result(fund.ticker, 'failed', {}, errorMessage(error));
@@ -2555,7 +2555,7 @@ export async function runUpdater(
   const updated = outcomes.filter((outcome) => outcome.status === 'updated').length;
   const skipped = outcomes.filter((outcome) => outcome.status === 'skipped').length;
   summary.skipped = outcomes.filter((outcome) => outcome.status === 'skipped').map((outcome) => outcome.ticker);
-  if (failures) console.log(`[ ${'failed'.padEnd(9)}] ${summary.failures.join(', ')}`);
+  if (failures) console.log(`[ ${'failed'.padEnd(8)} ] ${summary.failures.join(', ')}`);
   console.log(reporter.summary(startedAt, clock()));
   console.log(outputCounts(funds.length, holdingsTotal, historyTotal));
   await outputWriteSummary([
@@ -2635,7 +2635,7 @@ if (import.meta.main) {
   main()
     .then((code) => { process.exitCode = code; })
     .catch((error) => {
-      console.error(`[ ${'error'.padEnd(9)}] ${errorMessage(error)}`);
+      console.error(`[ ${'error'.padEnd(8)} ] ${errorMessage(error)}`);
       process.exitCode = 1;
     });
 }
