@@ -2115,14 +2115,13 @@ export async function updateFund(
     try {
       const response = await transport(yahooChartUrl(ticker, config.historyRange, now.getTime()), `${ticker} Yahoo chart`, { headers: yahooHeaders() });
       const fetched = parseYahooChart(await response.json());
-      // A HISTORY_RANGE window never shrinks the published history (shared windowed-chart block): the published days older than
-      // the window go in front, Adj Close rescaled by the overlapping days; a window that does not join keeps the fund as published.
+      // A fresh chart never shrinks the published history (shared windowed-chart block): the published days older than the
+      // chart go in front, Adj Close rescaled by the overlapping days; a chart that does not join keeps the fund as published.
+      // This covers a HISTORY_RANGE window and a truncated `max` answer; a full `max` answer starts at inception: unchanged.
       // The published distribution rows are [Ex-Date, Record Date, Payable Date, Amount]: the block reads [date, amount].
-      const chart = /^\d+y$/.test(config.historyRange)
-        ? mergeWindowedChart({ ...fetched, days: [...fetched.days].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)) }, previous.history.rows,
-          publishedDistributionRows(previous.meta).map((cells) => [cells[0], cells[3]]))
-        : fetched;
-      if (!chart) throw new Error(`chart window does not join the published history (${config.historyRange})`);
+      const chart = mergeWindowedChart({ ...fetched, days: [...fetched.days].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)) }, previous.history.rows,
+        publishedDistributionRows(previous.meta).map((cells) => [cells[0], cells[3]]));
+      if (!chart) throw new Error(`chart does not join the published history (${config.historyRange}, ${fetched.days.length} days)`);
       // The cent noise of Yahoo's float32 adjusted close keeps the published cent (ADJ_CLOSE_NOISE)
       days = mergeHistoryDays(chart.days, publishedDays);
       dividends = chart.dividends.map((dividend) => dividendFromWindow(dividend));
