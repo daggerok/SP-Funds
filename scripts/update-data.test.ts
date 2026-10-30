@@ -1231,6 +1231,14 @@ describe('pipeline 4', () => {
     const kept = await runUpdater(windowed, { apiRoot, fetcher: sampleFetcher({ 'yahoo-SPUS': JSON.stringify(gap) }).fetcher, now: day(2) });
     expect(kept.degraded).toEqual(['SPUS']);
     expect(await snapshot(apiRoot)).toEqual(before);
+    // a truncated `max` answer (Yahoo served 2 bars for some funds on 2026-10-29) never shrinks the history either:
+    // one that joins the published days keeps them all, one that does not join keeps the fund as published
+    const full = offlineConfig({ TICKERS: 'SPUS' });
+    await runUpdater(full, { apiRoot, fetcher: sampleFetcher({ 'yahoo-SPUS': yahooWindow('SPUS', 2, 0.98) }).fetcher, now: day(3) });
+    expect(await snapshot(apiRoot)).toEqual(before);
+    const lone = await runUpdater(full, { apiRoot, fetcher: sampleFetcher({ 'yahoo-SPUS': JSON.stringify(gap) }).fetcher, now: day(4) });
+    expect(lone.degraded).toEqual(['SPUS']);
+    expect(await snapshot(apiRoot)).toEqual(before);
   });
 
   test('a relaxed guard still keeps numeric published weights from an all-blank weight sheet (Q24)', async () => {
