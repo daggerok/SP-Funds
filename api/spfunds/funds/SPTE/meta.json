@@ -8,20 +8,20 @@
   "terValue": 0.55,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$47.73",
-  "navValue": 47.73,
-  "aum": "$258.93M",
-  "aumValue": 258930000,
-  "asOfDate": "2026-10-29",
+  "nav": "$41.20",
+  "navValue": 41.2,
+  "aum": "$223.52M",
+  "aumValue": 223520000,
+  "asOfDate": "2026-11-05",
   "inceptionDate": "2023-11-30",
   "exchange": "NYSE Arca",
-  "closePrice": "$47.85",
-  "closePriceValue": 47.85,
-  "closePriceAsOfDate": "2026-10-29",
-  "premiumDiscount": "0.25%",
-  "premiumDiscountValue": 0.25,
+  "closePrice": "$41.06",
+  "closePriceValue": 41.06,
+  "closePriceAsOfDate": "2026-11-05",
+  "premiumDiscount": "-0.34%",
+  "premiumDiscountValue": -0.34,
   "sharesOutstanding": 5425000,
-  "midpoint": 258935250,
+  "midpoint": 223510000,
   "cusip": "84612A101",
   "isin": null,
   "distributions": {
@@ -244,13 +244,13 @@
   },
   "returns": {
     "monthEnd": {
-      "asOfDate": "2026-09-30",
-      "ytd": 42.1,
-      "yr1": 46.26,
+      "asOfDate": "2026-10-31",
+      "ytd": 30.04,
+      "yr1": 26.19,
       "yr3": null,
       "yr5": null,
       "yr10": null,
-      "sinceInception": 38.74
+      "sinceInception": 33.32
     },
     "quarterEnd": {
       "asOfDate": "2026-09-30",
@@ -263,40 +263,40 @@
     }
   },
   "metrics": {
-    "ytd": 42.1,
-    "tr1y": 46.26,
+    "ytd": 30.04,
+    "tr1y": 26.19,
     "tr3y": null,
     "tr5y": null,
     "tr10y": null,
     "cagr3y": null,
     "cagr5y": null,
     "cagr10y": null,
-    "siAnn": 38.74,
-    "dividendYield": 0.16,
-    "dividendYieldText": "0.16%",
+    "siAnn": 33.32,
+    "dividendYield": 0.19,
+    "dividendYieldText": "0.19%",
     "dividendYieldBasis": "indicated",
-    "secYield": 0.09,
-    "secYieldText": "0.09%",
+    "secYield": 0.08,
+    "secYieldText": "0.08%",
     "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
-    "performanceAsOf": "2026-09-30"
+    "performanceAsOf": "2026-10-31"
   },
   "holdings": {
     "pages": [
       "holdings/001.json"
     ],
     "pageSize": 250,
-    "totalRows": 108,
-    "asOfDate": "2026-10-30"
+    "totalRows": 109,
+    "asOfDate": "2026-11-06"
   },
   "history": {
     "pages": [
       "history/001.json"
     ],
     "pageSize": 1000,
-    "totalRows": 731,
-    "asOfDate": "2026-10-30"
+    "totalRows": 736,
+    "asOfDate": "2026-11-06"
   },
-  "generatedAt": "2026-11-01T03:14:27Z",
+  "generatedAt": "2026-11-08T03:21:42Z",
   "netTerValue": 0.55,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -317,13 +317,13 @@
     "benchmark": "S&P Global 1200 Shariah Information Technology (Sector) Capped (USD) TR"
   },
   "yields": {
-    "dividendYield": 0.16,
-    "dividendYieldText": "0.16%",
+    "dividendYield": 0.19,
+    "dividendYieldText": "0.19%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 0.16,
-    "secYield": 0.09,
-    "secYieldText": "0.09%",
+    "distributionRate": 0.19,
+    "secYield": 0.08,
+    "secYieldText": "0.08%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
   },
   "documents": {
@@ -350,17 +350,17 @@
         "values": [
           "SP Funds S&P Global Technology ETF",
           "SPTE MKT",
-          "5.28",
-          "2.52",
-          "44.37",
-          "42.27",
-          "154.14",
-          "46.81",
+          "-9.05",
+          "1.00",
+          "8.56",
+          "29.40",
+          "131.15",
+          "25.33",
           "-",
           "-",
           "-",
-          "38.95",
-          "09/30/2026"
+          "33.23",
+          "10/31/2026"
         ]
       },
       {
@@ -368,17 +368,17 @@
         "values": [
           "SP Funds S&P Global Technology ETF",
           "SPTE NAV",
-          "5.43",
-          "2.43",
-          "45.25",
-          "42.10",
-          "153.09",
-          "46.26",
+          "-8.49",
+          "1.97",
+          "9.80",
+          "30.04",
+          "131.61",
+          "26.19",
           "-",
           "-",
           "-",
-          "38.74",
-          "09/30/2026"
+          "33.32",
+          "10/31/2026"
         ]
       },
       {
@@ -386,17 +386,17 @@
         "values": [
           "S&P Global 1200 Shariah Information Technology (Sector) Capped (USD) TR",
           "SPSITUT",
-          "4.90",
-          "1.10",
-          "51.61",
-          "52.28",
-          "174.07",
-          "62.80",
+          "-9.10",
+          "0.50",
+          "11.47",
+          "38.42",
+          "149.14",
+          "36.09",
           "-",
           "-",
           "-",
-          "42.70",
-          "09/30/2026"
+          "36.69",
+          "10/31/2026"
         ]
       },
       {
@@ -404,17 +404,17 @@
         "values": [
           "S&P 500 TR",
           "SPTR2",
-          "-0.35",
-          "2.30",
-          "17.85",
-          "12.75",
-          "73.71",
-          "15.74",
+          "-0.87",
+          "1.48",
+          "5.73",
+          "11.77",
+          "72.19",
+          "12.11",
           "-",
           "-",
           "-",
-          "21.50",
-          "09/30/2026"
+          "20.45",
+          "10/31/2026"
         ]
       }
     ]

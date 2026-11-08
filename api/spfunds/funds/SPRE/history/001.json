@@ -3,7 +3,7 @@
   "kind": "history",
   "page": 1,
   "pageSize": 1000,
-  "totalRows": 1466,
+  "totalRows": 1471,
   "headers": [
     "Date",
     "Close",
@@ -6012,5 +6012,5 @@
       "Volume": "31600"
     }
   ],
-  "asOfDate": "2026-10-30"
+  "asOfDate": "2026-11-06"
 }

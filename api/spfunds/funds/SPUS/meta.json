@@ -8,20 +8,20 @@
   "terValue": 0.45,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$59.75",
-  "navValue": 59.75,
-  "aum": "$3.38B",
-  "aumValue": 3380560000,
-  "asOfDate": "2026-10-29",
+  "nav": "$55.37",
+  "navValue": 55.37,
+  "aum": "$3.19B",
+  "aumValue": 3185190000,
+  "asOfDate": "2026-11-05",
   "inceptionDate": "2019-12-17",
   "exchange": "NYSE Arca",
-  "closePrice": "$59.77",
-  "closePriceValue": 59.77,
-  "closePriceAsOfDate": "2026-10-29",
-  "premiumDiscount": "0.03%",
-  "premiumDiscountValue": 0.03,
-  "sharesOutstanding": 56575000,
-  "midpoint": 3380356250,
+  "closePrice": "$55.41",
+  "closePriceValue": 55.41,
+  "closePriceAsOfDate": "2026-11-05",
+  "premiumDiscount": "0.07%",
+  "premiumDiscountValue": 0.07,
+  "sharesOutstanding": 57525000,
+  "midpoint": 3185159250,
   "cusip": "886364801",
   "isin": null,
   "distributions": {
@@ -400,13 +400,13 @@
   },
   "returns": {
     "monthEnd": {
-      "asOfDate": "2026-09-30",
-      "ytd": 17.13,
-      "yr1": 21.21,
-      "yr3": 25.32,
-      "yr5": 16.37,
+      "asOfDate": "2026-10-31",
+      "ytd": 14.93,
+      "yr1": 13.89,
+      "yr3": 25.75,
+      "yr5": 13.89,
       "yr10": null,
-      "sinceInception": 18.57
+      "sinceInception": 18
     },
     "quarterEnd": {
       "asOfDate": "2026-09-30",
@@ -419,22 +419,22 @@
     }
   },
   "metrics": {
-    "ytd": 17.13,
-    "tr1y": 21.21,
-    "tr3y": 96.82,
-    "tr5y": 113.41,
+    "ytd": 14.93,
+    "tr1y": 13.89,
+    "tr3y": 98.85,
+    "tr5y": 91.61,
     "tr10y": null,
-    "cagr3y": 25.32,
-    "cagr5y": 16.37,
+    "cagr3y": 25.75,
+    "cagr5y": 13.89,
     "cagr10y": null,
-    "siAnn": 18.57,
-    "dividendYield": 0.52,
-    "dividendYieldText": "0.52%",
+    "siAnn": 18,
+    "dividendYield": 0.56,
+    "dividendYieldText": "0.56%",
     "dividendYieldBasis": "indicated",
     "secYield": 0.39,
     "secYieldText": "0.39%",
     "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
-    "performanceAsOf": "2026-09-30"
+    "performanceAsOf": "2026-10-31"
   },
   "holdings": {
     "pages": [
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 218,
-    "asOfDate": "2026-10-30"
+    "asOfDate": "2026-11-06"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1726,
-    "asOfDate": "2026-10-30"
+    "totalRows": 1731,
+    "asOfDate": "2026-11-06"
   },
-  "generatedAt": "2026-11-01T03:14:27Z",
+  "generatedAt": "2026-11-08T03:21:42Z",
   "netTerValue": 0.45,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -470,15 +470,15 @@
   "identifiers": {
     "cusip": "886364801",
     "isin": null,
-    "indexTicker": "SPSIEUT",
-    "benchmark": "S&P 500 Shariah Industry Exclusions Index (USD) TR"
+    "indexTicker": "SPTR2",
+    "benchmark": "S&P 500 TR"
   },
   "yields": {
-    "dividendYield": 0.52,
-    "dividendYieldText": "0.52%",
+    "dividendYield": 0.56,
+    "dividendYieldText": "0.56%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 0.52,
+    "distributionRate": 0.56,
     "secYield": 0.39,
     "secYieldText": "0.39%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
@@ -492,7 +492,7 @@
     "esgWhitepaper": "https://www.sp-funds.com/wp-content/uploads/fund_files-411600123542-ESG-Whitepaper-by-Irfan-Chaudhry-SP-FundsSML-2-3.pdf",
     "annualReport": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Semi-Annual-Financials-5.31.26-Final.pdf",
     "fiscalQ1Holdings": "https://www.sp-funds.com/wp-content/uploads/SPUS-SOI-2-28-26.pdf",
-    "fiscalQ3Holdings": "https://www.sp-funds.com/wp-content/uploads/SPUS-SOI-8-31-25.pdf",
+    "fiscalQ3Holdings": "https://www.sp-funds.com/wp-content/uploads/SPUS-SOI_8.31.26.pdf",
     "form8937": "https://www.sp-funds.com/wp-content/uploads/SPUS-Form-8937-2025-Web.pdf",
     "certificateOfShariaAccreditation": "https://www.sp-funds.com/wp-content/uploads/SPUS-Certificate-of-Sharia-Accreditation-2020-Signed.pdf",
     "shariaAuditorReport": "https://www.sp-funds.com/wp-content/uploads/SPUS-Shariah-Auditors-Report-2026-SP-Funds.pdf",
@@ -500,25 +500,25 @@
     "proxyVotes": "https://www.sp-funds.com/wp-content/uploads/Tidal-Trust-I-SP-ETFs-Voting-Table-1.xlsx"
   },
   "performance": {
-    "benchmark": "SPSIEUT",
-    "benchmarkName": "S&P 500 Shariah Industry Exclusions Index (USD) TR",
+    "benchmark": "SPTR2",
+    "benchmarkName": "S&P 500 TR",
     "rows": [
       {
         "label": "SPUS MKT",
         "values": [
           "SP Funds S&P 500 Sharia Industry Exclusions ETF",
           "SPUS MKT",
-          "1.23",
-          "3.69",
-          "23.97",
-          "17.09",
-          "217.84",
-          "21.19",
-          "25.28",
-          "16.32",
+          "-1.84",
+          "3.85",
+          "8.96",
+          "14.93",
+          "212.00",
+          "13.88",
+          "25.74",
+          "13.88",
           "-",
-          "18.57",
-          "09/30/2026"
+          "18.00",
+          "10/31/2026"
         ]
       },
       {
@@ -526,35 +526,17 @@
         "values": [
           "SP Funds S&P 500 Sharia Industry Exclusions ETF",
           "SPUS NAV",
-          "1.25",
-          "3.65",
-          "23.94",
-          "17.13",
-          "217.88",
-          "21.21",
-          "25.32",
-          "16.37",
+          "-1.88",
+          "3.79",
+          "8.93",
+          "14.93",
+          "211.90",
+          "13.89",
+          "25.75",
+          "13.89",
           "-",
-          "18.57",
-          "09/30/2026"
-        ]
-      },
-      {
-        "label": "SPSIEUT",
-        "values": [
-          "S&P 500 Shariah Industry Exclusions Index (USD) TR",
-          "SPSIEUT",
-          "1.88",
-          "4.02",
-          "23.71",
-          "17.15",
-          "210.61",
-          "21.50",
-          "25.15",
-          "15.66",
-          "-",
-          "18.17",
-          "09/30/2026"
+          "18.00",
+          "10/31/2026"
         ]
       },
       {
@@ -562,17 +544,17 @@
         "values": [
           "S&P 500 TR",
           "SPTR2",
-          "-0.35",
-          "2.30",
-          "17.85",
-          "12.75",
-          "165.14",
-          "15.74",
-          "22.89",
-          "13.79",
+          "-0.87",
+          "1.48",
+          "5.73",
+          "11.77",
+          "162.83",
+          "12.11",
+          "23.40",
+          "12.06",
           "-",
-          "15.45",
-          "09/30/2026"
+          "15.09",
+          "10/31/2026"
         ]
       }
     ]

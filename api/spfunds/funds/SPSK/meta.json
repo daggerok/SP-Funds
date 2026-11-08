@@ -8,20 +8,20 @@
   "terValue": 0.5,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$17.49",
-  "navValue": 17.49,
-  "aum": "$480.57M",
-  "aumValue": 480570000,
-  "asOfDate": "2026-10-29",
+  "nav": "$17.57",
+  "navValue": 17.57,
+  "aum": "$487.70M",
+  "aumValue": 487700000,
+  "asOfDate": "2026-11-05",
   "inceptionDate": "2019-12-27",
   "exchange": "NYSE",
-  "closePrice": "$17.52",
-  "closePriceValue": 17.52,
-  "closePriceAsOfDate": "2026-10-29",
-  "premiumDiscount": "0.16%",
-  "premiumDiscountValue": 0.16,
-  "sharesOutstanding": 27475000,
-  "midpoint": 480537750,
+  "closePrice": "$17.57",
+  "closePriceValue": 17.57,
+  "closePriceAsOfDate": "2026-11-05",
+  "premiumDiscount": "-0.03%",
+  "premiumDiscountValue": -0.03,
+  "sharesOutstanding": 27750000,
+  "midpoint": 487567500,
   "cusip": "886364702",
   "isin": null,
   "distributions": {
@@ -400,13 +400,13 @@
   },
   "returns": {
     "monthEnd": {
-      "asOfDate": "2026-09-30",
-      "ytd": -2.29,
-      "yr1": -1.43,
-      "yr3": 3.77,
-      "yr5": 0.39,
+      "asOfDate": "2026-10-31",
+      "ytd": -1.2,
+      "yr1": -0.93,
+      "yr3": 4.45,
+      "yr5": 0.72,
       "yr10": null,
-      "sinceInception": 0.77
+      "sinceInception": 0.92
     },
     "quarterEnd": {
       "asOfDate": "2026-09-30",
@@ -419,30 +419,30 @@
     }
   },
   "metrics": {
-    "ytd": -2.29,
-    "tr1y": -1.43,
-    "tr3y": 11.74,
-    "tr5y": 1.97,
+    "ytd": -1.2,
+    "tr1y": -0.93,
+    "tr3y": 13.95,
+    "tr5y": 3.65,
     "tr10y": null,
-    "cagr3y": 3.77,
-    "cagr5y": 0.39,
+    "cagr3y": 4.45,
+    "cagr5y": 0.72,
     "cagr10y": null,
-    "siAnn": 0.77,
-    "dividendYield": 3.57,
-    "dividendYieldText": "3.57%",
+    "siAnn": 0.92,
+    "dividendYield": 3.55,
+    "dividendYieldText": "3.55%",
     "dividendYieldBasis": "indicated",
-    "secYield": 5.04,
-    "secYieldText": "5.04%",
+    "secYield": 5.24,
+    "secYieldText": "5.24%",
     "returnsBasis": "official SP Funds month-end NAV total returns (fund page Performance Statistics table, fund NAV row); cumulative 3/5/10-year figures derived exactly from the published annualized returns",
-    "performanceAsOf": "2026-09-30"
+    "performanceAsOf": "2026-10-31"
   },
   "holdings": {
     "pages": [
       "holdings/001.json"
     ],
     "pageSize": 250,
-    "totalRows": 176,
-    "asOfDate": "2026-10-30"
+    "totalRows": 175,
+    "asOfDate": "2026-11-06"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1718,
-    "asOfDate": "2026-10-30"
+    "totalRows": 1723,
+    "asOfDate": "2026-11-06"
   },
-  "generatedAt": "2026-11-01T03:14:27Z",
+  "generatedAt": "2026-11-08T03:21:42Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -474,13 +474,13 @@
     "benchmark": "Bloomberg Global Aggregate Index"
   },
   "yields": {
-    "dividendYield": 3.57,
-    "dividendYieldText": "3.57%",
+    "dividendYield": 3.55,
+    "dividendYieldText": "3.55%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 3.57,
-    "secYield": 5.04,
-    "secYieldText": "5.04%",
+    "distributionRate": 3.55,
+    "secYield": 5.24,
+    "secYieldText": "5.24%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
   },
   "documents": {
@@ -492,7 +492,7 @@
     "esgWhitepaper": "https://www.sp-funds.com/wp-content/uploads/fund_files-411600123542-ESG-Whitepaper-by-Irfan-Chaudhry-SP-FundsSML-2-4.pdf",
     "annualReport": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Semi-Annual-Financials-5.31.26-Final.pdf",
     "fiscalQ1Holdings": "https://www.sp-funds.com/wp-content/uploads/SPSK-SOI-2-28-26.pdf",
-    "fiscalQ3Holdings": "https://www.sp-funds.com/wp-content/uploads/SPSK-SOI-8-31-25.pdf",
+    "fiscalQ3Holdings": "https://www.sp-funds.com/wp-content/uploads/SPSK-SOI_8.31.26.pdf",
     "certificateOfShariaAccreditation": "https://www.sp-funds.com/wp-content/uploads/SPSK-Certificate-of-Sharia-Accreditation-2020-Signed.pdf",
     "shariaAuditorReport": "https://www.sp-funds.com/wp-content/uploads/SPSK-Shariah-Auditors-Report-2026-SP-Funds.pdf",
     "annualTsr": "https://www.sp-funds.com/wp-content/uploads/SP-Funds-Dow-Jones-Global-Sukuk-ETF-1.pdf",
@@ -507,17 +507,17 @@
         "values": [
           "SP Funds Dow Jones Global Sukuk ETF",
           "SPSK MKT",
-          "-2.62",
-          "-2.70",
-          "-1.25",
-          "-2.34",
-          "5.27",
-          "-1.55",
-          "3.73",
-          "0.48",
+          "1.28",
+          "-0.72",
+          "-1.11",
+          "-1.09",
+          "6.61",
+          "-1.05",
+          "4.55",
+          "0.74",
           "-",
-          "0.76",
-          "09/30/2026"
+          "0.94",
+          "10/31/2026"
         ]
       },
       {
@@ -525,17 +525,17 @@
         "values": [
           "SP Funds Dow Jones Global Sukuk ETF",
           "SPSK NAV",
-          "-2.52",
-          "-2.64",
-          "-0.90",
-          "-2.29",
-          "5.30",
-          "-1.43",
-          "3.77",
-          "0.39",
+          "1.11",
+          "-0.68",
+          "-1.11",
+          "-1.20",
+          "6.47",
+          "-0.93",
+          "4.45",
+          "0.72",
           "-",
-          "0.77",
-          "09/30/2026"
+          "0.92",
+          "10/31/2026"
         ]
       },
       {
@@ -543,17 +543,17 @@
         "values": [
           "Bloomberg Global Aggregate Index",
           "-",
-          "-2.38",
-          "-2.46",
-          "-1.61",
-          "-2.66",
-          "-4.45",
-          "-2.44",
-          "3.82",
-          "-1.86",
+          "1.41",
+          "-0.56",
+          "-1.45",
+          "-1.30",
+          "-3.11",
+          "-0.81",
+          "4.72",
+          "-1.54",
           "-",
-          "-0.67",
-          "09/30/2026"
+          "-0.46",
+          "10/31/2026"
         ]
       },
       {
@@ -561,17 +561,17 @@
         "values": [
           "Dow Jones Sukuk Total Return Index (ex-Reinvestment)",
           "DJSUKTX",
-          "-2.19",
-          "-2.22",
-          "-0.35",
-          "-1.49",
-          "16.15",
+          "0.98",
+          "-0.50",
+          "-0.76",
           "-0.53",
-          "4.65",
-          "1.32",
+          "17.28",
+          "-0.17",
+          "5.30",
+          "1.56",
           "-",
-          "2.24",
-          "09/30/2026"
+          "2.36",
+          "10/31/2026"
         ]
       }
     ]
