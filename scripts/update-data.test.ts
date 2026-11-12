@@ -55,6 +55,8 @@ const TICKERS = ['SPRE', 'SPSK', 'SPTE', 'SPUS', 'SPWO'];
 const SPFUNDS = 'https://www.sp-funds.com';
 // the 52-week range keys every index row gets from its published history pages (shared range-52w block)
 const RANGE_KEYS = ['week52Low', 'week52High', 'range52w', 'range52wClose', 'range52wAsOf', 'range52wSince', 'range52wBasis'];
+// the nine swing keys after them, from the Close column of the same history pages (shared swing block)
+const SWING_KEYS = ['pctFrom52wHigh', 'athPrice', 'athDate', 'athBasis', 'pctFromAth', 'volatility1y', 'sigmaFromMean60d', 'high60d', 'low60d'];
 
 const HOME_HTML = `<html><body>
 <li class="menu-item"><a href="#"><span class="ui-menu-item-wrapper">Our ETFs</span></a>
@@ -832,8 +834,8 @@ describe('metrics 2', () => {
     await runUpdater(offlineConfig(), { apiRoot, fetcher: sampleFetcher().fetcher, now: NOW });
     const rows = (await readIndex(apiRoot))['funds'] as JsonRecord[];
     const expected = Object.keys(emptyMetrics()).sort();
-    // the index adds the 52-week range keys from the published history pages (shared range-52w block)
-    const indexed = [...expected, ...RANGE_KEYS].sort();
+    // the index adds the 52-week range and the swing keys from the published history pages (shared range-52w and swing blocks)
+    const indexed = [...expected, ...RANGE_KEYS, ...SWING_KEYS].sort();
     for (const row of rows) expect(Object.keys(row['metrics'] as JsonRecord).sort(), String(row['ticker'])).toEqual(indexed);
     const placeholder = placeholderEntry('SPWO', 'https://www.sp-funds.com/spwo/');
     const metrics = placeholder['metrics'] as JsonRecord;
@@ -920,6 +922,9 @@ describe('pipeline', () => {
     ].sort());
     expect(spus['distributions']).toEqual({ frequency: 'Monthly', exDate: '2026-09-28', dividend: '0.026' });
     for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord)).toEqual(expect.arrayContaining(RANGE_KEYS));
+    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-11, -2)).toEqual(SWING_KEYS);
+    const swing = spus['metrics'] as JsonRecord;
+    expect([typeof swing['athPrice'], swing['athBasis']]).toEqual(['number', expect.stringMatching(/^daily closes since \d{4}-\d{2}-\d{2}$/)]);
 
     const tree = await listFiles(apiRoot);
     expect(tree.length).toBe(1 + 5 * 3); // index.json + meta, one holdings and one history page per fund
@@ -1061,7 +1066,7 @@ describe('pipeline 2', () => {
     expect((await listFiles(fresh)).filter((file) => file.startsWith('funds/SPWO/'))).toEqual([]);
     const row = ((await readIndex(fresh))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === 'SPWO')!;
     expect(row).toMatchObject({ dataFile: null, holdings: 0 });
-    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual([...Object.keys(emptyMetrics()), ...RANGE_KEYS].sort());
+    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual([...Object.keys(emptyMetrics()), ...RANGE_KEYS, ...SWING_KEYS].sort());
     expect(String((row['metrics'] as JsonRecord)['returnsBasis'])).not.toBe('');
   });
 
