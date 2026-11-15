@@ -57,6 +57,8 @@ const SPFUNDS = 'https://www.sp-funds.com';
 const RANGE_KEYS = ['week52Low', 'week52High', 'range52w', 'range52wClose', 'range52wAsOf', 'range52wSince', 'range52wBasis'];
 // the nine swing keys after them, from the Close column of the same history pages (shared swing block)
 const SWING_KEYS = ['pctFrom52wHigh', 'athPrice', 'athDate', 'athBasis', 'pctFromAth', 'volatility1y', 'sigmaFromMean60d', 'high60d', 'low60d'];
+// the six dividend keys after them, from the dividend events of one daily chart per updated fund (shared dividends block)
+const DIVIDEND_KEYS = ['dividendRate', 'dividendGrowth', 'dividendGrowth3y', 'dividendGrowth5y', 'dividendStreak', 'dividendCut10y'];
 
 const HOME_HTML = `<html><body>
 <li class="menu-item"><a href="#"><span class="ui-menu-item-wrapper">Our ETFs</span></a>
@@ -208,7 +210,7 @@ function yahooJson(ticker: string): string {
   const timestamps = Array.from({ length: count }, (_, index) => 1_788_000_000 + index * 86_400);
   return JSON.stringify({
     chart: { result: [{
-      meta: { fullExchangeName: 'NYSEArca', firstTradeDate: 1_576_679_400, longName: SAMPLES[ticker].name },
+      meta: { fullExchangeName: 'NYSEArca', firstTradeDate: timestamps[0], dataGranularity: '1d', longName: SAMPLES[ticker].name },
       timestamp: timestamps,
       events: { dividends: {
         a: { amount: 0.026, date: timestamps[count - 1] }, b: { amount: 0.02, date: timestamps[Math.max(0, count - 10)] },
@@ -683,7 +685,7 @@ describe('parsing 3', () => {
     expect(chart.days.length).toBe(30);
     expect(chart.days[0].date >= chart.days[1].date).toBe(true);
     expect(chart.days.every((item) => Number(item.close.toFixed(2)) === item.close && Number(item.adjClose.toFixed(2)) === item.adjClose)).toBe(true);
-    expect(chart.firstTradeDate).toBe('2019-12-18');
+    expect(chart.firstTradeDate).toBe('2026-08-29'); // the mock's first bar: the dividends block needs a chart that starts at the listing
     expect(chart.exchange).toBe('NYSEArca');
     expect(chart.dividends[0].exDate >= chart.dividends[1].exDate).toBe(true);
     expect(chart.dividends[0].amount).toBe(0.026);
@@ -835,7 +837,7 @@ describe('metrics 2', () => {
     const rows = (await readIndex(apiRoot))['funds'] as JsonRecord[];
     const expected = Object.keys(emptyMetrics()).sort();
     // the index adds the 52-week range and the swing keys from the published history pages (shared range-52w and swing blocks)
-    const indexed = [...expected, ...RANGE_KEYS, ...SWING_KEYS].sort();
+    const indexed = [...expected, ...RANGE_KEYS, ...SWING_KEYS, ...DIVIDEND_KEYS].sort();
     for (const row of rows) expect(Object.keys(row['metrics'] as JsonRecord).sort(), String(row['ticker'])).toEqual(indexed);
     const placeholder = placeholderEntry('SPWO', 'https://www.sp-funds.com/spwo/');
     const metrics = placeholder['metrics'] as JsonRecord;
@@ -922,9 +924,13 @@ describe('pipeline', () => {
     ].sort());
     expect(spus['distributions']).toEqual({ frequency: 'Monthly', exDate: '2026-09-28', dividend: '0.026' });
     for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord)).toEqual(expect.arrayContaining(RANGE_KEYS));
-    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-11, -2)).toEqual(SWING_KEYS);
+    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-17, -8)).toEqual(SWING_KEYS);
+    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-8, -2)).toEqual(DIVIDEND_KEYS);
     const swing = spus['metrics'] as JsonRecord;
     expect([typeof swing['athPrice'], swing['athBasis']]).toEqual(['number', expect.stringMatching(/^daily closes since \d{4}-\d{2}-\d{2}$/)]);
+    // the dividends block read the two dividend events (0.026 + 0.02) of the updated fund from its own daily chart request: dividendRate 0.046, the five growth keys null (never 0)
+    expect(DIVIDEND_KEYS.map((key) => swing[key])).toEqual([0.046, null, null, null, null, null]);
+    expect(seen.filter((url) => /chart\/SPUS\?period1=0&.*includePrePost=false/.test(url))).toHaveLength(1);
 
     const tree = await listFiles(apiRoot);
     expect(tree.length).toBe(1 + 5 * 3); // index.json + meta, one holdings and one history page per fund
@@ -1066,7 +1072,7 @@ describe('pipeline 2', () => {
     expect((await listFiles(fresh)).filter((file) => file.startsWith('funds/SPWO/'))).toEqual([]);
     const row = ((await readIndex(fresh))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === 'SPWO')!;
     expect(row).toMatchObject({ dataFile: null, holdings: 0 });
-    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual([...Object.keys(emptyMetrics()), ...RANGE_KEYS, ...SWING_KEYS].sort());
+    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual([...Object.keys(emptyMetrics()), ...RANGE_KEYS, ...SWING_KEYS, ...DIVIDEND_KEYS].sort());
     expect(String((row['metrics'] as JsonRecord)['returnsBasis'])).not.toBe('');
   });
 
@@ -1503,8 +1509,11 @@ describe('network 2', () => {
 
     const { fetcher, seen } = sampleFetcher();
     await runUpdater(offlineConfig({ HISTORY_RANGE: '5y', TICKERS: 'SPUS' }), { apiRoot: await tempApiRoot(), fetcher, now: NOW });
-    const chart = seen.filter((url) => url.includes('finance.yahoo.com'));
+    // the brand's own history request; the dividends block adds one more for the same fund (includePrePost=false) and none for an unselected one
+    const chart = seen.filter((url) => url.includes('finance.yahoo.com') && !url.includes('includePrePost=false'));
     expect(chart.length).toBe(1);
+    expect(seen.filter((url) => /chart\/SPUS\?period1=0&.*includePrePost=false/.test(url))).toHaveLength(1);
+    expect(seen.some((url) => /chart\/(SPRE|SPSK|SPTE|SPWO)\?period1=0&.*includePrePost=false/.test(url))).toBe(false);
     expect(start(chart[0])).toBe(Math.floor(seconds - 5 * 365.25 * 86_400));
   });
 
