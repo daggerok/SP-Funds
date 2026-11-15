@@ -4,7 +4,7 @@
  * excerpt in the shape the real pages and feeds use; no test performs network I/O.
  * Groups (same names in every ETF repo): controls, parsing, metrics, pipeline, network.
  */
-import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, setSystemTime, spyOn, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -44,6 +44,7 @@ afterEach(async () => {
   for (const [name, value] of savedEnv) { if (value === undefined) delete process.env[name]; else process.env[name] = value; }
   globalThis.fetch = savedFetch;
   process.exitCode = 0;
+  setSystemTime();
   while (tempDirs.length) await rm(tempDirs.pop()!, { recursive: true, force: true });
 });
 
@@ -874,6 +875,7 @@ describe('metrics 2', () => {
 
 describe('pipeline', () => {
   test('SPUS: metadata, metrics and paged holdings/history land in the sibling contract', async () => {
+    setSystemTime(NOW); // the derived frequency reads the wall clock: keep the sample ex-dates recent
     const apiRoot = await tempApiRoot();
     const transport = quietTransport(sampleFetcher().fetcher);
     const outcome = await updateFund(fundFor('SPUS'), offlineConfig({ HOLDINGS_PAGE_SIZE: '4', HISTORY_PAGE_SIZE: '10' }), apiRoot, transport, null, NOW);
@@ -906,6 +908,7 @@ describe('pipeline', () => {
   });
 
   test('a full run publishes every fund, then a second identical run writes nothing (zero diff)', async () => {
+    setSystemTime(NOW); // the derived frequency reads the wall clock: keep the sample ex-dates recent
     const apiRoot = await tempApiRoot();
     const { fetcher, seen } = sampleFetcher();
     const first = await runUpdater(offlineConfig(), { apiRoot, fetcher, now: NOW });
