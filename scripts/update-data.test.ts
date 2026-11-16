@@ -58,8 +58,10 @@ const SPFUNDS = 'https://www.sp-funds.com';
 const RANGE_KEYS = ['week52Low', 'week52High', 'range52w', 'range52wClose', 'range52wAsOf', 'range52wSince', 'range52wBasis'];
 // the nine swing keys after them, from the Close column of the same history pages (shared swing block)
 const SWING_KEYS = ['pctFrom52wHigh', 'athPrice', 'athDate', 'athBasis', 'pctFromAth', 'volatility1y', 'sigmaFromMean60d', 'high60d', 'low60d'];
-// the six dividend keys after them, from the dividend events of one daily chart per updated fund (shared dividends block)
-const DIVIDEND_KEYS = ['dividendRate', 'dividendGrowth', 'dividendGrowth3y', 'dividendGrowth5y', 'dividendStreak', 'dividendCut10y'];
+// the eight dividend keys after them, from the dividend events of one daily chart per updated fund (shared dividends block)
+const DIVIDEND_KEYS = ['dividendRate', 'dividendGrowth', 'dividendGrowth3y', 'dividendGrowth5y', 'dividendStreak', 'dividendCut10y', 'paymentsPerYear', 'payFrequency'];
+// the 32 benchmark keys against SPY and QQQ after them, from the same daily chart request (shared benchmark block)
+const BENCHMARK_KEYS = ['perf1y', 'perf3y', 'perf5y', 'perf10y', 'perfSi', 'maxDrawdown1y', 'maxDrawdown3y', 'maxDrawdown5y', 'maxDrawdown10y', 'vsSpy1y', 'vsSpy3y', 'vsSpy5y', 'vsSpy10y', 'beta1ySpy', 'corr1ySpy', 'upCapture3ySpy', 'downCapture3ySpy', 'relStrength3mSpy', 'stressReturnSpy', 'stressBasisSpy', 'vsQqq1y', 'vsQqq3y', 'vsQqq5y', 'vsQqq10y', 'beta1yQqq', 'corr1yQqq', 'upCapture3yQqq', 'downCapture3yQqq', 'relStrength3mQqq', 'stressReturnQqq', 'stressBasisQqq', 'benchmarkAsOf'];
 
 const HOME_HTML = `<html><body>
 <li class="menu-item"><a href="#"><span class="ui-menu-item-wrapper">Our ETFs</span></a>
@@ -207,11 +209,13 @@ function holdingsCsv(ticker: string, rows: string[][] = SAMPLES[ticker].csv): st
 }
 
 function yahooJson(ticker: string): string {
-  const count = SAMPLES[ticker].days;
+  // SPY and QQQ (benchmark block) are no catalog funds: they answer 30 bars like SPUS
+  const sample = SAMPLES[ticker] ?? SAMPLES['SPUS'];
+  const count = sample.days;
   const timestamps = Array.from({ length: count }, (_, index) => 1_788_000_000 + index * 86_400);
   return JSON.stringify({
     chart: { result: [{
-      meta: { fullExchangeName: 'NYSEArca', firstTradeDate: timestamps[0], dataGranularity: '1d', longName: SAMPLES[ticker].name },
+      meta: { fullExchangeName: 'NYSEArca', firstTradeDate: timestamps[0], dataGranularity: '1d', longName: sample.name },
       timestamp: timestamps,
       events: { dividends: {
         a: { amount: 0.026, date: timestamps[count - 1] }, b: { amount: 0.02, date: timestamps[Math.max(0, count - 10)] },
@@ -838,7 +842,7 @@ describe('metrics 2', () => {
     const rows = (await readIndex(apiRoot))['funds'] as JsonRecord[];
     const expected = Object.keys(emptyMetrics()).sort();
     // the index adds the 52-week range and the swing keys from the published history pages (shared range-52w and swing blocks)
-    const indexed = [...expected, ...RANGE_KEYS, ...SWING_KEYS, ...DIVIDEND_KEYS].sort();
+    const indexed = [...expected, ...RANGE_KEYS, ...SWING_KEYS, ...DIVIDEND_KEYS, ...BENCHMARK_KEYS].sort();
     for (const row of rows) expect(Object.keys(row['metrics'] as JsonRecord).sort(), String(row['ticker'])).toEqual(indexed);
     const placeholder = placeholderEntry('SPWO', 'https://www.sp-funds.com/spwo/');
     const metrics = placeholder['metrics'] as JsonRecord;
@@ -927,13 +931,18 @@ describe('pipeline', () => {
     ].sort());
     expect(spus['distributions']).toEqual({ frequency: 'Monthly', exDate: '2026-09-28', dividend: '0.026' });
     for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord)).toEqual(expect.arrayContaining(RANGE_KEYS));
-    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-17, -8)).toEqual(SWING_KEYS);
-    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-8, -2)).toEqual(DIVIDEND_KEYS);
+    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-51, -42)).toEqual(SWING_KEYS);
+    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-42, -34)).toEqual(DIVIDEND_KEYS);
+    for (const row of index['funds'] as JsonRecord[]) expect(Object.keys(row['metrics'] as JsonRecord).slice(-34, -2)).toEqual(BENCHMARK_KEYS);
     const swing = spus['metrics'] as JsonRecord;
     expect([typeof swing['athPrice'], swing['athBasis']]).toEqual(['number', expect.stringMatching(/^daily closes since \d{4}-\d{2}-\d{2}$/)]);
     // the dividends block read the two dividend events (0.026 + 0.02) of the updated fund from its own daily chart request: dividendRate 0.046, the five growth keys null (never 0)
-    expect(DIVIDEND_KEYS.map((key) => swing[key])).toEqual([0.046, null, null, null, null, null]);
+    expect(DIVIDEND_KEYS.map((key) => swing[key])).toEqual([0.046, null, null, null, null, null, 2, null]);
+    // the 30 mocked bars of SPUS, SPY and QQQ cover under a year: every horizon and the 252-return statistics are null (never 0), the common date is the last bar
+    expect([swing['perf1y'], swing['perfSi'], swing['vsSpy1y'], swing['beta1ySpy'], swing['relStrength3mQqq'], swing['benchmarkAsOf']]).toEqual([null, null, null, null, null, expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/)]);
     expect(seen.filter((url) => /chart\/SPUS\?period1=0&.*includePrePost=false/.test(url))).toHaveLength(1);
+    // the benchmark block adds exactly the SPY and the QQQ chart to the five fund charts, no request per fund
+    expect(seen.filter((url) => /chart\/[A-Z]+\?period1=0&.*includePrePost=false/.test(url)).map((url) => /chart\/([A-Z]+)\?/.exec(url)![1]).sort()).toEqual(['QQQ', 'SPRE', 'SPSK', 'SPTE', 'SPUS', 'SPWO', 'SPY']);
 
     const tree = await listFiles(apiRoot);
     expect(tree.length).toBe(1 + 5 * 3); // index.json + meta, one holdings and one history page per fund
@@ -1075,7 +1084,7 @@ describe('pipeline 2', () => {
     expect((await listFiles(fresh)).filter((file) => file.startsWith('funds/SPWO/'))).toEqual([]);
     const row = ((await readIndex(fresh))['funds'] as JsonRecord[]).find((fund) => fund['ticker'] === 'SPWO')!;
     expect(row).toMatchObject({ dataFile: null, holdings: 0 });
-    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual([...Object.keys(emptyMetrics()), ...RANGE_KEYS, ...SWING_KEYS, ...DIVIDEND_KEYS].sort());
+    expect(Object.keys(row['metrics'] as JsonRecord).sort()).toEqual([...Object.keys(emptyMetrics()), ...RANGE_KEYS, ...SWING_KEYS, ...DIVIDEND_KEYS, ...BENCHMARK_KEYS].sort());
     expect(String((row['metrics'] as JsonRecord)['returnsBasis'])).not.toBe('');
   });
 
