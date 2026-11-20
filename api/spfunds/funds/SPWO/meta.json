@@ -8,20 +8,20 @@
   "terValue": 0.55,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$28.60",
-  "navValue": 28.6,
-  "aum": "$229.51M",
-  "aumValue": 229510000,
-  "asOfDate": "2026-11-17",
+  "nav": "$28.06",
+  "navValue": 28.06,
+  "aum": "$225.17M",
+  "aumValue": 225170000,
+  "asOfDate": "2026-11-19",
   "inceptionDate": "2023-12-19",
   "exchange": "NYSE Arca",
-  "closePrice": "$28.69",
-  "closePriceValue": 28.69,
-  "closePriceAsOfDate": "2026-11-17",
-  "premiumDiscount": "0.32%",
-  "premiumDiscountValue": 0.32,
+  "closePrice": "$27.90",
+  "closePriceValue": 27.9,
+  "closePriceAsOfDate": "2026-11-19",
+  "premiumDiscount": "-0.56%",
+  "premiumDiscountValue": -0.56,
   "sharesOutstanding": 8025000,
-  "midpoint": 229515000,
+  "midpoint": 225181500,
   "cusip": "84612A200",
   "isin": null,
   "distributions": {
@@ -272,8 +272,8 @@
     "cagr5y": null,
     "cagr10y": null,
     "siAnn": 17.99,
-    "dividendYield": 1.07,
-    "dividendYieldText": "1.07%",
+    "dividendYield": 1.09,
+    "dividendYieldText": "1.09%",
     "dividendYieldBasis": "indicated",
     "secYield": 0.79,
     "secYieldText": "0.79%",
@@ -287,17 +287,17 @@
     ],
     "pageSize": 250,
     "totalRows": 389,
-    "asOfDate": "2026-11-18"
+    "asOfDate": "2026-11-20"
   },
   "history": {
     "pages": [
       "history/001.json"
     ],
     "pageSize": 1000,
-    "totalRows": 731,
-    "asOfDate": "2026-11-18"
+    "totalRows": 733,
+    "asOfDate": "2026-11-20"
   },
-  "generatedAt": "2026-11-19T08:54:37Z",
+  "generatedAt": "2026-11-20T22:10:21Z",
   "netTerValue": 0.55,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -318,11 +318,11 @@
     "benchmark": "S&P DM Ex-U.S. & EM 50/50 Shariah Index"
   },
   "yields": {
-    "dividendYield": 1.07,
-    "dividendYieldText": "1.07%",
+    "dividendYield": 1.09,
+    "dividendYieldText": "1.09%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 1.07,
+    "distributionRate": 1.09,
     "secYield": 0.79,
     "secYieldText": "0.79%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"

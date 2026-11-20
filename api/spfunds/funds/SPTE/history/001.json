@@ -3,7 +3,7 @@
   "kind": "history",
   "page": 1,
   "pageSize": 1000,
-  "totalRows": 744,
+  "totalRows": 746,
   "headers": [
     "Date",
     "Close",
@@ -4474,7 +4474,19 @@
       "Close": "41.41",
       "Adj Close": "41.41",
       "Volume": "40300"
+    },
+    {
+      "Date": "Nov 19 2026",
+      "Close": "40.22",
+      "Adj Close": "40.22",
+      "Volume": "53300"
+    },
+    {
+      "Date": "Nov 20 2026",
+      "Close": "37.16",
+      "Adj Close": "37.16",
+      "Volume": "197394"
     }
   ],
-  "asOfDate": "2026-11-18"
+  "asOfDate": "2026-11-20"
 }

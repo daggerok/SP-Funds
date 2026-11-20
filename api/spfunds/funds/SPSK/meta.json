@@ -8,20 +8,20 @@
   "terValue": 0.5,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$17.41",
-  "navValue": 17.41,
-  "aum": "$488.86M",
-  "aumValue": 488860000,
-  "asOfDate": "2026-11-17",
+  "nav": "$17.43",
+  "navValue": 17.43,
+  "aum": "$489.37M",
+  "aumValue": 489370000,
+  "asOfDate": "2026-11-19",
   "inceptionDate": "2019-12-27",
   "exchange": "NYSE",
-  "closePrice": "$17.44",
-  "closePriceValue": 17.44,
-  "closePriceAsOfDate": "2026-11-17",
-  "premiumDiscount": "0.16%",
-  "premiumDiscountValue": 0.16,
+  "closePrice": "$17.42",
+  "closePriceValue": 17.42,
+  "closePriceAsOfDate": "2026-11-19",
+  "premiumDiscount": "-0.06%",
+  "premiumDiscountValue": -0.06,
   "sharesOutstanding": 28075000,
-  "midpoint": 488785750,
+  "midpoint": 489347250,
   "cusip": "886364702",
   "isin": null,
   "distributions": {
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 176,
-    "asOfDate": "2026-11-18"
+    "asOfDate": "2026-11-20"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1731,
-    "asOfDate": "2026-11-18"
+    "totalRows": 1733,
+    "asOfDate": "2026-11-20"
   },
-  "generatedAt": "2026-11-19T08:54:37Z",
+  "generatedAt": "2026-11-20T22:10:21Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
