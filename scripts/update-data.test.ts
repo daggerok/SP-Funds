@@ -18,7 +18,7 @@ import {
   matchesRange, mergeDividends, nameValueMap, normalizeWeightText, nportHoldingsSheet, nportIsFresh, nportTickers, parseMoneyNumber,
   numberOrNull, outputPrintConfig, pageFileName, parseAumRange, parseCatalogCards, parseCatalogMenu,
   parseCsv, parseFundPage, parseHtmlTables, parseNportFiling, parseSecCompanyNames, parseSecFundTickers,
-  parseRange, parseSpFundsHoldingsCsv, parseYahooChart, paymentsPerYear, periodKey,
+  parseRange, parseSpFundsHoldingsCsv, tooNewForHistory, parseYahooChart, paymentsPerYear, periodKey,
   readConfig, readCursor, readPreviousIndex, readPreviousPages, resolveControls, round, runUpdater, runtimeControls,
   samePublishedContent, sanitizeTicker, secHeaders, selectionEntryFromIndex, splitPages, spFundsAssetCategory,
   stableStringify, toIsoDate, trustForTicker, installSystemCa, isCertError, updateFund, writeIfChanged, writePages,
@@ -1389,6 +1389,25 @@ describe('pipeline 5', () => {
 });
 
 describe('pipeline 6', () => {
+  test('a just-launched fund whose Yahoo history is unavailable is published, an older one with the same failure is kept as failed', async () => {
+    // Capital-Group CGBI and CGMI (launched 2026-11-17) failed every run after their first publication: no history at the source yet
+    const ago = (days: number): string => { const d = day(-days); return `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}/${d.getUTCFullYear()}`; };
+    const born = (days: number) => failing(sampleFetcher({ spus: fundPageHtml('SPUS').replace(/12\/17\/2019/g, ago(days)) }).fetcher, 'yahoo');
+    const apiRoot = await tempApiRoot();
+    const young = born(3);
+    const first = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(young), null, NOW);
+    expect(first.written).toBe(true);
+    const second = await updateFund(fundFor('SPUS'), offlineConfig(), apiRoot, quietTransport(young), null, NOW);
+    expect(second.failedSources ?? []).toEqual([]);
+    expect(tooNewForHistory(ago(3), '2026-10-01', 0)).toBe(true);
+    expect(tooNewForHistory(ago(90), '2026-10-01', 0)).toBe(false);
+    expect(tooNewForHistory(ago(3), '2026-10-01', 5)).toBe(false);
+    const aged = await tempApiRoot();
+    await updateFund(fundFor('SPUS'), offlineConfig(), aged, quietTransport(born(90)), null, NOW);
+    const again = await updateFund(fundFor('SPUS'), offlineConfig(), aged, quietTransport(born(90)), null, NOW);
+    expect(again.failedSources).toEqual(['Yahoo history']);
+  });
+
   test('a new fund that no source answered is failed with a catalog-only row and no files; that row is never read back as published data', async () => {
     // SPWO is new and its page is a block page answered with HTTP 200; it has no holdings CSV, N-PORT-P filing or Yahoo chart
     const silent = (fetcher: typeof fetch): typeof fetch => ((url: string, init?: RequestInit) => {
