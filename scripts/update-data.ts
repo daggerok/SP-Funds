@@ -2004,6 +2004,19 @@ export function dividendsFromPublished(rows: unknown): FundPage['distributions']
   }).filter((row) => row.exDate);
 }
 
+/** Days after inception during which a fund with no published history may lack a Yahoo chart (Capital-Group CGBI and CGMI, launched 2026-11-17, had no issuer history). */
+export const NEW_FUND_HISTORY_DAYS = 60;
+/**
+ * A just-launched fund may have no daily history at its source yet: a failed history request is then not a failed source, the
+ * fund is published from its page and holdings and picks up the history once the source has it.
+ * Only when nothing is published in history yet: a failure for a fund with published history stays an outage.
+ */
+export function tooNewForHistory(inception: unknown, today: unknown, publishedHistoryRows: number): boolean {
+  const start = calendarIso(inception), end = calendarIso(today);
+  if (publishedHistoryRows > 0 || !start || !end) return false;
+  const days = (Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000;
+  return days >= 0 && days <= NEW_FUND_HISTORY_DAYS;
+}
 export async function updateFund(
   catalogFund: CatalogFund,
   config: UpdaterConfig,
@@ -2129,8 +2142,13 @@ export async function updateFund(
       yahooName = chart.longName;
       providers.yahoo = true;
     } catch (error) {
-      failedSources.push('Yahoo history');
-      outputNote(`[ ${'chart'.padEnd(8)} ] ${ticker}: Yahoo chart unavailable (${errorMessage(error)}), keeping the published history`);
+      const launched = (page ? detailsFromPage(page, ticker).inceptionDate : null) ?? ((previous.meta?.['inceptionDate'] as string | null | undefined) ?? null);
+      if (tooNewForHistory(launched, now.toISOString().slice(0, 10), previous.history.rows.length)) {
+        outputNote(`[ ${'chart'.padEnd(8)} ] ${ticker}: launched ${launched}, no Yahoo history yet (${errorMessage(error)}) - published without it`);
+      } else {
+        failedSources.push('Yahoo history');
+        outputNote(`[ ${'chart'.padEnd(8)} ] ${ticker}: Yahoo chart unavailable (${errorMessage(error)}), keeping the published history`);
+      }
     }
   }
   if (!days.length) {
