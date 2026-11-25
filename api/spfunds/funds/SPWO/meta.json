@@ -8,20 +8,20 @@
   "terValue": 0.55,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$27.95",
-  "navValue": 27.95,
-  "aum": "$224.32M",
-  "aumValue": 224320000,
-  "asOfDate": "2026-11-23",
+  "nav": "$28.00",
+  "navValue": 28,
+  "aum": "$224.68M",
+  "aumValue": 224680000,
+  "asOfDate": "2026-11-24",
   "inceptionDate": "2023-12-19",
   "exchange": "NYSE Arca",
-  "closePrice": "$28.55",
-  "closePriceValue": 28.55,
-  "closePriceAsOfDate": "2026-11-23",
-  "premiumDiscount": "2.14%",
-  "premiumDiscountValue": 2.14,
+  "closePrice": "$27.84",
+  "closePriceValue": 27.84,
+  "closePriceAsOfDate": "2026-11-24",
+  "premiumDiscount": "-0.56%",
+  "premiumDiscountValue": -0.56,
   "sharesOutstanding": 8025000,
-  "midpoint": 224298750,
+  "midpoint": 224700000,
   "cusip": "84612A200",
   "isin": null,
   "distributions": {
@@ -292,18 +292,18 @@
       "holdings/002.json"
     ],
     "pageSize": 250,
-    "totalRows": 387,
-    "asOfDate": "2026-11-24"
+    "totalRows": 384,
+    "asOfDate": "2026-11-25"
   },
   "history": {
     "pages": [
       "history/001.json"
     ],
     "pageSize": 1000,
-    "totalRows": 735,
-    "asOfDate": "2026-11-24"
+    "totalRows": 736,
+    "asOfDate": "2026-11-25"
   },
-  "generatedAt": "2026-11-25T05:12:57Z",
+  "generatedAt": "2026-11-25T23:14:59Z",
   "netTerValue": 0.55,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
