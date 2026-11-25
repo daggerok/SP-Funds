@@ -1,6 +1,11 @@
 name: Update SP Funds ETF data
 
 on:
+  schedule:
+    - cron: '37 9 * * 1-5'
+      timezone: America/New_York
+    - cron: '17 20 * * 1-5'
+      timezone: America/New_York
   workflow_dispatch:
     inputs:
       tickers:
