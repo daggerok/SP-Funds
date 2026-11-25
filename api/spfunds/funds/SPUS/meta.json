@@ -8,25 +8,25 @@
   "terValue": 0.45,
   "terGross": "—",
   "terGrossValue": null,
-  "nav": "$54.13",
-  "navValue": 54.13,
-  "aum": "$3.21B",
-  "aumValue": 3207120000,
-  "asOfDate": "2026-11-19",
+  "nav": "$54.74",
+  "navValue": 54.74,
+  "aum": "$3.25B",
+  "aumValue": 3254240000,
+  "asOfDate": "2026-11-23",
   "inceptionDate": "2019-12-17",
   "exchange": "NYSE Arca",
-  "closePrice": "$54.11",
-  "closePriceValue": 54.11,
-  "closePriceAsOfDate": "2026-11-19",
-  "premiumDiscount": "-0.03%",
-  "premiumDiscountValue": -0.03,
-  "sharesOutstanding": 59250000,
-  "midpoint": 3207202500,
+  "closePrice": "$54.78",
+  "closePriceValue": 54.78,
+  "closePriceAsOfDate": "2026-11-23",
+  "premiumDiscount": "0.07%",
+  "premiumDiscountValue": 0.07,
+  "sharesOutstanding": 59450000,
+  "midpoint": 3254293000,
   "cusip": "886364801",
   "isin": null,
   "distributions": {
     "frequency": "Monthly",
-    "exDate": "2026-10-27",
+    "exDate": "2026-11-24",
     "dividend": "0.026",
     "paymentsPerYear": 12,
     "headers": [
@@ -36,6 +36,12 @@
       "Amount"
     ],
     "rows": [
+      [
+        "2026-11-24",
+        "2026-11-24",
+        "2026-11-25",
+        "0.026"
+      ],
       [
         "2026-10-27",
         "2026-10-27",
@@ -389,12 +395,6 @@
         "2021-12-29",
         "2021-12-31",
         "0.1"
-      ],
-      [
-        "2021-12-01",
-        "2021-12-02",
-        "2021-12-06",
-        "0.026"
       ]
     ]
   },
@@ -428,8 +428,8 @@
     "cagr5y": 13.89,
     "cagr10y": null,
     "siAnn": 18,
-    "dividendYield": 0.58,
-    "dividendYieldText": "0.58%",
+    "dividendYield": 0.57,
+    "dividendYieldText": "0.57%",
     "dividendYieldBasis": "indicated",
     "secYield": 0.39,
     "secYieldText": "0.39%",
@@ -441,8 +441,8 @@
       "holdings/001.json"
     ],
     "pageSize": 250,
-    "totalRows": 218,
-    "asOfDate": "2026-11-20"
+    "totalRows": 217,
+    "asOfDate": "2026-11-24"
   },
   "history": {
     "pages": [
@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1741,
-    "asOfDate": "2026-11-20"
+    "totalRows": 1743,
+    "asOfDate": "2026-11-24"
   },
-  "generatedAt": "2026-11-20T22:10:21Z",
+  "generatedAt": "2026-11-25T05:12:57Z",
   "netTerValue": 0.45,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
@@ -474,11 +474,11 @@
     "benchmark": "S&P 500 TR"
   },
   "yields": {
-    "dividendYield": 0.58,
-    "dividendYieldText": "0.58%",
+    "dividendYield": 0.57,
+    "dividendYieldText": "0.57%",
     "dividendYieldBasis": "indicated",
     "dividendYieldKind": "derived: latest official distribution x inferred payments per year / official NAV",
-    "distributionRate": 0.58,
+    "distributionRate": 0.57,
     "secYield": 0.39,
     "secYieldText": "0.39%",
     "secYieldKind": "official SP Funds 30-day SEC yield (fund page Fund Details)"
