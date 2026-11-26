@@ -12,12 +12,12 @@
   "navValue": 18.75,
   "aum": "$196.92M",
   "aumValue": 196920000,
-  "asOfDate": "2026-11-24",
+  "asOfDate": "2026-11-25",
   "inceptionDate": "2020-12-29",
   "exchange": "NYSE Arca",
   "closePrice": "$18.66",
   "closePriceValue": 18.66,
-  "closePriceAsOfDate": "2026-11-24",
+  "closePriceAsOfDate": "2026-11-25",
   "premiumDiscount": "-0.51%",
   "premiumDiscountValue": -0.51,
   "sharesOutstanding": 10500000,
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 29,
-    "asOfDate": "2026-11-25"
+    "asOfDate": "2026-11-27"
   },
   "history": {
     "pages": [
@@ -453,7 +453,7 @@
     "totalRows": 1484,
     "asOfDate": "2026-11-25"
   },
-  "generatedAt": "2026-11-25T23:14:59Z",
+  "generatedAt": "2026-11-26T09:32:34Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",

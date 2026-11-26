@@ -19,7 +19,7 @@
       "Ticker": "BT6MTT4",
       "Identifier": "BT6MTT4",
       "Weight": "1.7",
-      "Market Value": "8339111.65",
+      "Market Value": "8341654.75",
       "Shares Held": "8971000",
       "Asset Category": "Fixed Income"
     },
@@ -28,7 +28,7 @@
       "Ticker": "BVSYBV8",
       "Identifier": "BVSYBV8",
       "Weight": "1.52",
-      "Market Value": "7453603.5",
+      "Market Value": "7469403.16",
       "Shares Held": "8169000",
       "Asset Category": "Fixed Income"
     },
@@ -37,7 +37,7 @@
       "Ticker": "BNDT833",
       "Identifier": "BNDT833",
       "Weight": "1.51",
-      "Market Value": "7373467.06",
+      "Market Value": "7377025.32",
       "Shares Held": "7870000",
       "Asset Category": "Fixed Income"
     },
@@ -46,7 +46,7 @@
       "Ticker": "BNC3KG3",
       "Identifier": "BNC3KG3",
       "Weight": "1.5",
-      "Market Value": "7340867.44",
+      "Market Value": "7345311.75",
       "Shares Held": "7568000",
       "Asset Category": "Fixed Income"
     },
@@ -55,7 +55,7 @@
       "Ticker": "BNKVR46",
       "Identifier": "BNKVR46",
       "Weight": "1.46",
-      "Market Value": "7154677.43",
+      "Market Value": "7147952.35",
       "Shares Held": "8175000",
       "Asset Category": "Fixed Income"
     },
@@ -64,7 +64,7 @@
       "Ticker": "BMWPXT6",
       "Identifier": "BMWPXT6",
       "Weight": "1.3",
-      "Market Value": "6366603.71",
+      "Market Value": "6369461.72",
       "Shares Held": "6324000",
       "Asset Category": "Equity"
     },
@@ -73,7 +73,7 @@
       "Ticker": "BM9WJ69",
       "Identifier": "BM9WJ69",
       "Weight": "1.29",
-      "Market Value": "6295361.12",
+      "Market Value": "6299714.98",
       "Shares Held": "6304000",
       "Asset Category": "Fixed Income"
     },
@@ -82,7 +82,7 @@
       "Ticker": "BN6KFN2",
       "Identifier": "BN6KFN2",
       "Weight": "1.21",
-      "Market Value": "5923755.8",
+      "Market Value": "5927843.43",
       "Shares Held": "6114000",
       "Asset Category": "Fixed Income"
     },
@@ -91,7 +91,7 @@
       "Ticker": "BT7N0N7",
       "Identifier": "BT7N0N7",
       "Weight": "1.2",
-      "Market Value": "5881220.81",
+      "Market Value": "5876959.29",
       "Shares Held": "6158000",
       "Asset Category": "Fixed Income"
     },
@@ -100,7 +100,7 @@
       "Ticker": "BKPTPV7",
       "Identifier": "BKPTPV7",
       "Weight": "1.19",
-      "Market Value": "5810718.29",
+      "Market Value": "5815917",
       "Shares Held": "6239000",
       "Asset Category": "Fixed Income"
     },
@@ -108,9 +108,9 @@
       "Name": "Cash & Other",
       "Ticker": "Cash&Other",
       "Identifier": "Cash&Other",
-      "Weight": "1.13",
-      "Market Value": "5539488.72",
-      "Shares Held": "5539489",
+      "Weight": "1.15",
+      "Market Value": "5653901.05",
+      "Shares Held": "5653901",
       "Asset Category": "Cash"
     },
     {
@@ -118,7 +118,7 @@
       "Ticker": "BSNZ0Q3",
       "Identifier": "BSNZ0Q3",
       "Weight": "1.11",
-      "Market Value": "5435475.65",
+      "Market Value": "5432886.64",
       "Shares Held": "5577000",
       "Asset Category": "Equity"
     },
@@ -127,7 +127,7 @@
       "Ticker": "BWNN292",
       "Identifier": "BWNN292",
       "Weight": "1.1",
-      "Market Value": "5397531.62",
+      "Market Value": "5399777.76",
       "Shares Held": "5550000",
       "Asset Category": "Fixed Income"
     },
@@ -136,7 +136,7 @@
       "Ticker": "BS298C8",
       "Identifier": "BS298C8",
       "Weight": "1.09",
-      "Market Value": "5331347.29",
+      "Market Value": "5336459.08",
       "Shares Held": "5325000",
       "Asset Category": "Fund"
     },
@@ -145,7 +145,7 @@
       "Ticker": "BWQLPR2",
       "Identifier": "BWQLPR2",
       "Weight": "1.08",
-      "Market Value": "5268436.67",
+      "Market Value": "5272998.66",
       "Shares Held": "5567000",
       "Asset Category": "Equity"
     },
@@ -154,7 +154,7 @@
       "Ticker": "71567RAV8",
       "Identifier": "71567RAV8",
       "Weight": "1.07",
-      "Market Value": "5227281.9",
+      "Market Value": "5221000.5",
       "Shares Held": "5510000",
       "Asset Category": "Equity"
     },
@@ -163,7 +163,7 @@
       "Ticker": "BQH7NQ2",
       "Identifier": "BQH7NQ2",
       "Weight": "1.04",
-      "Market Value": "5067576.12",
+      "Market Value": "5078379.42",
       "Shares Held": "5077000",
       "Asset Category": "Fund"
     },
@@ -172,7 +172,7 @@
       "Ticker": "BFX3CW6",
       "Identifier": "BFX3CW6",
       "Weight": "1.02",
-      "Market Value": "5014665.38",
+      "Market Value": "5017036.47",
       "Shares Held": "5135000",
       "Asset Category": "Fixed Income"
     },
@@ -181,7 +181,7 @@
       "Ticker": "BMFZL88",
       "Identifier": "BMFZL88",
       "Weight": "0.97",
-      "Market Value": "4751961.9",
+      "Market Value": "4756825.51",
       "Shares Held": "4862000",
       "Asset Category": "Fixed Income"
     },
@@ -190,7 +190,7 @@
       "Ticker": "BMQ80H8",
       "Identifier": "BMQ80H8",
       "Weight": "0.95",
-      "Market Value": "4672396.13",
+      "Market Value": "4676202.27",
       "Shares Held": "5375000",
       "Asset Category": "Fixed Income"
     },
@@ -199,7 +199,7 @@
       "Ticker": "BSNSS35",
       "Identifier": "BSNSS35",
       "Weight": "0.93",
-      "Market Value": "4540439.59",
+      "Market Value": "4541010.98",
       "Shares Held": "4745000",
       "Asset Category": "Fixed Income"
     },
@@ -208,25 +208,16 @@
       "Ticker": "BMF0F03",
       "Identifier": "BMF0F03",
       "Weight": "0.92",
-      "Market Value": "4489083.36",
+      "Market Value": "4493396.59",
       "Shares Held": "4502000",
       "Asset Category": "Fund"
-    },
-    {
-      "Name": "DP World Crescent Ltd 5.5% 05/08/2035",
-      "Ticker": "BTRVRW9",
-      "Identifier": "BTRVRW9",
-      "Weight": "0.9",
-      "Market Value": "4413533.19",
-      "Shares Held": "4615000",
-      "Asset Category": "Equity"
     },
     {
       "Name": "Suci Second Investment Co 4.875% 05/08/2032",
       "Ticker": "BTTMQ67",
       "Identifier": "BTTMQ67",
       "Weight": "0.9",
-      "Market Value": "4419279.12",
+      "Market Value": "4420177.07",
       "Shares Held": "4625000",
       "Asset Category": "Equity"
     },
@@ -235,34 +226,43 @@
       "Ticker": "BVMSYK6",
       "Identifier": "BVMSYK6",
       "Weight": "0.9",
-      "Market Value": "4417411.9",
+      "Market Value": "4416850.79",
       "Shares Held": "4560000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Isdb Trust Services NO 2 SARL 4.211% 03/18/2030",
-      "Ticker": "BTWSBF6",
-      "Identifier": "BTWSBF6",
-      "Weight": "0.89",
-      "Market Value": "4335482.03",
-      "Shares Held": "4428000",
-      "Asset Category": "Fund"
+      "Name": "DP World Crescent Ltd 5.5% 05/08/2035",
+      "Ticker": "BTRVRW9",
+      "Identifier": "BTRVRW9",
+      "Weight": "0.9",
+      "Market Value": "4415015.48",
+      "Shares Held": "4615000",
+      "Asset Category": "Equity"
     },
     {
       "Name": "DP World Crescent Ltd 5.5% 09/13/2033",
       "Ticker": "BP5JT43",
       "Identifier": "BP5JT43",
       "Weight": "0.89",
-      "Market Value": "4334862.6",
+      "Market Value": "4344348.42",
       "Shares Held": "4500000",
       "Asset Category": "Equity"
+    },
+    {
+      "Name": "Isdb Trust Services NO 2 SARL 4.211% 03/18/2030",
+      "Ticker": "BTWSBF6",
+      "Identifier": "BTWSBF6",
+      "Weight": "0.89",
+      "Market Value": "4347240.54",
+      "Shares Held": "4428000",
+      "Asset Category": "Fund"
     },
     {
       "Name": "SA Global Sukuk Ltd 4.25% 10/02/2029",
       "Ticker": "BL6LXR1",
       "Identifier": "BL6LXR1",
       "Weight": "0.88",
-      "Market Value": "4301976.49",
+      "Market Value": "4299734.61",
       "Shares Held": "4469000",
       "Asset Category": "Fixed Income"
     },
@@ -270,8 +270,8 @@
       "Name": "Isdb Trust Services NO 2 SARL 4.246% 06/25/2030",
       "Ticker": "BVK2MP1",
       "Identifier": "BVK2MP1",
-      "Weight": "0.87",
-      "Market Value": "4282428.52",
+      "Weight": "0.88",
+      "Market Value": "4294347.22",
       "Shares Held": "4373000",
       "Asset Category": "Fund"
     },
@@ -280,7 +280,7 @@
       "Ticker": "BMZQ318",
       "Identifier": "BMZQ318",
       "Weight": "0.86",
-      "Market Value": "4213336.22",
+      "Market Value": "4213506.64",
       "Shares Held": "4252000",
       "Asset Category": "Equity"
     },
@@ -289,7 +289,7 @@
       "Ticker": "BL54L33",
       "Identifier": "BL54L33",
       "Weight": "0.85",
-      "Market Value": "4177731.74",
+      "Market Value": "4174480.11",
       "Shares Held": "4350000",
       "Asset Category": "Fixed Income"
     },
@@ -298,7 +298,7 @@
       "Ticker": "BMW2F46",
       "Identifier": "BMW2F46",
       "Weight": "0.85",
-      "Market Value": "4177842.14",
+      "Market Value": "4179716.59",
       "Shares Held": "4424000",
       "Asset Category": "Fixed Income"
     },
@@ -307,7 +307,7 @@
       "Ticker": "BNKB6J4",
       "Identifier": "BNKB6J4",
       "Weight": "0.82",
-      "Market Value": "4028491.03",
+      "Market Value": "4028256.37",
       "Shares Held": "4255000",
       "Asset Category": "Fixed Income"
     },
@@ -316,7 +316,7 @@
       "Ticker": "BL6LXQ0",
       "Identifier": "BL6LXQ0",
       "Weight": "0.81",
-      "Market Value": "3959346.95",
+      "Market Value": "3955819.59",
       "Shares Held": "4289000",
       "Asset Category": "Fixed Income"
     },
@@ -325,17 +325,8 @@
       "Ticker": "BSNST43",
       "Identifier": "BSNST43",
       "Weight": "0.81",
-      "Market Value": "3982094.19",
+      "Market Value": "3985842.2",
       "Shares Held": "4248000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "SA Global Sukuk Ltd 4.625% 09/17/2035",
-      "Ticker": "BMW2F24",
-      "Identifier": "BMW2F24",
-      "Weight": "0.79",
-      "Market Value": "3849595.87",
-      "Shares Held": "4265000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -343,8 +334,17 @@
       "Ticker": "BP68Z63",
       "Identifier": "BP68Z63",
       "Weight": "0.79",
-      "Market Value": "3854149.07",
+      "Market Value": "3855605.45",
       "Shares Held": "4452000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "SA Global Sukuk Ltd 4.625% 09/17/2035",
+      "Ticker": "BMW2F24",
+      "Identifier": "BMW2F24",
+      "Weight": "0.79",
+      "Market Value": "3849643.85",
+      "Shares Held": "4265000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -352,7 +352,7 @@
       "Ticker": "BN4L5K4",
       "Identifier": "BN4L5K4",
       "Weight": "0.77",
-      "Market Value": "3750446.02",
+      "Market Value": "3750633.57",
       "Shares Held": "3789000",
       "Asset Category": "Fixed Income"
     },
@@ -361,7 +361,7 @@
       "Ticker": "BRBZFJ6",
       "Identifier": "BRBZFJ6",
       "Weight": "0.76",
-      "Market Value": "3735359.36",
+      "Market Value": "3733632.8",
       "Shares Held": "3934000",
       "Asset Category": "Fixed Income"
     },
@@ -370,7 +370,7 @@
       "Ticker": "BTXQV82",
       "Identifier": "BTXQV82",
       "Weight": "0.76",
-      "Market Value": "3706246.84",
+      "Market Value": "3706527.32",
       "Shares Held": "3772000",
       "Asset Category": "Fixed Income"
     },
@@ -379,7 +379,7 @@
       "Ticker": "BMWPY26",
       "Identifier": "BMWPY26",
       "Weight": "0.75",
-      "Market Value": "3673473.46",
+      "Market Value": "3671917.25",
       "Shares Held": "3595000",
       "Asset Category": "Equity"
     },
@@ -387,8 +387,8 @@
       "Name": "EDO Sukuk Ltd 5.875% 09/21/2033",
       "Ticker": "BR55K75",
       "Identifier": "BR55K75",
-      "Weight": "0.72",
-      "Market Value": "3542058",
+      "Weight": "0.73",
+      "Market Value": "3551777.68",
       "Shares Held": "3600000",
       "Asset Category": "Fixed Income"
     },
@@ -396,8 +396,8 @@
       "Name": "STC Sukuk Co Ltd 3.89% 05/13/2029",
       "Ticker": "BHNG702",
       "Identifier": "BHNG702",
-      "Weight": "0.71",
-      "Market Value": "3500321.04",
+      "Weight": "0.72",
+      "Market Value": "3502607.45",
       "Shares Held": "3653000",
       "Asset Category": "Fixed Income"
     },
@@ -406,17 +406,8 @@
       "Ticker": "BWNN2B4",
       "Identifier": "BWNN2B4",
       "Weight": "0.71",
-      "Market Value": "3486136.07",
+      "Market Value": "3486286.16",
       "Shares Held": "3550000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Sharjah Sukuk Program Ltd 4.226% 03/14/2028",
-      "Ticker": "BYZPV04",
-      "Identifier": "BYZPV04",
-      "Weight": "0.7",
-      "Market Value": "3420384.2",
-      "Shares Held": "3490000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -424,16 +415,25 @@
       "Ticker": "BVPH626",
       "Identifier": "BVPH626",
       "Weight": "0.7",
-      "Market Value": "3411562.5",
+      "Market Value": "3407013.75",
       "Shares Held": "3639000",
       "Asset Category": "Equity"
+    },
+    {
+      "Name": "Sharjah Sukuk Program Ltd 4.226% 03/14/2028",
+      "Ticker": "BYZPV04",
+      "Identifier": "BYZPV04",
+      "Weight": "0.7",
+      "Market Value": "3417166.25",
+      "Shares Held": "3490000",
+      "Asset Category": "Fixed Income"
     },
     {
       "Name": "STC Sukuk Co II Ltd 5.083% 01/15/2036",
       "Ticker": "BS48856",
       "Identifier": "BS48856",
       "Weight": "0.69",
-      "Market Value": "3392881.34",
+      "Market Value": "3394675.8",
       "Shares Held": "3660000",
       "Asset Category": "Fixed Income"
     },
@@ -442,7 +442,7 @@
       "Ticker": "BMBQK33",
       "Identifier": "BMBQK33",
       "Weight": "0.67",
-      "Market Value": "3279257.03",
+      "Market Value": "3277541.88",
       "Shares Held": "3320000",
       "Asset Category": "Fixed Income"
     },
@@ -451,26 +451,8 @@
       "Ticker": "BN6MLS5",
       "Identifier": "BN6MLS5",
       "Weight": "0.66",
-      "Market Value": "3229245.4",
+      "Market Value": "3230232.49",
       "Shares Held": "3250000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.2% 07/02/2034",
-      "Ticker": "BQH8G66",
-      "Identifier": "BQH8G66",
-      "Weight": "0.66",
-      "Market Value": "3224783.56",
-      "Shares Held": "3412000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Saudi Electricity Sukuk Programme Co 4.632% 04/11/2033",
-      "Ticker": "BP68Z29",
-      "Identifier": "BP68Z29",
-      "Weight": "0.66",
-      "Market Value": "3238154.34",
-      "Shares Held": "3450000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -478,16 +460,34 @@
       "Ticker": "BVMLPD5",
       "Identifier": "BVMLPD5",
       "Weight": "0.66",
-      "Market Value": "3219952.63",
+      "Market Value": "3216982.71",
       "Shares Held": "3524000",
       "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Saudi Electricity Sukuk Programme Co 4.632% 04/11/2033",
+      "Ticker": "BP68Z29",
+      "Identifier": "BP68Z29",
+      "Weight": "0.66",
+      "Market Value": "3242585.38",
+      "Shares Held": "3450000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.2% 07/02/2034",
+      "Ticker": "BQH8G66",
+      "Identifier": "BQH8G66",
+      "Weight": "0.66",
+      "Market Value": "3226899",
+      "Shares Held": "3412000",
+      "Asset Category": "Equity"
     },
     {
       "Name": "Perusahaan Penerbit SBSN Indonesia III 2.55% 06/09/2031",
       "Ticker": "71567RAS5",
       "Identifier": "71567RAS5",
       "Weight": "0.65",
-      "Market Value": "3163011.2",
+      "Market Value": "3165907.2",
       "Shares Held": "3620000",
       "Asset Category": "Equity"
     },
@@ -495,8 +495,8 @@
       "Name": "Isdb Trust Services NO 2 SARL 4.047% 10/15/2029",
       "Ticker": "BR4TZR3",
       "Identifier": "BR4TZR3",
-      "Weight": "0.62",
-      "Market Value": "3058518.51",
+      "Weight": "0.63",
+      "Market Value": "3064502.48",
       "Shares Held": "3126000",
       "Asset Category": "Fund"
     },
@@ -505,7 +505,7 @@
       "Ticker": "BTXQV93",
       "Identifier": "BTXQV93",
       "Weight": "0.61",
-      "Market Value": "2996014.2",
+      "Market Value": "2994500.92",
       "Shares Held": "3123000",
       "Asset Category": "Fixed Income"
     },
@@ -514,26 +514,8 @@
       "Ticker": "BVBQT62",
       "Identifier": "BVBQT62",
       "Weight": "0.6",
-      "Market Value": "2937144.58",
+      "Market Value": "2938755.38",
       "Shares Held": "3110000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.6% 11/15/2033",
-      "Ticker": "BLDCTP7",
-      "Identifier": "BLDCTP7",
-      "Weight": "0.59",
-      "Market Value": "2901015",
-      "Shares Held": "2964000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Sharjah Sukuk Program Ltd 5.433% 04/17/2035",
-      "Ticker": "BR4S8X7",
-      "Identifier": "BR4S8X7",
-      "Weight": "0.59",
-      "Market Value": "2902960.58",
-      "Shares Held": "3049000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -541,17 +523,17 @@
       "Ticker": "BNKDVM8",
       "Identifier": "BNKDVM8",
       "Weight": "0.59",
-      "Market Value": "2889493.75",
+      "Market Value": "2885850",
       "Shares Held": "2915000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.25% 11/25/2034",
-      "Ticker": "BRWLH75",
-      "Identifier": "BRWLH75",
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.6% 11/15/2033",
+      "Ticker": "BLDCTP7",
+      "Identifier": "BLDCTP7",
       "Weight": "0.59",
-      "Market Value": "2896445.86",
-      "Shares Held": "3058000",
+      "Market Value": "2897310",
+      "Shares Held": "2964000",
       "Asset Category": "Equity"
     },
     {
@@ -559,8 +541,35 @@
       "Ticker": "BMZMFF4",
       "Identifier": "BMZMFF4",
       "Weight": "0.59",
-      "Market Value": "2884340.61",
+      "Market Value": "2884240.75",
       "Shares Held": "2914000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Sharjah Sukuk Program Ltd 5.433% 04/17/2035",
+      "Ticker": "BR4S8X7",
+      "Identifier": "BR4S8X7",
+      "Weight": "0.59",
+      "Market Value": "2905808.84",
+      "Shares Held": "3049000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.25% 11/25/2034",
+      "Ticker": "BRWLH75",
+      "Identifier": "BRWLH75",
+      "Weight": "0.59",
+      "Market Value": "2895467.3",
+      "Shares Held": "3058000",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Mdgh Sukuk Ltd 4.959% 04/04/2034",
+      "Ticker": "BRSCCN3",
+      "Identifier": "BRSCCN3",
+      "Weight": "0.58",
+      "Market Value": "2832915.12",
+      "Shares Held": "2947000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -568,17 +577,8 @@
       "Ticker": "BSHT9V9",
       "Identifier": "BSHT9V9",
       "Weight": "0.58",
-      "Market Value": "2828925.73",
+      "Market Value": "2826435.24",
       "Shares Held": "2860000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "KFH Sukuk Co 4.563% 01/13/2031",
-      "Ticker": "BVPBXJ4",
-      "Identifier": "BVPBXJ4",
-      "Weight": "0.58",
-      "Market Value": "2837036.23",
-      "Shares Held": "2964000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -586,26 +586,26 @@
       "Ticker": "BR4XWF2",
       "Identifier": "BR4XWF2",
       "Weight": "0.58",
-      "Market Value": "2830136.72",
+      "Market Value": "2832698.6",
       "Shares Held": "2947000",
       "Asset Category": "Equity"
+    },
+    {
+      "Name": "KFH Sukuk Co 4.563% 01/13/2031",
+      "Ticker": "BVPBXJ4",
+      "Identifier": "BVPBXJ4",
+      "Weight": "0.58",
+      "Market Value": "2838670.4",
+      "Shares Held": "2964000",
+      "Asset Category": "Fixed Income"
     },
     {
       "Name": "Mdgh Sukuk Ltd 5% 06/04/2035",
       "Ticker": "BNBV831",
       "Identifier": "BNBV831",
       "Weight": "0.58",
-      "Market Value": "2835009.49",
+      "Market Value": "2838725.59",
       "Shares Held": "2952000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Mdgh Sukuk Ltd 4.959% 04/04/2034",
-      "Ticker": "BRSCCN3",
-      "Identifier": "BRSCCN3",
-      "Weight": "0.58",
-      "Market Value": "2826499.85",
-      "Shares Held": "2947000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -613,26 +613,8 @@
       "Ticker": "BVMSYL7",
       "Identifier": "BVMSYL7",
       "Weight": "0.57",
-      "Market Value": "2776313.6",
+      "Market Value": "2781670.77",
       "Shares Held": "3035000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "SRC Sukuk Ltd 5.375% 02/27/2035",
-      "Ticker": "BV1BZB4",
-      "Identifier": "BV1BZB4",
-      "Weight": "0.57",
-      "Market Value": "2812870.68",
-      "Shares Held": "2947000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Almarai Sukuk Ltd 5.233% 07/25/2033",
-      "Ticker": "BNG21T6",
-      "Identifier": "BNG21T6",
-      "Weight": "0.57",
-      "Market Value": "2777414.8",
-      "Shares Held": "2850000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -640,8 +622,26 @@
       "Ticker": "BSY0BK8",
       "Identifier": "BSY0BK8",
       "Weight": "0.57",
-      "Market Value": "2792306.57",
+      "Market Value": "2791530.29",
       "Shares Held": "2881000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Almarai Sukuk Ltd 5.233% 07/25/2033",
+      "Ticker": "BNG21T6",
+      "Identifier": "BNG21T6",
+      "Weight": "0.57",
+      "Market Value": "2777781.8",
+      "Shares Held": "2850000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "SRC Sukuk Ltd 5.375% 02/27/2035",
+      "Ticker": "BV1BZB4",
+      "Identifier": "BV1BZB4",
+      "Weight": "0.57",
+      "Market Value": "2813507.8",
+      "Shares Held": "2947000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -649,7 +649,7 @@
       "Ticker": "BVPH3X6",
       "Identifier": "BVPH3X6",
       "Weight": "0.56",
-      "Market Value": "2737916.72",
+      "Market Value": "2737208.97",
       "Shares Held": "2831000",
       "Asset Category": "Equity"
     },
@@ -658,7 +658,7 @@
       "Ticker": "71567RBG0",
       "Identifier": "71567RBG0",
       "Weight": "0.55",
-      "Market Value": "2692452",
+      "Market Value": "2691332",
       "Shares Held": "2800000",
       "Asset Category": "Equity"
     },
@@ -667,7 +667,7 @@
       "Ticker": "BS2GPJ5",
       "Identifier": "BS2GPJ5",
       "Weight": "0.55",
-      "Market Value": "2709364.95",
+      "Market Value": "2707024.9",
       "Shares Held": "2753000",
       "Asset Category": "Equity"
     },
@@ -676,16 +676,25 @@
       "Ticker": "BV1D9M9",
       "Identifier": "BV1D9M9",
       "Weight": "0.54",
-      "Market Value": "2624348.64",
+      "Market Value": "2624992.9",
       "Shares Held": "2643000",
       "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 5% 12/01/2035",
+      "Ticker": "71567RBH8",
+      "Identifier": "71567RBH8",
+      "Weight": "0.53",
+      "Market Value": "2612242.68",
+      "Shares Held": "2841000",
+      "Asset Category": "Equity"
     },
     {
       "Name": "Perusahaan Penerbit SBSN Indonesia III 3.8% 06/23/2050",
       "Ticker": "71567RAQ9",
       "Identifier": "71567RAQ9",
       "Weight": "0.53",
-      "Market Value": "2603316.51",
+      "Market Value": "2589401.25",
       "Shares Held": "3942000",
       "Asset Category": "Equity"
     },
@@ -694,44 +703,17 @@
       "Ticker": "BNKG7Y1",
       "Identifier": "BNKG7Y1",
       "Weight": "0.53",
-      "Market Value": "2610384.18",
+      "Market Value": "2613468.39",
       "Shares Held": "2729000",
       "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 5% 12/01/2035",
-      "Ticker": "71567RBH8",
-      "Identifier": "71567RBH8",
-      "Weight": "0.53",
-      "Market Value": "2617498.53",
-      "Shares Held": "2841000",
-      "Asset Category": "Equity"
     },
     {
       "Name": "DIB Sukuk Ltd 5.243% 03/04/2029",
       "Ticker": "BQC4WZ0",
       "Identifier": "BQC4WZ0",
       "Weight": "0.53",
-      "Market Value": "2572131.87",
+      "Market Value": "2572641.63",
       "Shares Held": "2583000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Al Rajhi Sukuk Ltd 5.047% 03/12/2029",
-      "Ticker": "BPCTNF5",
-      "Identifier": "BPCTNF5",
-      "Weight": "0.52",
-      "Market Value": "2544266.78",
-      "Shares Held": "2583000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "KFH Sukuk Co 5.011% 01/17/2029",
-      "Ticker": "BRF2010",
-      "Identifier": "BRF2010",
-      "Weight": "0.52",
-      "Market Value": "2546859.42",
-      "Shares Held": "2579000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -744,21 +726,30 @@
       "Asset Category": "Equity"
     },
     {
+      "Name": "Al Rajhi Sukuk Ltd 5.047% 03/12/2029",
+      "Ticker": "BPCTNF5",
+      "Identifier": "BPCTNF5",
+      "Weight": "0.52",
+      "Market Value": "2545133.74",
+      "Shares Held": "2583000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "KFH Sukuk Co 5.011% 01/17/2029",
+      "Ticker": "BRF2010",
+      "Identifier": "BRF2010",
+      "Weight": "0.52",
+      "Market Value": "2545413.68",
+      "Shares Held": "2579000",
+      "Asset Category": "Fixed Income"
+    },
+    {
       "Name": "EDO Sukuk Ltd 5.14% 01/22/2036",
       "Ticker": "BV2FKM1",
       "Identifier": "BV2FKM1",
       "Weight": "0.51",
-      "Market Value": "2474294.67",
+      "Market Value": "2476534.63",
       "Shares Held": "2675000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Malaysia Sovereign Sukuk Bhd 4.612% 04/30/2032",
-      "Ticker": "BRCB689",
-      "Identifier": "BRCB689",
-      "Weight": "0.51",
-      "Market Value": "2477011.93",
-      "Shares Held": "2500000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -766,7 +757,7 @@
       "Ticker": "BGRDLK0",
       "Identifier": "BGRDLK0",
       "Weight": "0.51",
-      "Market Value": "2499309.84",
+      "Market Value": "2498912.91",
       "Shares Held": "2541000",
       "Asset Category": "Fixed Income"
     },
@@ -775,17 +766,26 @@
       "Ticker": "BMJ0PJ8",
       "Identifier": "BMJ0PJ8",
       "Weight": "0.51",
-      "Market Value": "2490198.56",
+      "Market Value": "2492334.4",
       "Shares Held": "2618000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Ma'aden Sukuk Ltd 5.25% 01/29/2036",
-      "Ticker": "55407NAD4",
-      "Identifier": "55407NAD4",
+      "Name": "Malaysia Sovereign Sukuk Bhd 4.612% 04/30/2032",
+      "Ticker": "BRCB689",
+      "Identifier": "BRCB689",
+      "Weight": "0.51",
+      "Market Value": "2483932.1",
+      "Shares Held": "2500000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "DIB Sukuk Ltd 4.572% 11/19/2030",
+      "Ticker": "BS84D22",
+      "Identifier": "BS84D22",
       "Weight": "0.5",
-      "Market Value": "2457373.94",
-      "Shares Held": "2650000",
+      "Market Value": "2457826.43",
+      "Shares Held": "2559000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -793,35 +793,35 @@
       "Ticker": "BKFH1X5",
       "Identifier": "BKFH1X5",
       "Weight": "0.5",
-      "Market Value": "2425773.52",
+      "Market Value": "2427366.78",
       "Shares Held": "2559000",
       "Asset Category": "Equity"
     },
     {
-      "Name": "DIB Sukuk Ltd 4.572% 11/19/2030",
-      "Ticker": "BS84D22",
-      "Identifier": "BS84D22",
+      "Name": "Ma'aden Sukuk Ltd 5.25% 01/29/2036",
+      "Ticker": "55407NAD4",
+      "Identifier": "55407NAD4",
       "Weight": "0.5",
-      "Market Value": "2455834.58",
-      "Shares Held": "2559000",
+      "Market Value": "2458961.98",
+      "Shares Held": "2650000",
       "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 4.45% 02/20/2029",
-      "Ticker": "71567RAM8",
-      "Identifier": "71567RAM8",
-      "Weight": "0.49",
-      "Market Value": "2383168.97",
-      "Shares Held": "2426000",
-      "Asset Category": "Equity"
     },
     {
       "Name": "Saudi Electricity Sukuk Programme Co 4.518% 01/22/2032",
       "Ticker": "BVMLPC4",
       "Identifier": "BVMLPC4",
       "Weight": "0.49",
-      "Market Value": "2383803.11",
+      "Market Value": "2388164.07",
       "Shares Held": "2550000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Sharjah Sukuk Program Ltd 3.234% 10/23/2029",
+      "Ticker": "BJNPR70",
+      "Identifier": "BJNPR70",
+      "Weight": "0.49",
+      "Market Value": "2376900.96",
+      "Shares Held": "2576000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -829,71 +829,62 @@
       "Ticker": "BFCMGH7",
       "Identifier": "BFCMGH7",
       "Weight": "0.49",
-      "Market Value": "2417909.3",
+      "Market Value": "2420982.13",
       "Shares Held": "2464000",
       "Asset Category": "Equity"
-    },
-    {
-      "Name": "Sharjah Sukuk Program Ltd 3.234% 10/23/2029",
-      "Ticker": "BJNPR70",
-      "Identifier": "BJNPR70",
-      "Weight": "0.49",
-      "Market Value": "2377938.16",
-      "Shares Held": "2576000",
-      "Asset Category": "Fixed Income"
     },
     {
       "Name": "SNB Sukuk Ltd 5.129% 02/27/2029",
       "Ticker": "BLD74V3",
       "Identifier": "BLD74V3",
       "Weight": "0.49",
-      "Market Value": "2379648.46",
+      "Market Value": "2379393.97",
       "Shares Held": "2407000",
       "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 4.45% 02/20/2029",
+      "Ticker": "71567RAM8",
+      "Identifier": "71567RAM8",
+      "Weight": "0.49",
+      "Market Value": "2384381.97",
+      "Shares Held": "2426000",
+      "Asset Category": "Equity"
     },
     {
       "Name": "Mazoon Assets Co SAOC 5.25% 10/09/2031",
       "Ticker": "BSVLRR3",
       "Identifier": "BSVLRR3",
       "Weight": "0.48",
-      "Market Value": "2340195.07",
+      "Market Value": "2341214.77",
       "Shares Held": "2427000",
       "Asset Category": "Equity"
-    },
-    {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 2.8% 06/23/2030",
-      "Ticker": "71567RAP1",
-      "Identifier": "71567RAP1",
-      "Weight": "0.47",
-      "Market Value": "2317678.25",
-      "Shares Held": "2549000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Saudi Electricity Global Sukuk Co 3 5.5% 04/08/2044",
-      "Ticker": "BLCG6V5",
-      "Identifier": "BLCG6V5",
-      "Weight": "0.47",
-      "Market Value": "2281186.69",
-      "Shares Held": "2576000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "QIB Sukuk Ltd 4.803% 06/12/2030",
-      "Ticker": "BRV14M0",
-      "Identifier": "BRV14M0",
-      "Weight": "0.47",
-      "Market Value": "2320347.96",
-      "Shares Held": "2382000",
-      "Asset Category": "Fixed Income"
     },
     {
       "Name": "Sharjah Sukuk Program Ltd 5.192% 05/25/2036",
       "Ticker": "BPCQYB9",
       "Identifier": "BPCQYB9",
       "Weight": "0.47",
-      "Market Value": "2316405.96",
+      "Market Value": "2314732.85",
       "Shares Held": "2447000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 2.8% 06/23/2030",
+      "Ticker": "71567RAP1",
+      "Identifier": "71567RAP1",
+      "Weight": "0.47",
+      "Market Value": "2318239.03",
+      "Shares Held": "2549000",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "QIB Sukuk Ltd 4.803% 06/12/2030",
+      "Ticker": "BRV14M0",
+      "Identifier": "BRV14M0",
+      "Weight": "0.47",
+      "Market Value": "2321055.48",
+      "Shares Held": "2382000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -901,16 +892,25 @@
       "Ticker": "BTWMPV2",
       "Identifier": "BTWMPV2",
       "Weight": "0.46",
-      "Market Value": "2239426.51",
+      "Market Value": "2246825.13",
       "Shares Held": "2300000",
       "Asset Category": "Fund"
+    },
+    {
+      "Name": "Saudi Electricity Global Sukuk Co 3 5.5% 04/08/2044",
+      "Ticker": "BLCG6V5",
+      "Identifier": "BLCG6V5",
+      "Weight": "0.46",
+      "Market Value": "2276673",
+      "Shares Held": "2576000",
+      "Asset Category": "Fixed Income"
     },
     {
       "Name": "Ma'aden Sukuk Ltd 5.25% 02/13/2030",
       "Ticker": "BNM4RF4",
       "Identifier": "BNM4RF4",
       "Weight": "0.46",
-      "Market Value": "2269325.27",
+      "Market Value": "2270623.62",
       "Shares Held": "2328000",
       "Asset Category": "Fixed Income"
     },
@@ -919,7 +919,7 @@
       "Ticker": "BQLQ923",
       "Identifier": "BQLQ923",
       "Weight": "0.45",
-      "Market Value": "2216718.38",
+      "Market Value": "2216272.21",
       "Shares Held": "2269000",
       "Asset Category": "Fixed Income"
     },
@@ -928,17 +928,8 @@
       "Ticker": "BR2NP99",
       "Identifier": "BR2NP99",
       "Weight": "0.45",
-      "Market Value": "2220022.17",
+      "Market Value": "2223103.95",
       "Shares Held": "2250000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Malaysia Sovereign Sukuk Bhd 4.949% 07/30/2036",
-      "Ticker": "BRCB678",
-      "Identifier": "BRCB678",
-      "Weight": "0.44",
-      "Market Value": "2136879.01",
-      "Shares Held": "2180000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -946,26 +937,17 @@
       "Ticker": "BT9QYP4",
       "Identifier": "BT9QYP4",
       "Weight": "0.44",
-      "Market Value": "2134878.44",
+      "Market Value": "2136244.24",
       "Shares Held": "2200000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Saudi Electricity Sukuk Programme Co 4.942% 02/13/2029",
-      "Ticker": "BRBZNK3",
-      "Identifier": "BRBZNK3",
-      "Weight": "0.43",
-      "Market Value": "2087228.91",
-      "Shares Held": "2124000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Saudi Electricity Global Sukuk Co 2 5.06% 04/08/2043",
-      "Ticker": "B8FR766",
-      "Identifier": "B8FR766",
-      "Weight": "0.43",
-      "Market Value": "2111303.53",
-      "Shares Held": "2464000",
+      "Name": "Malaysia Sovereign Sukuk Bhd 4.949% 07/30/2036",
+      "Ticker": "BRCB678",
+      "Identifier": "BRCB678",
+      "Weight": "0.44",
+      "Market Value": "2145788.04",
+      "Shares Held": "2180000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -973,8 +955,17 @@
       "Ticker": "BV6KGS0",
       "Identifier": "BV6KGS0",
       "Weight": "0.43",
-      "Market Value": "2097980.78",
+      "Market Value": "2095403.15",
       "Shares Held": "2199000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Saudi Electricity Global Sukuk Co 2 5.06% 04/08/2043",
+      "Ticker": "B8FR766",
+      "Identifier": "B8FR766",
+      "Weight": "0.43",
+      "Market Value": "2109076.69",
+      "Shares Held": "2464000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -982,8 +973,17 @@
       "Ticker": "BP39MN5",
       "Identifier": "BP39MN5",
       "Weight": "0.43",
-      "Market Value": "2109205.02",
+      "Market Value": "2109572.6",
       "Shares Held": "2107000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Saudi Electricity Sukuk Programme Co 4.942% 02/13/2029",
+      "Ticker": "BRBZNK3",
+      "Identifier": "BRBZNK3",
+      "Weight": "0.43",
+      "Market Value": "2087491.12",
+      "Shares Held": "2124000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -991,26 +991,8 @@
       "Ticker": "BWPJHX7",
       "Identifier": "BWPJHX7",
       "Weight": "0.42",
-      "Market Value": "2038434.76",
+      "Market Value": "2038943.83",
       "Shares Held": "2135000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Dua Capital Ltd 2.78% 05/11/2031",
-      "Ticker": "BMV3KK1",
-      "Identifier": "BMV3KK1",
-      "Weight": "0.42",
-      "Market Value": "2044436.08",
-      "Shares Held": "2280000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Fab Sukuk Co Ltd 4.779% 01/23/2029",
-      "Ticker": "BR87487",
-      "Identifier": "BR87487",
-      "Weight": "0.42",
-      "Market Value": "2032169.99",
-      "Shares Held": "2059000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1018,17 +1000,26 @@
       "Ticker": "Y57542AA3",
       "Identifier": "Y57542AA3",
       "Weight": "0.42",
-      "Market Value": "2053009.37",
+      "Market Value": "2057107.01",
       "Shares Held": "2300000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 4.4% 03/01/2028",
-      "Ticker": "71567RAK2",
-      "Identifier": "71567RAK2",
-      "Weight": "0.41",
-      "Market Value": "2015050.63",
-      "Shares Held": "2029000",
+      "Name": "Fab Sukuk Co Ltd 4.779% 01/23/2029",
+      "Ticker": "BR87487",
+      "Identifier": "BR87487",
+      "Weight": "0.42",
+      "Market Value": "2033211.17",
+      "Shares Held": "2059000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Dua Capital Ltd 2.78% 05/11/2031",
+      "Ticker": "BMV3KK1",
+      "Identifier": "BMV3KK1",
+      "Weight": "0.42",
+      "Market Value": "2047632.93",
+      "Shares Held": "2280000",
       "Asset Category": "Equity"
     },
     {
@@ -1036,16 +1027,25 @@
       "Ticker": "BKSC1D7",
       "Identifier": "BKSC1D7",
       "Weight": "0.41",
-      "Market Value": "2009693.07",
+      "Market Value": "2010448.55",
       "Shares Held": "2275000",
       "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 4.4% 03/01/2028",
+      "Ticker": "71567RAK2",
+      "Identifier": "71567RAK2",
+      "Weight": "0.41",
+      "Market Value": "2014462.22",
+      "Shares Held": "2029000",
+      "Asset Category": "Equity"
     },
     {
       "Name": "National Central Cooling Co PJSC 5.279% 03/05/2030",
       "Ticker": "BSKQPX1",
       "Identifier": "BSKQPX1",
       "Weight": "0.39",
-      "Market Value": "1919919.63",
+      "Market Value": "1920154.98",
       "Shares Held": "1950000",
       "Asset Category": "Equity"
     },
@@ -1054,7 +1054,7 @@
       "Ticker": "BTGTP53",
       "Identifier": "BTGTP53",
       "Weight": "0.39",
-      "Market Value": "1914823.62",
+      "Market Value": "1915695.03",
       "Shares Held": "1937000",
       "Asset Category": "Fixed Income"
     },
@@ -1063,7 +1063,16 @@
       "Ticker": "BFD1J96",
       "Identifier": "BFD1J96",
       "Weight": "0.39",
-      "Market Value": "1925957.07",
+      "Market Value": "1925133.47",
+      "Shares Held": "1937000",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.1% 07/02/2029",
+      "Ticker": "BQH8HG3",
+      "Identifier": "BQH8HG3",
+      "Weight": "0.39",
+      "Market Value": "1926462.72",
       "Shares Held": "1937000",
       "Asset Category": "Equity"
     },
@@ -1072,26 +1081,17 @@
       "Ticker": "BRK4C26",
       "Identifier": "BRK4C26",
       "Weight": "0.39",
-      "Market Value": "1928328.4",
+      "Market Value": "1928093.79",
       "Shares Held": "1937000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.1% 07/02/2029",
-      "Ticker": "BQH8HG3",
-      "Identifier": "BQH8HG3",
-      "Weight": "0.39",
-      "Market Value": "1926559.57",
-      "Shares Held": "1937000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "APICORP Sukuk Ltd 4.686% 06/16/2031",
-      "Ticker": "BWRXLX5",
-      "Identifier": "BWRXLX5",
+      "Name": "Esic Sukuk Ltd 5.831% 02/14/2029",
+      "Ticker": "BRPS1V5",
+      "Identifier": "BRPS1V5",
       "Weight": "0.38",
-      "Market Value": "1854644.76",
-      "Shares Held": "1900000",
+      "Market Value": "1863472.9",
+      "Shares Held": "1869000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1099,8 +1099,17 @@
       "Ticker": "BP486M8",
       "Identifier": "BP486M8",
       "Weight": "0.38",
-      "Market Value": "1859682.18",
+      "Market Value": "1854339.06",
       "Shares Held": "1950000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "APICORP Sukuk Ltd 4.686% 06/16/2031",
+      "Ticker": "BWRXLX5",
+      "Identifier": "BWRXLX5",
+      "Weight": "0.38",
+      "Market Value": "1854156.02",
+      "Shares Held": "1900000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1108,53 +1117,17 @@
       "Ticker": "BPJM0M3",
       "Identifier": "BPJM0M3",
       "Weight": "0.38",
-      "Market Value": "1853215.27",
+      "Market Value": "1854274.56",
       "Shares Held": "1869000",
       "Asset Category": "Equity"
-    },
-    {
-      "Name": "Esic Sukuk Ltd 5.831% 02/14/2029",
-      "Ticker": "BRPS1V5",
-      "Identifier": "BRPS1V5",
-      "Weight": "0.38",
-      "Market Value": "1866055.67",
-      "Shares Held": "1869000",
-      "Asset Category": "Fixed Income"
     },
     {
       "Name": "EI Sukuk Co Ltd 4.54% 03/23/2031",
       "Ticker": "BQT3HY4",
       "Identifier": "BQT3HY4",
       "Weight": "0.38",
-      "Market Value": "1845836.38",
+      "Market Value": "1846452.29",
       "Shares Held": "1935000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "AL Jawaher Assets Co Spc 4.662% 10/29/2030",
-      "Ticker": "BV3PWK2",
-      "Identifier": "BV3PWK2",
-      "Weight": "0.37",
-      "Market Value": "1828986.37",
-      "Shares Held": "1937000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Emaar Sukuk Ltd 3.7% 07/06/2031",
-      "Ticker": "BND89Z9",
-      "Identifier": "BND89Z9",
-      "Weight": "0.37",
-      "Market Value": "1797369.91",
-      "Shares Held": "1950000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "BSF Sukuk Co Ltd 4.75% 05/31/2028",
-      "Ticker": "BR2Q0M6",
-      "Identifier": "BR2Q0M6",
-      "Weight": "0.37",
-      "Market Value": "1787766.57",
-      "Shares Held": "1811000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1162,26 +1135,44 @@
       "Ticker": "BRBQDD9",
       "Identifier": "BRBQDD9",
       "Weight": "0.37",
-      "Market Value": "1813733.95",
+      "Market Value": "1813187.14",
       "Shares Held": "1869000",
       "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Emaar Sukuk Ltd 3.7% 07/06/2031",
+      "Ticker": "BND89Z9",
+      "Identifier": "BND89Z9",
+      "Weight": "0.37",
+      "Market Value": "1803543.61",
+      "Shares Held": "1950000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "AL Jawaher Assets Co Spc 4.662% 10/29/2030",
+      "Ticker": "BV3PWK2",
+      "Identifier": "BV3PWK2",
+      "Weight": "0.37",
+      "Market Value": "1829037.26",
+      "Shares Held": "1937000",
+      "Asset Category": "Equity"
     },
     {
       "Name": "STC Sukuk Co II Ltd 4.489% 01/15/2031",
       "Ticker": "BS48834",
       "Identifier": "BS48834",
       "Weight": "0.36",
-      "Market Value": "1763227.96",
+      "Market Value": "1763582.92",
       "Shares Held": "1859000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "BSF Sukuk Co Ltd 5% 01/25/2029",
-      "Ticker": "BRJSMH4",
-      "Identifier": "BRJSMH4",
-      "Weight": "0.35",
-      "Market Value": "1711125.97",
-      "Shares Held": "1733000",
+      "Name": "BSF Sukuk Co Ltd 4.75% 05/31/2028",
+      "Ticker": "BR2Q0M6",
+      "Identifier": "BR2Q0M6",
+      "Weight": "0.36",
+      "Market Value": "1787453.16",
+      "Shares Held": "1811000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1189,17 +1180,17 @@
       "Ticker": "BR2PN46",
       "Identifier": "BR2PN46",
       "Weight": "0.35",
-      "Market Value": "1722132.94",
+      "Market Value": "1722189.31",
       "Shares Held": "1800000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "MAF Sukuk Ltd 3.9325% 02/28/2030",
-      "Ticker": "BKWBF94",
-      "Identifier": "BKWBF94",
-      "Weight": "0.34",
-      "Market Value": "1655016.41",
-      "Shares Held": "1750000",
+      "Name": "BSF Sukuk Co Ltd 5% 01/25/2029",
+      "Ticker": "BRJSMH4",
+      "Identifier": "BRJSMH4",
+      "Weight": "0.35",
+      "Market Value": "1706399.26",
+      "Shares Held": "1733000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1207,7 +1198,7 @@
       "Ticker": "BXXNMN3",
       "Identifier": "BXXNMN3",
       "Weight": "0.34",
-      "Market Value": "1659106.02",
+      "Market Value": "1656611.68",
       "Shares Held": "1700000",
       "Asset Category": "Fixed Income"
     },
@@ -1216,8 +1207,17 @@
       "Ticker": "BSRK4K6",
       "Identifier": "BSRK4K6",
       "Weight": "0.34",
-      "Market Value": "1662166.65",
+      "Market Value": "1662291.49",
       "Shares Held": "1699000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "MAF Sukuk Ltd 3.9325% 02/28/2030",
+      "Ticker": "BKWBF94",
+      "Identifier": "BKWBF94",
+      "Weight": "0.34",
+      "Market Value": "1655875.45",
+      "Shares Held": "1750000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1225,35 +1225,26 @@
       "Ticker": "BRWKS80",
       "Identifier": "BRWKS80",
       "Weight": "0.34",
-      "Market Value": "1655896.62",
+      "Market Value": "1650588.66",
       "Shares Held": "1869000",
       "Asset Category": "Equity"
-    },
-    {
-      "Name": "DAE Sukuk Difc Ltd 4.5% 10/16/2030",
-      "Ticker": "BTMMRL6",
-      "Identifier": "BTMMRL6",
-      "Weight": "0.33",
-      "Market Value": "1609300.55",
-      "Shares Held": "1696000",
-      "Asset Category": "Fixed Income"
     },
     {
       "Name": "Sharjah Sukuk Program Ltd 3.886% 04/04/2030",
       "Ticker": "BP8L128",
       "Identifier": "BP8L128",
       "Weight": "0.33",
-      "Market Value": "1636644.35",
+      "Market Value": "1635010.39",
       "Shares Held": "1750000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Fab Sukuk Co Ltd 5.153% 01/16/2030",
-      "Ticker": "BTKTD44",
-      "Identifier": "BTKTD44",
-      "Weight": "0.32",
-      "Market Value": "1580955.21",
-      "Shares Held": "1601000",
+      "Name": "DAE Sukuk Difc Ltd 4.5% 10/16/2030",
+      "Ticker": "BTMMRL6",
+      "Identifier": "BTMMRL6",
+      "Weight": "0.33",
+      "Market Value": "1610756.24",
+      "Shares Held": "1696000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1261,7 +1252,7 @@
       "Ticker": "BX7WL40",
       "Identifier": "BX7WL40",
       "Weight": "0.32",
-      "Market Value": "1547161.46",
+      "Market Value": "1549463.86",
       "Shares Held": "1600000",
       "Asset Category": "Fixed Income"
     },
@@ -1270,8 +1261,17 @@
       "Ticker": "BK6QWG1",
       "Identifier": "BK6QWG1",
       "Weight": "0.32",
-      "Market Value": "1557749.01",
+      "Market Value": "1554282.31",
       "Shares Held": "1597000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Fab Sukuk Co Ltd 5.153% 01/16/2030",
+      "Ticker": "BTKTD44",
+      "Identifier": "BTKTD44",
+      "Weight": "0.32",
+      "Market Value": "1581595.59",
+      "Shares Held": "1601000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1279,7 +1279,7 @@
       "Ticker": "BPK85K3",
       "Identifier": "BPK85K3",
       "Weight": "0.31",
-      "Market Value": "1495649.58",
+      "Market Value": "1496028.91",
       "Shares Held": "1535000",
       "Asset Category": "Fixed Income"
     },
@@ -1288,7 +1288,7 @@
       "Ticker": "BJLBK71",
       "Identifier": "BJLBK71",
       "Weight": "0.3",
-      "Market Value": "1449479.23",
+      "Market Value": "1446499.74",
       "Shares Held": "1550000",
       "Asset Category": "Equity"
     },
@@ -1297,7 +1297,7 @@
       "Ticker": "BTQLGW3",
       "Identifier": "BTQLGW3",
       "Weight": "0.29",
-      "Market Value": "1438603.01",
+      "Market Value": "1439384.94",
       "Shares Held": "1480000",
       "Asset Category": "Fixed Income"
     },
@@ -1306,8 +1306,17 @@
       "Ticker": "BR2Q8K0",
       "Identifier": "BR2Q8K0",
       "Weight": "0.29",
-      "Market Value": "1429362.62",
+      "Market Value": "1429959.38",
       "Shares Held": "1437000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Ajman Senior Sukuk Ltd 5.125% 04/30/2030",
+      "Ticker": "BT7L5W5",
+      "Identifier": "BT7L5W5",
+      "Weight": "0.28",
+      "Market Value": "1363705.63",
+      "Shares Held": "1400000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1315,34 +1324,70 @@
       "Ticker": "BKWGXD9",
       "Identifier": "BKWGXD9",
       "Weight": "0.28",
-      "Market Value": "1381273.62",
+      "Market Value": "1384966.57",
       "Shares Held": "1550000",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Ajman Senior Sukuk Ltd 5.125% 04/30/2030",
-      "Ticker": "BT7L5W5",
-      "Identifier": "BT7L5W5",
-      "Weight": "0.28",
-      "Market Value": "1363736.36",
-      "Shares Held": "1400000",
+      "Name": "ICDPS Sukuk Ltd 4.391% 10/09/2030",
+      "Ticker": "BRC1WZ8",
+      "Identifier": "BRC1WZ8",
+      "Weight": "0.27",
+      "Market Value": "1340660.44",
+      "Shares Held": "1385000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.5% 07/02/2054",
-      "Ticker": "BQH89R8",
-      "Identifier": "BQH89R8",
-      "Weight": "0.28",
-      "Market Value": "1347446.67",
-      "Shares Held": "1563000",
-      "Asset Category": "Equity"
+      "Name": "SIB Sukuk Co III Ltd 5.2% 02/26/2030",
+      "Ticker": "BTLR110",
+      "Identifier": "BTLR110",
+      "Weight": "0.27",
+      "Market Value": "1324441.4",
+      "Shares Held": "1350000",
+      "Asset Category": "Fixed Income"
     },
     {
       "Name": "Khazanah Global Sukuk Bhd 4.484% 09/05/2029",
       "Ticker": "BSY54K4",
       "Identifier": "BSY54K4",
       "Weight": "0.27",
-      "Market Value": "1301540.36",
+      "Market Value": "1302430.19",
+      "Shares Held": "1325000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Mashreq AL Islami Sukuk Co Ltd 5.03% 04/22/2030",
+      "Ticker": "BV8FT17",
+      "Identifier": "BV8FT17",
+      "Weight": "0.27",
+      "Market Value": "1319650.37",
+      "Shares Held": "1342000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Perusahaan Penerbit SBSN Indonesia III 5.5% 07/02/2054",
+      "Ticker": "BQH89R8",
+      "Identifier": "BQH89R8",
+      "Weight": "0.27",
+      "Market Value": "1340772.66",
+      "Shares Held": "1563000",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Mazoon Assets Co SAOC 5.5% 02/14/2029",
+      "Ticker": "BRPS3M0",
+      "Identifier": "BRPS3M0",
+      "Weight": "0.27",
+      "Market Value": "1301628.5",
+      "Shares Held": "1315000",
+      "Asset Category": "Equity"
+    },
+    {
+      "Name": "Warba Sukuk Ltd 5.351% 07/10/2029",
+      "Ticker": "BT6MM06",
+      "Identifier": "BT6MM06",
+      "Weight": "0.27",
+      "Market Value": "1308332.19",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
@@ -1351,17 +1396,8 @@
       "Ticker": "BSHRGP6",
       "Identifier": "BSHRGP6",
       "Weight": "0.27",
-      "Market Value": "1318284.25",
+      "Market Value": "1320400.69",
       "Shares Held": "1325000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "SIB Sukuk Co III Ltd 5.2% 02/26/2030",
-      "Ticker": "BTLR110",
-      "Identifier": "BTLR110",
-      "Weight": "0.27",
-      "Market Value": "1323875.84",
-      "Shares Held": "1350000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1369,70 +1405,7 @@
       "Ticker": "BQCZDC7",
       "Identifier": "BQCZDC7",
       "Weight": "0.27",
-      "Market Value": "1315772.44",
-      "Shares Held": "1325000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "ICDPS Sukuk Ltd 4.391% 10/09/2030",
-      "Ticker": "BRC1WZ8",
-      "Identifier": "BRC1WZ8",
-      "Weight": "0.27",
-      "Market Value": "1336247.04",
-      "Shares Held": "1385000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Mashreq AL Islami Sukuk Co Ltd 5.03% 04/22/2030",
-      "Ticker": "BV8FT17",
-      "Identifier": "BV8FT17",
-      "Weight": "0.27",
-      "Market Value": "1318590.42",
-      "Shares Held": "1342000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Warba Sukuk Ltd 5.351% 07/10/2029",
-      "Ticker": "BT6MM06",
-      "Identifier": "BT6MM06",
-      "Weight": "0.27",
-      "Market Value": "1307898.64",
-      "Shares Held": "1325000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Mazoon Assets Co SAOC 5.5% 02/14/2029",
-      "Ticker": "BRPS3M0",
-      "Identifier": "BRPS3M0",
-      "Weight": "0.27",
-      "Market Value": "1301607",
-      "Shares Held": "1315000",
-      "Asset Category": "Equity"
-    },
-    {
-      "Name": "Adib Sukuk Co II Ltd 5.695% 11/15/2028",
-      "Ticker": "BMG9H69",
-      "Identifier": "BMG9H69",
-      "Weight": "0.26",
-      "Market Value": "1295696.67",
-      "Shares Held": "1291000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Aercap Sukuk Ltd/ Cayman Islands 4.5% 10/03/2029",
-      "Ticker": "BRV46T0",
-      "Identifier": "BRV46T0",
-      "Weight": "0.26",
-      "Market Value": "1284924.95",
-      "Shares Held": "1325000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "Aldar Sukuk No 2 Ltd 3.875% 10/22/2029",
-      "Ticker": "BKT2JY3",
-      "Identifier": "BKT2JY3",
-      "Weight": "0.26",
-      "Market Value": "1258276.8",
+      "Market Value": "1315055.8",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
@@ -1441,8 +1414,17 @@
       "Ticker": "BR2NPH7",
       "Identifier": "BR2NPH7",
       "Weight": "0.26",
-      "Market Value": "1276218.31",
+      "Market Value": "1276126.39",
       "Shares Held": "1291000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Boubyan Sukuk Ltd 4.973% 06/04/2030",
+      "Ticker": "BTNMLJ1",
+      "Identifier": "BTNMLJ1",
+      "Weight": "0.26",
+      "Market Value": "1288831.04",
+      "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1450,7 +1432,7 @@
       "Ticker": "BSSD8M4",
       "Identifier": "BSSD8M4",
       "Weight": "0.26",
-      "Market Value": "1291938.76",
+      "Market Value": "1292019.27",
       "Shares Held": "1325000",
       "Asset Category": "Equity"
     },
@@ -1459,16 +1441,16 @@
       "Ticker": "BSJN5T9",
       "Identifier": "BSJN5T9",
       "Weight": "0.26",
-      "Market Value": "1265373.29",
+      "Market Value": "1265491.72",
       "Shares Held": "1300000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Boubyan Sukuk Ltd 4.973% 06/04/2030",
-      "Ticker": "BTNMLJ1",
-      "Identifier": "BTNMLJ1",
+      "Name": "Aercap Sukuk Ltd/ Cayman Islands 4.5% 10/03/2029",
+      "Ticker": "BRV46T0",
+      "Identifier": "BRV46T0",
       "Weight": "0.26",
-      "Market Value": "1288703",
+      "Market Value": "1286507.86",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
@@ -1477,17 +1459,26 @@
       "Ticker": "BKV2KY8",
       "Identifier": "BKV2KY8",
       "Weight": "0.26",
-      "Market Value": "1269515.92",
+      "Market Value": "1268939",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
     {
-      "Name": "Saudi Electricity Global Sukuk Co 5 2.413% 09/17/2030",
-      "Ticker": "BM98CS0",
-      "Identifier": "BM98CS0",
-      "Weight": "0.25",
-      "Market Value": "1234224.31",
-      "Shares Held": "1400000",
+      "Name": "Adib Sukuk Co II Ltd 5.695% 11/15/2028",
+      "Ticker": "BMG9H69",
+      "Identifier": "BMG9H69",
+      "Weight": "0.26",
+      "Market Value": "1294190.85",
+      "Shares Held": "1291000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Aldar Sukuk No 2 Ltd 3.875% 10/22/2029",
+      "Ticker": "BKT2JY3",
+      "Identifier": "BKT2JY3",
+      "Weight": "0.26",
+      "Market Value": "1258033.89",
+      "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1495,17 +1486,8 @@
       "Ticker": "BQT3GK3",
       "Identifier": "BQT3GK3",
       "Weight": "0.25",
-      "Market Value": "1238664.29",
+      "Market Value": "1239463.27",
       "Shares Held": "1308000",
-      "Asset Category": "Fixed Income"
-    },
-    {
-      "Name": "MAF Sukuk Ltd 4.875% 10/22/2035",
-      "Ticker": "BVPWCG7",
-      "Identifier": "BVPWCG7",
-      "Weight": "0.25",
-      "Market Value": "1221557.55",
-      "Shares Held": "1315000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1513,17 +1495,35 @@
       "Ticker": "BQ3R6T0",
       "Identifier": "BQ3R6T0",
       "Weight": "0.25",
-      "Market Value": "1230216.73",
+      "Market Value": "1231780.16",
       "Shares Held": "1281000",
       "Asset Category": "Equity"
     },
     {
-      "Name": "APICORP Sukuk Ltd 4.721% 02/03/2036",
-      "Ticker": "BWRQQY0",
-      "Identifier": "BWRQQY0",
+      "Name": "MAF Sukuk Ltd 4.875% 10/22/2035",
+      "Ticker": "BVPWCG7",
+      "Identifier": "BVPWCG7",
+      "Weight": "0.25",
+      "Market Value": "1219160.46",
+      "Shares Held": "1315000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Saudi Electricity Global Sukuk Co 5 2.413% 09/17/2030",
+      "Ticker": "BM98CS0",
+      "Identifier": "BM98CS0",
+      "Weight": "0.25",
+      "Market Value": "1234793.9",
+      "Shares Held": "1400000",
+      "Asset Category": "Fixed Income"
+    },
+    {
+      "Name": "Saudi Electricity Sukuk Programme Co 4.31% 01/22/2029",
+      "Ticker": "BVMLPB3",
+      "Identifier": "BVMLPB3",
       "Weight": "0.24",
-      "Market Value": "1179000.84",
-      "Shares Held": "1274000",
+      "Market Value": "1185742.36",
+      "Shares Held": "1223000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1531,17 +1531,17 @@
       "Ticker": "71567RAT3",
       "Identifier": "71567RAT3",
       "Weight": "0.24",
-      "Market Value": "1193779.2",
+      "Market Value": "1193548.8",
       "Shares Held": "1920000",
       "Asset Category": "Equity"
     },
     {
-      "Name": "Saudi Electricity Sukuk Programme Co 4.31% 01/22/2029",
-      "Ticker": "BVMLPB3",
-      "Identifier": "BVMLPB3",
+      "Name": "APICORP Sukuk Ltd 4.721% 02/03/2036",
+      "Ticker": "BWRQQY0",
+      "Identifier": "BWRQQY0",
       "Weight": "0.24",
-      "Market Value": "1185621.79",
-      "Shares Held": "1223000",
+      "Market Value": "1180195.29",
+      "Shares Held": "1274000",
       "Asset Category": "Fixed Income"
     },
     {
@@ -1549,7 +1549,7 @@
       "Ticker": "Y5749LAB7",
       "Identifier": "Y5749LAB7",
       "Weight": "0.23",
-      "Market Value": "1112466.82",
+      "Market Value": "1104143.01",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
@@ -1558,7 +1558,7 @@
       "Ticker": "Y54788AB3",
       "Identifier": "Y54788AB3",
       "Weight": "0.22",
-      "Market Value": "1080544.79",
+      "Market Value": "1088379.12",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
@@ -1567,7 +1567,7 @@
       "Ticker": "BNHVS80",
       "Identifier": "BNHVS80",
       "Weight": "0.22",
-      "Market Value": "1058413.72",
+      "Market Value": "1060226.82",
       "Shares Held": "1063000",
       "Asset Category": "Fixed Income"
     },
@@ -1576,7 +1576,7 @@
       "Ticker": "C087380",
       "Identifier": "C087380",
       "Weight": "0.2",
-      "Market Value": "992926.21",
+      "Market Value": "994286.73",
       "Shares Held": "1000000",
       "Asset Category": "Fixed Income"
     },
@@ -1585,7 +1585,7 @@
       "Ticker": "Y57542AB1",
       "Identifier": "Y57542AB1",
       "Weight": "0.18",
-      "Market Value": "874704.41",
+      "Market Value": "882479.12",
       "Shares Held": "1325000",
       "Asset Category": "Fixed Income"
     },
@@ -1594,10 +1594,10 @@
       "Ticker": "BLPHWG2",
       "Identifier": "BLPHWG2",
       "Weight": "0.17",
-      "Market Value": "854017.72",
+      "Market Value": "854353.54",
       "Shares Held": "1000000",
       "Asset Category": "Fixed Income"
     }
   ],
-  "asOfDate": "2026-11-25"
+  "asOfDate": "2026-11-27"
 }

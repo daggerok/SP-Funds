@@ -12,12 +12,12 @@
   "navValue": 17.44,
   "aum": "$489.57M",
   "aumValue": 489570000,
-  "asOfDate": "2026-11-24",
+  "asOfDate": "2026-11-25",
   "inceptionDate": "2019-12-27",
   "exchange": "NYSE",
   "closePrice": "$17.42",
   "closePriceValue": 17.42,
-  "closePriceAsOfDate": "2026-11-24",
+  "closePriceAsOfDate": "2026-11-25",
   "premiumDiscount": "-0.10%",
   "premiumDiscountValue": -0.1,
   "sharesOutstanding": 28075000,
@@ -442,7 +442,7 @@
     ],
     "pageSize": 250,
     "totalRows": 176,
-    "asOfDate": "2026-11-25"
+    "asOfDate": "2026-11-27"
   },
   "history": {
     "pages": [
@@ -453,7 +453,7 @@
     "totalRows": 1736,
     "asOfDate": "2026-11-25"
   },
-  "generatedAt": "2026-11-25T23:14:59Z",
+  "generatedAt": "2026-11-26T09:32:34Z",
   "netTerValue": 0.5,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
