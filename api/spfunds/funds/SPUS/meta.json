@@ -450,10 +450,10 @@
       "history/002.json"
     ],
     "pageSize": 1000,
-    "totalRows": 1744,
-    "asOfDate": "2026-11-25"
+    "totalRows": 1745,
+    "asOfDate": "2026-11-27"
   },
-  "generatedAt": "2026-11-26T21:45:13Z",
+  "generatedAt": "2026-11-27T22:53:11Z",
   "netTerValue": 0.45,
   "source": {
     "provider": "SP Funds (Sharia-compliant ETFs)",
